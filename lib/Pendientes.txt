@@ -1,0 +1,10 @@
+Inventigar Sqflite para flutter
+
+
+
+Verificar los campos que llevara el producto la pantalla de products 
+
+--- Verificar video para realizar el ejemplo. 
+
+
+
