@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:femovil/assets/nav_bar_bottom.dart';
 import 'package:femovil/presentation/perfil/perfil.dart';
+import 'package:femovil/presentation/clients/clients_screen.dart';
 import 'package:femovil/presentation/products/products_screen.dart';
 import 'package:femovil/presentation/screen/login/progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart';
 
 dynamic documentosPorTipo = {};
 bool flag = false;
@@ -126,30 +128,38 @@ class HomeState extends State<Home> {
                       ),
                     ),
                     const SizedBox(width: 100),
-                     Column(
+                     GestureDetector(
+                      onTap: (){
 
-                      children: [
-                      const Text("Clientes"),
-                        Image.network(
-                                    'https://www.clienteindiscreto.com/wp/wp-content/uploads/2018/10/tipos-de-clientes-parte-ii.jpg', 
-                                      width: 100,
-                                      height: 100,
-                                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
-                                      return CircularProgressIndicator(
-                                        value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                        : null,
-                                      );
-                                    },
-                                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                                      return const Text('No se pudo cargar la imagen');
-                                    },
-                                  ),
-                      ],
-                    ),
+                       Navigator.push(context, MaterialPageRoute(builder:(context) => const Clients(),));
+
+
+                      },
+                       child: Column(
+                       
+                        children: [
+                        const Text("Clientes"),
+                          Image.network(
+                                      'https://www.clienteindiscreto.com/wp/wp-content/uploads/2018/10/tipos-de-clientes-parte-ii.jpg', 
+                                        width: 100,
+                                        height: 100,
+                                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                          : null,
+                                        );
+                                      },
+                                      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                        return const Text('No se pudo cargar la imagen');
+                                      },
+                                    ),
+                        ],
+                                           ),
+                     ),
                   ],
                 ),
                  Row(

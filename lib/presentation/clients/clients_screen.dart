@@ -1,43 +1,37 @@
 import 'package:femovil/database/create_database.dart';
-import 'package:femovil/presentation/products/add_products.dart';
-import 'package:femovil/presentation/products/filter_dialog.dart';
-import 'package:femovil/presentation/products/products_details.dart';
+import 'package:femovil/presentation/clients/add_clients.dart';
+import 'package:femovil/presentation/clients/clients_details.dart';
+import 'package:femovil/presentation/clients/filter_dialog_clients.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
 
 
 
 
 
 
-class Products extends StatefulWidget {
-  const Products({super.key});
+class Clients extends StatefulWidget {
+  const Clients({super.key});
 
   @override
-  State<Products> createState() => _ProductsState();
+  State<Clients> createState() => _ClientsState();
 }
 
-class _ProductsState extends State<Products> {
+class _ClientsState extends State<Clients> {
  String _filter = "";
-  late List<Map<String, dynamic>> products = [];
-  List<Map<String, dynamic>> filteredProducts = [];
+  late List<Map<String, dynamic>> clients = [];
+  List<Map<String, dynamic>> searchClient = [];
   TextEditingController searchController = TextEditingController();
   String input = "";
 
   Future<void> _loadProducts() async {
-    final productos = await DatabaseHelper.instance.getProducts(); // Obtener todos los productos
+    final clientes = await DatabaseHelper.instance.getClients(); // Obtener todos los productos
 
-    print("Estoy obteniendo products $products");
+    print("Estoy obteniendo Clientes $clientes");
     setState(() {
-      products = productos;
-      filteredProducts = productos;
+      clients = clientes;
+      searchClient = clientes;
     });
-  }
 
-
-  Future<void> _deleteBaseDatos() async {
-    final productos = await DatabaseHelper.instance.deleteDatabases(); // Obtener todos los productos
-      
 
   }
 
@@ -45,7 +39,7 @@ class _ProductsState extends State<Products> {
   void _showFilterOptions(BuildContext context) async {
     final selectedFilter = await showDialog<String>(
       context: context,
-      builder: (context) => FilterCategories(products: products,), // Reemplaza YourFilterDialog con tu widget de filtro
+      builder: (context) => FilterGroups(clients: clients,), // Reemplaza YourFilterDialog con tu widget de filtro
     );
 
     print("Esto es el valor del select $selectedFilter");
@@ -66,6 +60,7 @@ class _ProductsState extends State<Products> {
 
       _loadProducts();
       super.initState();
+
   }
 
   
@@ -74,7 +69,7 @@ class _ProductsState extends State<Products> {
 
      if(input == ""){
 
-        filteredProducts = products.toList();
+        searchClient = clients.toList();
 
     }
  
@@ -85,28 +80,36 @@ class _ProductsState extends State<Products> {
             searchController.clear();
             input = "";
 
-            filteredProducts = products.toList();
+            searchClient = clients.toList();
           } else {
-            filteredProducts = products.where((product) => product['categoria'] == _filter).toList();
+            searchClient = clients.where((client) => client['grupo'] == _filter).toList();
+            print("Este es el searchClient $searchClient");
           }
           input = ""; // Limpiar el campo de búsqueda al filtrar por categoría
         });
       } else if (input != "") {
+        print("Estoy entrando en el input cuando no esta vacio ");
         setState(() {
-          filteredProducts = products.where((product) => product['name'].toLowerCase().contains(input.toLowerCase())).toList();
+          searchClient = clients.where((client) {
+            final name = client['name'].toString().toLowerCase();
+            final ruc = client['ruc'].toString().toLowerCase();
+            final inputLower = input.toLowerCase();
+            return name.contains(inputLower) || ruc.contains(inputLower);
+          }).toList();
+          print("Estos son los clientes por grupo $searchClient $input");
         });
       }
 
       if(_filter != "" && _filter != "Todos"){
           
-          filteredProducts = products.where((product) => product['categoria'] == _filter).toList();
+          searchClient = clients.where((client) => client['grupo'] == _filter).toList();
           searchController.clear();
           input = "";
       }else if(_filter == "Todos"){
           searchController.clear();
           input = "";
     
-            filteredProducts = products.toList();
+            searchClient = clients.toList();
       }
 
 
@@ -117,7 +120,7 @@ class _ProductsState extends State<Products> {
       backgroundColor: const Color.fromARGB(255, 236, 247, 255),
       appBar: AppBar(
         title: const Text(
-          "Productos",
+          "Clientes",
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w400,
@@ -164,13 +167,27 @@ class _ProductsState extends State<Products> {
                setState(() {
                 input = value;
               print("Este es el valor $value");
-                  filteredProducts = products.where((product) => product['name'].toLowerCase().contains(value.toLowerCase())).toList();
-                  print("cual es el valor de filteredproducts $filteredProducts");
+
+                searchClient = clients.where((client) {
+                  final valueLower = value.toLowerCase();
+                  if (int.tryParse(valueLower) != null) {
+                    // Si el valor se puede convertir a un número entero, buscar por ruc
+                    final ruc = client['ruc'].toString().toLowerCase();
+                    return ruc.contains(valueLower);
+                  } else {
+                    // Si no se puede convertir a un número entero, buscar por nombre
+                    final name = client['name'].toString().toLowerCase();
+                    return name.contains(valueLower);
+                  }
+                }).toList();
+
+
+                  print("cual es el valor de filteredproducts $searchClient");
                 });
       
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Buscar por nombre',
+                  labelText: 'Buscar por nombre o Ruc',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
                 ),
@@ -178,10 +195,10 @@ class _ProductsState extends State<Products> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: filteredProducts.length,
+                itemCount: searchClient.length,
                 itemBuilder: (context, index) {
       
-                  final product = filteredProducts[index];
+                  final client = searchClient[index];
       
       
       
@@ -198,8 +215,7 @@ class _ProductsState extends State<Products> {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              product['categoria'],
+                            child: Text(' RUC ${client['ruc'].toString()}',
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
                               textAlign: TextAlign.center,
                             ),
@@ -213,11 +229,11 @@ class _ProductsState extends State<Products> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Nombre: ${product['name']}'),
-                                Text('Precio: \$${product['price']}'),
-                                Text('Cantidad: ${product['quantity']}'),
-                                Text('Stock mínimo: ${product['min_stock']}'),
-                                Text('Stock máximo: ${product['max_stock']}'),
+                                Text('Nombre: ${client['name']}'),
+                                Text('Ruc: ${client['ruc'].toString()}'),
+                                Text('Correo: ${client['correo']}'),
+                                Text('Telefono: ${client['telefono'].toString()}'),
+                                Text('Grupo: ${client['grupo']}'),
                               ],
                             ),
                           ),
@@ -226,7 +242,7 @@ class _ProductsState extends State<Products> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             TextButton(
-                              onPressed: () => _verMasProducto('${product['id']}'),
+                              onPressed: () => _verMasClient('${client['id']}'),
                               style: TextButton.styleFrom(
                                 backgroundColor: Colors.grey,
                                 foregroundColor: Colors.white,
@@ -245,8 +261,6 @@ class _ProductsState extends State<Products> {
                 },
               ),
             ),
-            //esto para abajo es el navbar bottom 
-           
            
 
           ],
@@ -281,7 +295,7 @@ class _ProductsState extends State<Products> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AddProductForm()),
+              MaterialPageRoute(builder: (context) => const AddClientsForm()),
             );
           },
           child: const Icon(Icons.add),
@@ -309,17 +323,17 @@ class _ProductsState extends State<Products> {
     );
   }
 
-    void _verMasProducto(String productId) async {
+    void _verMasClient(String clientId) async {
     final db = await DatabaseHelper.instance.database;
     if (db != null) {
-      final product = await db.query(
-        'products',
+      final client = await db.query(
+        'clients',
         where: 'id = ?',
-        whereArgs: [int.parse(productId)],
+        whereArgs: [int.parse(clientId)],
       );
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ProductDetailsScreen(product: product.first)),
+        MaterialPageRoute(builder: (context) => ClientDetailsScreen(client: client.first)),
       );
     } else {
       print('Error: db is null');
@@ -328,9 +342,11 @@ class _ProductsState extends State<Products> {
 }
 
 
-class ProductFilter {
-  final String? category;
+class ClientFilter {
+  final String? grupo;
   final String? name;
 
-  ProductFilter({this.category, this.name});
+  ClientFilter({this.grupo, this.name});
+
+
 }
