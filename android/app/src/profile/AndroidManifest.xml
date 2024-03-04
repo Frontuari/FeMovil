@@ -13,4 +13,6 @@
     <!-- Asegura el permiso para acceder a la ubicación del dispositivo -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+
+
 </manifest>

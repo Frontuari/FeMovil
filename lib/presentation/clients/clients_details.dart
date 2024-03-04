@@ -1,5 +1,4 @@
 import 'package:femovil/presentation/clients/edit_clients.dart';
-import 'package:femovil/presentation/products/edit_product.dart';
 import 'package:flutter/material.dart';
 
 class ClientDetailsScreen extends StatelessWidget {

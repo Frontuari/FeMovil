@@ -43,6 +43,7 @@ import 'package:path/path.dart' as path;
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT,
           quantity INTEGER,
+          image_path TEXT, 
           price REAL,
           min_stock INTEGER,
           max_stock INTEGER,

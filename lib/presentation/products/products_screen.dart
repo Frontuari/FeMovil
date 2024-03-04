@@ -63,7 +63,6 @@ class _ProductsState extends State<Products> {
 
   @override
   void initState(){
-
       _loadProducts();
       super.initState();
   }
@@ -321,6 +320,7 @@ class _ProductsState extends State<Products> {
         context,
         MaterialPageRoute(builder: (context) => ProductDetailsScreen(product: product.first)),
       );
+      
     } else {
       print('Error: db is null');
     }

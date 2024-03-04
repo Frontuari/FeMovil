@@ -1,6 +1,7 @@
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 
@@ -21,6 +22,8 @@ class _AddProductFormState extends State<AddProductForm> {
   final TextEditingController _minStockController = TextEditingController();
   final TextEditingController _maxStockController = TextEditingController();
   final TextEditingController _categoriaController = TextEditingController();
+  String imagePath = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +84,25 @@ class _AddProductFormState extends State<AddProductForm> {
                       return null;
                     },
                   ),
+                  ElevatedButton(
+          onPressed: () async {
+            final imagePicker = ImagePicker();
+            
+            final XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
+
+
+            if (image != null) {
+              // Aquí puedes guardar la ruta de la imagen en una variable o mostrarla en algún lugar de tu formulario
+              setState(() {
+                
+                imagePath = image.path;
+
+              });
+            }
+          },
+          child: const Text('Seleccionar imagen'),
+        ),
+
                    const SizedBox(height: 10,),
                   TextFormField(
                     controller: _minStockController,
@@ -160,6 +182,7 @@ class _AddProductFormState extends State<AddProductForm> {
       name: name,
       price: price,
       quantity: quantity,
+      imagePath: imagePath,
       minStock: minStock,
       maxStock: maxStock,
       categoria:categoria,
@@ -211,4 +234,6 @@ class _AddProductFormState extends State<AddProductForm> {
     _maxStockController.dispose();
     super.dispose();
   }
+
+
 }

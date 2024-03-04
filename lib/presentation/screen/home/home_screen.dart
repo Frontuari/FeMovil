@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:femovil/assets/nav_bar_bottom.dart';
 import 'package:femovil/presentation/perfil/perfil.dart';
 import 'package:femovil/presentation/clients/clients_screen.dart';
+import 'package:femovil/presentation/precios/precios.dart';
 import 'package:femovil/presentation/products/products_screen.dart';
 import 'package:femovil/presentation/screen/login/progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -162,61 +163,67 @@ class HomeState extends State<Home> {
                      ),
                   ],
                 ),
-                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 150),
-                       Column(
+                 GestureDetector(
+                  onTap: () {
+                 Navigator.push(context, MaterialPageRoute(builder:(context) => const Precios(),));
 
-                      children: [
-                      const Text("Precios"),
-                        Image.network(
-                                    'https://www.fijaciondeprecios.com/wp-content/uploads/2017/01/Puedo-cobrar-un-precio-mas-alto-Conozcalo-por-5-se%C3%B1ales-clave.jpg', 
-                                      width: 100,
-                                      height: 100,
-                                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
-                                      return CircularProgressIndicator(
-                                        value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                        : null,
-                                      );
-                                    },
-                                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                                      return const Text('No se pudo cargar la imagen');
-                                    },
-                                  ),
-                      ],
-                    ),
-                    const SizedBox(width: 100),
-                    Column(
-                      children: [
-                        const Text("Ventas"),
-                        Image.network('https://www.cloudtalk.io/wp-content/uploads/2021/12/Article-202105-ImproveSalesEfforts-2x-1024x538.png',
-                        width: 100,
-                        height: 100,
-                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
-
-                              if(loadingProgress == null){
-                                return child;
-                              }
-
-                              return CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!: null,);
-
-                        },
-                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace){
-
-                          return const Text("No se pudo cargar la imagen"); 
-                        },
-                        )
-                      ],
-                    ),
-                  ],
-                  
-                  
-                ),
+                  },
+                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 150),
+                         Column(
+                   
+                        children: [
+                        const Text("Precios"),
+                          Image.network(
+                                      'https://www.fijaciondeprecios.com/wp-content/uploads/2017/01/Puedo-cobrar-un-precio-mas-alto-Conozcalo-por-5-se%C3%B1ales-clave.jpg', 
+                                        width: 100,
+                                        height: 100,
+                                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                          : null,
+                                        );
+                                      },
+                                      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                        return const Text('No se pudo cargar la imagen');
+                                      },
+                                    ),
+                        ],
+                      ),
+                      const SizedBox(width: 100),
+                      Column(
+                        children: [
+                          const Text("Ventas"),
+                          Image.network('https://www.cloudtalk.io/wp-content/uploads/2021/12/Article-202105-ImproveSalesEfforts-2x-1024x538.png',
+                          width: 100,
+                          height: 100,
+                          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
+                   
+                                if(loadingProgress == null){
+                                  return child;
+                                }
+                   
+                                return CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!: null,);
+                   
+                          },
+                          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace){
+                   
+                            return const Text("No se pudo cargar la imagen"); 
+                          },
+                          )
+                        ],
+                      ),
+                    ],
+                    
+                    
+                                   ),
+                 ),
                    Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
