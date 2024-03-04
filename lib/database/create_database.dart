@@ -47,7 +47,8 @@ import 'package:path/path.dart' as path;
           price REAL,
           min_stock INTEGER,
           max_stock INTEGER,
-          categoria TEXT
+          categoria TEXT,
+          quantity_sold INTEGER
         )
       ''');
     await db.execute('''
@@ -62,6 +63,32 @@ import 'package:path/path.dart' as path;
       )
 
   ''');
+
+    await db.execute('''
+        CREATE TABLE orden_venta (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cliente_id INTEGER,
+        numero_referencia TEXT,
+        fecha TEXT,
+        descripcion TEXT,
+        monto REAL,
+        FOREIGN KEY (cliente_id) REFERENCES clients(id)
+      )
+    ''');
+
+    await db.execute('''
+
+      CREATE TABLE orden_venta_producto (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          orden_venta_id INTEGER,
+          producto_id INTEGER,
+          cantidad INTEGER,
+          FOREIGN KEY (orden_venta_id) REFERENCES orden_venta(id),
+          FOREIGN KEY (producto_id) REFERENCES products(id)
+       )
+
+    ''');
+
     },
   );
 
@@ -142,7 +169,28 @@ import 'package:path/path.dart' as path;
   }
 }
 
+    Future<int> insertOrder(Map<String, dynamic> order) async {
+      final db = await database;
+      if (db != null) {
+        // Insertar la orden de venta en la tabla 'orden_venta'
+        
+        int orderId = await db.insert('orden_venta', order);
+        
+        // Recorrer la lista de productos y agregarlos a la tabla de unión 'orden_venta_producto'
+        for (Map<String, dynamic> product in order['productos']) {
+          await db.insert('orden_venta_producto', {
+            'orden_venta_id': orderId,
+            'producto_id': product['id'],
+          });
+        }
 
+        return orderId;
+      } else {
+        // Manejar el caso en el que db sea null
+        print('Error: db is null');
+        return -1;
+      }
+    }
 
 
 }
