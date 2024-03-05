@@ -31,7 +31,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Seleccionar Productos'),
+        title: const Text('Seleccionar Productos'),
       ),
       body: products != null
           ? ListView.builder(
@@ -52,16 +52,28 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                     ],
                   ),
                   trailing: isSelected
-                      ? Icon(Icons.check_circle, color: Colors.green) // Icono de check si el producto está seleccionado
+                      ? const Icon(Icons.check_circle, color: Colors.green) // Icono de check si el producto está seleccionado
                       : null,
                   onTap: () async {
                     final selectedQuantity = await _showQuantityPickerDialog(context, productName);
                     if (selectedQuantity != null) {
+
+                       final selectedProduct = {
+                          "id": products![index]['id'], // Agregar el ID del producto seleccionado
+                          "quantity_avaible" : products![index]['quantity'],
+                          "name": productName,
+                          "quantity": selectedQuantity,
+                          "price": productPrice,
+                        };
                       setState(() {
                         if (isSelected) {
+                          
                           selectedProducts.removeWhere((product) => product['name'] == productName); // Desmarca el producto si ya estaba seleccionado
+                        
                         } else {
-                          selectedProducts.add(products![index]); // Marca el producto si no estaba seleccionado
+
+                          selectedProducts.add(selectedProduct); 
+
                         }
                         productQuantities[productName] = selectedQuantity;
                       });
@@ -70,76 +82,88 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                 );
               },
             )
-          : Center(child: CircularProgressIndicator()), // Muestra un indicador de carga mientras se cargan los productos
+          : const Center(child: CircularProgressIndicator()), // Muestra un indicador de carga mientras se cargan los productos
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pop(context, selectedProducts); // Devuelve los productos seleccionados al presionar el botón de regresar
         },
-        child: Icon(Icons.check),
+        child: const Icon(Icons.check),
       ),
     );
   }
 
-  Future<int?> _showQuantityPickerDialog(BuildContext context, String productName) {
-    int quantity = 1; // Cantidad inicial seleccionada
+Future<int?> _showQuantityPickerDialog(BuildContext context, String productName) {
+  int selectedQuantity = 0; // Cantidad inicial seleccionada
 
-    return showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
+  return showModalBottomSheet<int>(
+    context: context,
+    isScrollControlled: true, // Permitir que el contenido haga scroll si es necesario
+    builder: (BuildContext context) {
+      return SingleChildScrollView( // Envolver el contenido con SingleChildScrollView
+        child: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
-              height: 200,
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     'Seleccione la cantidad de $productName',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
                         onPressed: () {
                           setState(() {
-                            if (quantity > 1) {
-                              quantity--;
+                            if (selectedQuantity > 1) {
+                              selectedQuantity--;
                             }
                           });
                         },
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                       ),
                       Text(
-                        quantity.toString(),
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        selectedQuantity.toString(),
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
                         onPressed: () {
                           setState(() {
-                            quantity++;
+                            final availableQuantity = products!.firstWhere((product) => product['name'] == productName)['quantity'];
+                            if (selectedQuantity < availableQuantity) {
+                              selectedQuantity++;
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('No se puede incrementar más. No hay suficientes productos disponibles.'),
+                                ),
+                              );
+                            }
                           });
                         },
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context, quantity);
+                      Navigator.pop(context, selectedQuantity);
                     },
-                    child: Text('Confirmar'),
+                    child: const Text('Confirmar'),
                   ),
                 ],
               ),
             );
           },
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 }
