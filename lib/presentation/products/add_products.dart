@@ -1,6 +1,7 @@
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 
@@ -16,11 +17,14 @@ class AddProductForm extends StatefulWidget {
 class _AddProductFormState extends State<AddProductForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _qtySoldController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _minStockController = TextEditingController();
   final TextEditingController _maxStockController = TextEditingController();
   final TextEditingController _categoriaController = TextEditingController();
+  String imagePath = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +85,25 @@ class _AddProductFormState extends State<AddProductForm> {
                       return null;
                     },
                   ),
+                  ElevatedButton(
+          onPressed: () async {
+            final imagePicker = ImagePicker();
+            
+            final XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
+
+
+            if (image != null) {
+              // Aquí puedes guardar la ruta de la imagen en una variable o mostrarla en algún lugar de tu formulario
+              setState(() {
+                
+                imagePath = image.path;
+
+              });
+            }
+          },
+          child: const Text('Seleccionar imagen'),
+        ),
+
                    const SizedBox(height: 10,),
                   TextFormField(
                     controller: _minStockController,
@@ -112,6 +135,16 @@ class _AddProductFormState extends State<AddProductForm> {
                      validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa una categoria';
+                      }
+                      return null;
+                    },
+                  ),
+                   TextFormField(
+                    controller: _qtySoldController,
+                    decoration: const InputDecoration(labelText: 'Vendido', filled: true, fillColor: Colors.white),
+                     validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingresa la cantidad de ventas del producto';
                       }
                       return null;
                     },
@@ -155,14 +188,19 @@ class _AddProductFormState extends State<AddProductForm> {
     double minStock = double.parse(_minStockController.text);
     double maxStock = double.parse(_maxStockController.text);
     String categoria = _categoriaController.text;
+    int qtySold = int.parse(_qtySoldController.text);
+
     // Crea una instancia del producto
     Product product = Product(
       name: name,
       price: price,
       quantity: quantity,
+      imagePath: imagePath,
       minStock: minStock,
       maxStock: maxStock,
       categoria:categoria,
+      qtySold: qtySold
+      
     );
 
     // Llama a un método para guardar el producto en Sqflite
@@ -175,6 +213,7 @@ class _AddProductFormState extends State<AddProductForm> {
     _minStockController.clear();
     _maxStockController.clear();
     _categoriaController.clear();
+    _qtySoldController.clear();
 
     // Muestra un mensaje de éxito o realiza cualquier otra acción necesaria
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -209,6 +248,9 @@ class _AddProductFormState extends State<AddProductForm> {
     _quantityController.dispose();
     _minStockController.dispose();
     _maxStockController.dispose();
+    _qtySoldController.dispose();
     super.dispose();
   }
+
+
 }

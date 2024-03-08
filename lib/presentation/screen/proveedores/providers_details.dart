@@ -1,17 +1,17 @@
-import 'package:femovil/presentation/clients/edit_clients.dart';
-import 'package:femovil/presentation/orden_venta/orden_venta.dart';
+import 'package:femovil/presentation/orden_compra/orden_compra.dart';
+import 'package:femovil/presentation/screen/proveedores/edit_providers.dart';
 import 'package:flutter/material.dart';
 
-class ClientDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> client;
+class ProvidersDetailsScreen extends StatelessWidget {
+  final Map<String, dynamic> provider;
 
-  const ClientDetailsScreen({super.key, required this.client});
+  const ProvidersDetailsScreen({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       
-      appBar: AppBar(title: const Text("Detalles del Cliente", style: TextStyle(
+      appBar: AppBar(title: const Text("Detalles del proveedor", style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w400,
             color: Color.fromARGB(255, 105, 102, 102),
@@ -32,11 +32,11 @@ class ClientDetailsScreen extends StatelessWidget {
               children: [
                 const SizedBox( height: 25,),
           
-                _buildTextFormField('Nombre', client['name'].toString()),
-                _buildTextFormField('Ruc', client['ruc'].toString()),
-                _buildTextFormField('Correo', '${client['correo']}'),
-                _buildTextFormField('Telefono', client['telefono'].toString()),
-                _buildTextFormField('Grupo', client['grupo'].toString()),
+                _buildTextFormField('Nombre', provider['name'].toString()),
+                _buildTextFormField('Ruc', provider['ruc'].toString()),
+                _buildTextFormField('Correo', '${provider['correo']}'),
+                _buildTextFormField('Telefono', provider['telefono'].toString()),
+                _buildTextFormField('Grupo', provider['grupo'].toString()),
                 const SizedBox(height: 29,),
                SizedBox(
                 
@@ -46,7 +46,7 @@ class ClientDetailsScreen extends StatelessWidget {
                   onPressed: () {
                     // Aquí puedes manejar la acción de agregar orden
                     // Por ejemplo, puedes navegar a una pantalla de agregar orden
-                   Navigator.push(context,MaterialPageRoute(builder: (context) => OrdenDeVentaScreen(clientId: client["id"] ,clientName: client["name"])),
+                   Navigator.push(context,MaterialPageRoute(builder: (context) => OrdenDeCompraScreen(providerId: provider["id"] ,providerName: provider["name"])),
                   );
 
                   },
@@ -70,7 +70,7 @@ class ClientDetailsScreen extends StatelessWidget {
           // Por ejemplo, puedes navegar a una pantalla de edición de productos
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => EditClientScreen(client: client)),
+            MaterialPageRoute(builder: (context) => EditProviderScreen(provider: provider)),
           );
         },
         backgroundColor: Colors.green, // Color del botón

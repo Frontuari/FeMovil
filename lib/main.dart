@@ -5,6 +5,7 @@ import 'package:femovil/presentation/screen/configuracion/config_screen.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:femovil/presentation/screen/login/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,10 +19,17 @@ class AppInitializer {
     if (isFirstTime) {
       prefs.setBool("isFirstTime", false);
     }
+    requestPermissions();
     runApp(MyApp(initialRoute: isFirstTime ? '/configuracion' : '/'));
   }
 }
 
+
+void requestPermissions() async {
+  // Solicitar permisos de acceso a la cámara y a la galería
+  await Permission.camera.request();
+  
+}
 
 
 

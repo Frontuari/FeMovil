@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:femovil/presentation/products/edit_product.dart';
 import 'package:flutter/material.dart';
 
@@ -30,8 +32,11 @@ class ProductDetailsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox( height: 25,),
+                
           
                 _buildTextFormField('Nombre', product['name'].toString()),
+                _buildTextFormField('Path Image', product['image_path'].toString()),
+                _buildImage(product['image_path'].toString()),
                 _buildTextFormField('Categoría', product['categoria'].toString()),
                 _buildTextFormField('Precio', '\$${product['price']}'),
                 _buildTextFormField('Cantidad Disponible', product['quantity'].toString()),
@@ -74,4 +79,8 @@ class ProductDetailsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildImage(String imagePath) {
+  return Image.file(File(imagePath)); // Utiliza la ruta de la imagen para cargar la imagen desde el sistema de archivos
 }

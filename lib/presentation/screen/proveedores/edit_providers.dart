@@ -1,16 +1,16 @@
 import 'package:femovil/database/create_database.dart';
 import 'package:flutter/material.dart';
 
-class EditClientScreen extends StatefulWidget {
-  final Map<String, dynamic> client;
+class EditProviderScreen extends StatefulWidget {
+  final Map<String, dynamic> provider;
 
-  const EditClientScreen({super.key, required this.client});
+  const EditProviderScreen({super.key, required this.provider});
 
   @override
-  _EditClientScreenState createState() => _EditClientScreenState();
+  _EditProviderScreenState createState() => _EditProviderScreenState();
 }
 
-class _EditClientScreenState extends State<EditClientScreen> {
+class _EditProviderScreenState extends State<EditProviderScreen> {
   final _nameController = TextEditingController();
   final _rucController = TextEditingController();
   final _correoController = TextEditingController();
@@ -21,11 +21,11 @@ class _EditClientScreenState extends State<EditClientScreen> {
   void initState() {
     super.initState();
     // Initialize controllers with existing product details
-    _nameController.text = widget.client['name'].toString();
-    _rucController.text = widget.client['ruc'].toString();
-    _correoController.text = widget.client['correo'].toString();
-    _telefonoController.text = widget.client['telefono'].toString();
-    _grupoController.text = widget.client['grupo'].toString();
+    _nameController.text = widget.provider['name'].toString();
+    _rucController.text = widget.provider['ruc'].toString();
+    _correoController.text = widget.provider['correo'].toString();
+    _telefonoController.text = widget.provider['telefono'].toString();
+    _grupoController.text = widget.provider['grupo'].toString();
 
   }
 
@@ -40,7 +40,7 @@ class _EditClientScreenState extends State<EditClientScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            "Editar Producto",
+            "Editar Proveedor",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w400,
@@ -81,8 +81,8 @@ class _EditClientScreenState extends State<EditClientScreen> {
     String newGrupo = _grupoController.text;
 
     // Crear un mapa con los datos actualizados del producto
-    Map<String, dynamic> updatedClient = {
-      'id': widget.client['id'], // Asegúrate de incluir el ID del producto
+    Map<String, dynamic> updatedprovider = {
+      'id': widget.provider['id'], // Asegúrate de incluir el ID del producto
       'name': newName,
       'Ruc': newRuc,
       'Correo': newCorreo,
@@ -92,11 +92,11 @@ class _EditClientScreenState extends State<EditClientScreen> {
     };
 
     // Actualizar el producto en la base de datos
-    await DatabaseHelper.instance.updateClient(updatedClient);
+    await DatabaseHelper.instance.updateProvider(updatedprovider);
 
         ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cliente actualizado satisfactoriamente'),
+          content: Text('Proveedor actualizado satisfactoriamente'),
           duration: Duration(seconds: 2), 
           backgroundColor: Colors.green,
         ),
