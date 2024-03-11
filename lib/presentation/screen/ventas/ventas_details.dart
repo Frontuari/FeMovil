@@ -1,11 +1,12 @@
 import 'package:femovil/database/create_database.dart';
+import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:flutter/material.dart';
 
 class VentasDetails extends StatefulWidget {
   final int ventaId;
   final String nameClient;
-
-  const VentasDetails({Key? key, required this.ventaId, required this.nameClient});
+  final double saldoTotal;
+  const VentasDetails({super.key, required this.ventaId, required this.nameClient, required this.saldoTotal});
 
   @override
   State<VentasDetails> createState() => _VentasDetailsState();
@@ -53,6 +54,7 @@ class _VentasDetailsState extends State<VentasDetails> {
               final ventaData = snapshot.data!['order'];
               final productsData = snapshot.data!['products'];
               print("Esto es lo que hay productsData ${snapshot.data}");
+              print("esto es ventas data $ventaData");
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
@@ -232,12 +234,18 @@ class _VentasDetailsState extends State<VentasDetails> {
                   width: screenMax,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: Colors.green, // Color verde para el fondo del botón
+                    color: widget.saldoTotal > 0 ? Colors.green: Colors.grey, // Color verde para el fondo del botón
                   ),
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Acción al presionar el botón "Cobrar"
-                    },
+                    onPressed:widget.saldoTotal > 0 ? () {
+
+                        Navigator.of(context).push(
+                         MaterialPageRoute(
+                            builder: (context) =>  Cobro(orderId: ventaData['id'],saldoTotal: widget.saldoTotal, loadCobranzas: _loadVentasForId),
+                          ),
+                         );
+
+                    }: null,
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(

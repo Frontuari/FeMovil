@@ -278,7 +278,7 @@ void initState() {
                             return;
                           }
                   final order = {
-                    'cliente_id': widget.providerId,
+                    'proveedor_id': widget.providerId,
                     'numero_referencia': numeroReferenciaController.text,
                     'numero_factura': numeroFacturaController.text,
                     'fecha': fechaController.text,

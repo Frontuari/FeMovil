@@ -9,8 +9,10 @@ import 'package:intl/intl.dart';
 
 class Cobro extends StatefulWidget {
   final int orderId;
+  final double saldoTotal;
+  final Function loadCobranzas;
   
-  const Cobro({super.key, required this.orderId});
+  const Cobro({super.key, required this.orderId, required this.saldoTotal, required this.loadCobranzas});
 
   @override
   State<Cobro> createState() => _CobroState();
@@ -283,7 +285,7 @@ void initState() {
                                               ElevatedButton(
                                                 onPressed:  () async {
                                                   // Aquí puedes agregar la lógica para crear el cobro
-                                                           await _createCobro();
+                                                           await _createCobro(widget.loadCobranzas);
   
                                                 },
                                                 style: ElevatedButton.styleFrom(
@@ -313,37 +315,65 @@ void initState() {
     );
   }
 
-  Future<void> _createCobro() async {
-  // Aquí puedes obtener los valores de los controladores y guardarlos en la base de datos
+ Future<void> _createCobro(loadCobranzas) async {
   final int numberReference = int.parse(numRefController.text);
   final String? typeDocument = typeDocumentValue;
-  final String? paymentType = paymentTypeValue; 
+  final String? paymentType = paymentTypeValue;
   final String date = dateController.text;
-  final String? coin = coinValue; // Hardcoded para DropdownButtonFormField de moneda
+  final String? coin = coinValue;
   final int amount = int.parse(montoController.text);
-  final String? bankAccount = bankAccountValue; // Hardcoded para DropdownButtonFormField de cuenta bancaria
+  final String? bankAccount = bankAccountValue;
   final String observation = observacionController.text;
   final int saleOrderId = widget.orderId;
 
-  print("Type document $typeDocument");
-  // Inserta los datos en la base de datos
-  await DatabaseHelper.instance.insertCobro(
-    numberReference: numberReference,
-    typeDocument: typeDocument,
-    paymentType: paymentType, // Valor obtenido del DropdownButtonFormField de tipo de pago
-    date: date,
-    coin: coin, // Valor obtenido del DropdownButtonFormField de moneda
-    amount: amount,
-    bankAccount: bankAccount, // Valor obtenido del DropdownButtonFormField de cuenta bancaria
-    observation: observation,
-    saleOrderId: saleOrderId,
-  );
-      numRefController.clear();
-      montoController.clear();
-      observacionController.clear();
-  // Muestra un mensaje de éxito o realiza alguna otra acción después de crear el cobro
-  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cobro creado con éxito')));
+  // Obtener el saldo total de la orden
+  final double saldoTotal = widget.saldoTotal;
+
+  if (amount > saldoTotal) {
+    // Si el monto del cobro es mayor al saldo total, mostrar mensaje de diálogo
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: const Text('El cobro no puede ser mayor al saldo total de la orden.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    // Si el monto del cobro es menor o igual al saldo total, insertar el cobro en la base de datos
+    await DatabaseHelper.instance.insertCobro(
+      numberReference: numberReference,
+      typeDocument: typeDocument,
+      paymentType: paymentType,
+      date: date,
+      coin: coin,
+      amount: amount,
+      bankAccount: bankAccount,
+      observation: observation,
+      saleOrderId: saleOrderId,
+    );
+
+    loadCobranzas();
+
+    // Limpiar los campos de texto después de insertar el cobro
+    numRefController.clear();
+    montoController.clear();
+    observacionController.clear();
+
+    // Mostrar un mensaje de éxito
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cobro creado con éxito')));
+  }
 }
+
 
 }
 

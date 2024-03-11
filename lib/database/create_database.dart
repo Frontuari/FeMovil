@@ -147,6 +147,22 @@ import 'package:path/path.dart' as path;
         )
       ''');
 
+      await db.execute('''
+        CREATE TABLE retenciones(
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          total_bdi INTEGER,
+          fecha_transaccion TEXT,
+          tipo_retencion TEXT,
+          nro_document INTEGER,
+          porcentaje REAL, 
+          total_impuesto REAL, 
+          regla_retencion TEXT,
+          orden_compra_id INTEGER,
+          FOREIGN KEY(orden_compra_id) REFERENCES orden_compra(id)
+          )
+
+      ''');
+
     },
   );
 
@@ -481,6 +497,25 @@ Future<int> getProductAvailableQuantity(int productId) async {
     return 0;
   }
 }
+
+Future<List<Map<String, dynamic>>> getAllOrdenesCompraWithProveedorNames() async {
+  final db = await database;
+  if (db != null) {
+    // Consultar todas las órdenes de compra con el nombre del proveedor asociado
+    List<Map<String, dynamic>> ordenesCompra = await db.rawQuery('''
+      SELECT oc.*, p.name AS nombre_proveedor
+      FROM orden_compra oc
+      INNER JOIN providers p ON oc.proveedor_id = p.id
+    ''');
+    return ordenesCompra;
+  } else {
+    // Manejar el caso en el que db sea null
+    print('Error: db is null');
+    return [];
+  }
+}
+
+
 
 
 

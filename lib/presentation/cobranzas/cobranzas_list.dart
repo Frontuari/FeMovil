@@ -32,7 +32,10 @@ class _CobranzasState extends State<Cobranzas> {
 
             setState(() {
               Cobranzas = CobranzasData;
-              filteredCobranzas = CobranzasData;
+              // filteredCobranzas = CobranzasData;
+              filteredCobranzas = Cobranzas.where((venta) => venta['saldo_total'] > 0).toList();
+
+              
             });
       }
 
@@ -64,6 +67,12 @@ void _showFilterOptions(BuildContext context) {
           title: const Text('Filtrar Por Ordenes con saldo abierto'),
           onTap: () {
             Navigator.pop(context);
+            
+              setState(() {
+                
+              filteredCobranzas = Cobranzas.where((venta) => venta['saldo_total'] > 0).toList();
+              });
+
 
           },
         ),
@@ -73,7 +82,11 @@ void _showFilterOptions(BuildContext context) {
           title: const Text('Filtrar Por Ordenes con saldo pagado'),
           onTap: () {
             Navigator.pop(context);
-        
+            setState(() {
+              
+             filteredCobranzas = Cobranzas.where((venta) => venta['saldo_total'] == 0).toList();
+            });
+
         },
         ),
       ),
@@ -146,8 +159,9 @@ void _showFilterOptions(BuildContext context) {
                 child: ListView.builder(
                   itemCount: filteredCobranzas.length,
                   itemBuilder: (context, index) {
+                  
                     final venta = filteredCobranzas[index];
-                    return Column(
+                    return  Column(
                       children: [
                         Container(  
 
@@ -199,10 +213,9 @@ void _showFilterOptions(BuildContext context) {
                                 height: 50,
                                 child: GestureDetector(
                                   onTap: venta['saldo_total'] > 0 ?   () {
-
                                         Navigator.of(context).push(
                                           MaterialPageRoute(
-                                          builder: (context) =>  Cobro(orderId: venta['id']),
+                                          builder: (context) =>  Cobro(orderId: venta['id'],saldoTotal: venta['saldo_total'], loadCobranzas: _loadCobranzas),
                                         ),
                                       );
 

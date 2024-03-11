@@ -1,4 +1,5 @@
 import 'package:femovil/database/create_database.dart';
+import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/ventas/ventas_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -307,7 +308,7 @@ void _showFilterOptions(BuildContext context) {
                                                       // Acción al presionar el botón "Ver más"
                                                         Navigator.of(context).push(
                                                           MaterialPageRoute(
-                                                            builder: (context) => VentasDetails(ventaId: venta['id'], nameClient: venta['nombre_cliente']),
+                                                            builder: (context) => VentasDetails(ventaId: venta['id'], nameClient: venta['nombre_cliente'], saldoTotal: venta['saldo_total']),
                                                           ),
                                                         );
                                                     },
@@ -315,12 +316,17 @@ void _showFilterOptions(BuildContext context) {
                                                   ),
                                                   ElevatedButton(
                                                      style: ButtonStyle(
-                                                      backgroundColor: MaterialStateProperty.all<Color>(Colors.grey),
+                                                      backgroundColor:venta['saldo_total'] > 0 ? MaterialStateProperty.all<Color>(Colors.green) : MaterialStateProperty.all<Color>(Colors.grey),
                                                       foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                                                     ),
-                                                    onPressed: () {
+                                                    onPressed: venta['saldo_total'] > 0 ? () {
                                                       // Acción al presionar el botón "Cobrar"
-                                                    },
+                                                       Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                            builder: (context) => Cobro(orderId: venta['id'], loadCobranzas: _loadVentas,saldoTotal: venta['saldo_total'], ),
+                                                          ),
+                                                        );
+                                                    }: null,
                                                     child: const Text('Cobrar'),
                                                   ),
                                                 ],

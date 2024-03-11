@@ -5,6 +5,7 @@ import 'package:femovil/presentation/perfil/perfil.dart';
 import 'package:femovil/presentation/clients/clients_screen.dart';
 import 'package:femovil/presentation/precios/precios.dart';
 import 'package:femovil/presentation/products/products_screen.dart';
+import 'package:femovil/presentation/retenciones/retenciones_screen.dart';
 import 'package:femovil/presentation/screen/login/progress_indicator.dart';
 import 'package:femovil/presentation/screen/proveedores/providers_screen.dart';
 import 'package:femovil/presentation/screen/ventas/ventas.dart';
@@ -297,31 +298,39 @@ class HomeState extends State<Home> {
                                      
                                    ),
                    Row(
+              
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 150),
-                     Column(
-                      children: [
-                        const Text("Retenciones"),
-                        Image.network('https://static.wixstatic.com/media/b21422_23a906f84cfc45d5ba8d3a422f0847e7~mv2.jpg/v1/fill/w_640,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/b21422_23a906f84cfc45d5ba8d3a422f0847e7~mv2.jpg',
-                        width: 100,
-                        height: 100,
-                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
+                     GestureDetector(
+                       onTap: () {
+                       
+                        Navigator.push(context, MaterialPageRoute(builder:(context) => const Retenciones(),));
 
-                              if(loadingProgress == null){
-                                return child;
-                              }
-
-                              return CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!: null,);
-
-                        },
-                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace){
-
-                          return const Text("No se pudo cargar la imagen"); 
-                        },
-                        )
-                      ],
-                    ),
+                       },
+                       child: Column(
+                        children: [
+                          const Text("Retenciones"),
+                          Image.network('https://static.wixstatic.com/media/b21422_23a906f84cfc45d5ba8d3a422f0847e7~mv2.jpg/v1/fill/w_640,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/b21422_23a906f84cfc45d5ba8d3a422f0847e7~mv2.jpg',
+                          width: 100,
+                          height: 100,
+                          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
+                       
+                                if(loadingProgress == null){
+                                  return child;
+                                }
+                       
+                                return CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!: null,);
+                       
+                          },
+                          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace){
+                       
+                            return const Text("No se pudo cargar la imagen"); 
+                          },
+                          )
+                        ],
+                                           ),
+                     ),
                
                   ],
                   
