@@ -198,9 +198,9 @@ Widget build(BuildContext context) {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Categoria: ${product['categoria']}'),
-                        Text('Precio: \$${product['price']}'),
+                        Text('Precio: \$ ${product['price'] is double ? product['price']: 0}'),
                         // Text('Vendidos: ${product['quantity_sold']}'),
-                        Text('Cantidad disponible ${product['quantity']}'),
+                        Text('Cantidad disponible ${product['quantity'] is double || product['quantity'] is int ? product['quantity']: 0}'),
                         const Divider(),
                       ],
                     ), 

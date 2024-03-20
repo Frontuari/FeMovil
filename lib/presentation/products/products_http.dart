@@ -64,11 +64,12 @@ sincronizationProducts() async {
   // Escribir el cuerpo en la solicitud
   request.write(jsonBody);
 
+
   final response = await request.close();
   final responseBody = await response.transform(utf8.decoder).join();
   dynamic products =  extractProductData(responseBody);
   await syncProducts(products); // Obtener todos los productos
-
+  
 
   final parsedJson = jsonDecode(responseBody);
   print("esta es la respuesta $parsedJson");

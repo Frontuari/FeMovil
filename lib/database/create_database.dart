@@ -53,6 +53,8 @@ import 'package:sqflite/sqflite.dart';
             categoria TEXT,
             tax_cat_id INTEGER,
             tax_cat_name STRING,
+            product_group_id INTEGER,
+            product_group_name STRING,
             um_id INTEGER,
             um_name STRING,
             quantity_sold INTEGER,

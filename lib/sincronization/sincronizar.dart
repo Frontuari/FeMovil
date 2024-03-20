@@ -9,20 +9,22 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData) async {
         for (Map<String, dynamic> productData in productsData) {
           // Construye un objeto Product a partir de los datos recibidos
           Product product = Product(
-            mProductId: productData['m_product_id'],
-            productType: productData['product_type'],
-            productTypeName: productData['product_type_name'],
-            codProd: productData['cod_product'],
-            prodCatId: productData['pro_cat_id'],
-            taxName: productData['tax_cat_name'],
-            umId: productData['um_id'] ,
-            umName: productData['um_name'],
-            name: productData['name'],
-            price: productData['price'],
-            quantity: productData['quantity'],
-            categoria: productData['categoria'],
-            qtySold: productData['total_sold'],
-            taxId: productData['tax_cat_id'],
+            mProductId: productData['m_product_id'].toString(),
+            productType: productData['product_type'].toString(),
+            productTypeName: productData['product_type_name'].toString(),
+            codProd: productData['cod_product'].toString(),
+            prodCatId: productData['pro_cat_id'].toString(),
+            taxName: productData['tax_cat_name'].toString(),
+            productGroupId: productData['product_group_id'].toString(),
+            produtGroupName: productData['product_group_name'].toString(),
+            umId: productData['um_id'].toString(),
+            umName: productData['um_name'].toString(),
+            name: productData['name'].toString(),
+            price: productData['price'] is double ? productData['price']:0,
+            quantity: productData['quantity'] is int ? productData['quantity']: 0,
+            categoria: productData['categoria'].toString(),
+            qtySold: productData['total_sold'].toString(),
+            taxId: productData['tax_cat_id'].toString(),
           );
 
           // Convierte el objeto Product a un mapa
@@ -103,5 +105,25 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData) async {
           return [];
         }
 
+          Future<List<Map<String, dynamic>>> listarProductGroup() async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+            SELECT DISTINCT product_group_id, product_group_name
+               FROM products
+            ''');
+          }
+          return [];
+        }
 
-          
+
+        Future<List<Map<String, dynamic>>> getProductsWithZeroValues() async {
+        final db = await DatabaseHelper.instance.database;
+        if (db != null) {
+          return await db.rawQuery('''
+            SELECT * FROM products 
+            WHERE cod_product = 0 AND m_product_id = 0
+          ''');
+        }
+        return [];
+      }

@@ -26,6 +26,8 @@ class _AddProductFormState extends State<AddProductForm> {
   String _taxText = '';
   String _umText = '';
   String _productTypeText = '';
+  String _productGroupText = '';
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -35,9 +37,11 @@ class _AddProductFormState extends State<AddProductForm> {
  List<Map<String, dynamic>> _categoriesList = [];
  List<Map<String, dynamic>> _umList = [];
  List<Map<String, dynamic>> _productTpeList =[];
+ List<Map<String, dynamic>> _productGroupList = [];
   int _selectedTaxIndex = 0; // Índice del impuesto seleccionado por defecto
   int _selectedCategoriesIndex = 0;
   int _selectedUmIndex = 0;
+  int _seletedProductGroup = 0;
   String _selectedProductType = 'first';
 
      void _loadTaxs()async {
@@ -47,27 +51,33 @@ class _AddProductFormState extends State<AddProductForm> {
         final getCategories = await listarCategorias();
         final getUm = await  listarUnidadesDeMedida();
         final getProductType = await listarProductType();
+        final getProductGroup = await listarProductGroup();
+
         print("Esto es getTaxs $getTaxs");
         print('Esto es getCategories $getCategories');
         print('Estas son las unidades de medidas $getUm');
         print('Esto es la lista de los tipos de productos $getProductType');
+        print('Esto es la lista de product group $getProductGroup');
 
 
       print("esto es categoriesList con la nueva opcion 0 $_taxList");
       _taxList.add({'tax_cat_id': 0, 'tax_cat_name': 'Selecciona un impuesto'});
       _categoriesList.add({'pro_cat_id': 0, 'categoria': 'Selecciona una categoria'});
-      _umList.add({'um_id': 0, 'um_name': 'Unidad de medida'});
+      _umList.add({'um_id': 0, 'um_name': 'Seleccione la unidad de medida'});
       _productTpeList.add({'product_type': 'first', 'product_type_name': 'Selecciona un tipo de producto'});
-
+      _productGroupList.add({'product_group_id': 0, 'product_group_name': 'Selecciona un grupo de productos'});
 
         setState(() {
         _taxList.addAll(getTaxs);
         _categoriesList.addAll(getCategories);
         _umList.addAll(getUm);
         _productTpeList.addAll(getProductType);
+        _productGroupList.addAll(getProductGroup);
 
         });
+
         print("esto es taxlist $_taxList");
+      
       }
 
 
@@ -105,6 +115,16 @@ print("Esto es el nombre umlist $um");
   return um != null ? um['um_name'] : '';
 }
 
+String obtenerNombrePG(int? id) {
+  // Buscar la categoría en _categoriesList que coincide con el ID dado
+  Map<String, dynamic>? productGroup = _productGroupList.firstWhere(
+    (productGroupList) => productGroupList['product_group_id'] == id,
+  );
+
+print("Esto es el nombre umlist $productGroup");
+
+  return productGroup != null ? productGroup['product_group_name'] : '';
+}
 
 String obtenerNombreProductType(String? type) {
   // Buscar la categoría en _categoriesList que coincide con el ID dado
@@ -211,7 +231,7 @@ String obtenerNombreProductType(String? type) {
                       return null;
                     },
                   ),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     DropdownButtonFormField<String>(
                     value: _selectedProductType,
                     items: _productTpeList.map<DropdownMenuItem<String>>((productType) {
@@ -269,6 +289,36 @@ String obtenerNombreProductType(String? type) {
                     validator: (value) {
                       if (value == null || value == 0) {
                         return 'Por favor selecciona una categoria';
+                      }
+                      return null;
+                    },
+                  ),
+                    const SizedBox(height: 10,),
+                        DropdownButtonFormField<int>(
+                    value: _seletedProductGroup,
+                    items: _productGroupList.map<DropdownMenuItem<int>>((productGroup) {
+                      return DropdownMenuItem<int>(
+                        value: productGroup['product_group_id'] as int,
+                        child: SizedBox(
+                            width: 200,
+                          child: Text(productGroup['product_group_name'] as String, style: const TextStyle(overflow: TextOverflow.clip),)),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                    String nombreProductGroup = obtenerNombrePG(newValue);
+                      
+                      setState(() {
+                        _productGroupText= nombreProductGroup;
+                        _seletedProductGroup= newValue as int;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    validator: (value) {
+                      if (value == null || value == 0) {
+                        return 'Por favor seleccionar el grupo del producto';
                       }
                       return null;
                     },
@@ -357,46 +407,51 @@ String obtenerNombreProductType(String? type) {
     int prodCatId = _selectedCategoriesIndex;
     int umId = _selectedUmIndex;
     String productTypeId = _selectedProductType;
+    int prodructGroupId = _seletedProductGroup;
     int codProd = 0;
 
     int qtySold = 0;
 
     String categoria = _prodCatText;
     String taxName = _taxText;
+    String productGroupName = _productGroupText;
     String uM= _umText;
     String ptype = _productTypeText;
 
 
-    // Crea una instancia del producto
-    Product product = Product(
-      mProductId: 0,
-      productType: productTypeId,
-      productTypeName: ptype ,
-      codProd: codProd,
-      prodCatId: prodCatId,
-      taxName: taxName ,
-      umId: umId,
-      name: name,
-      price: price,
-      quantity: quantity,
-      categoria:categoria,
-      qtySold: qtySold,
-      taxId: selectTax,
-      umName: uM,
-      
-    );
+      // Crea una instancia del producto
+      Product product = Product(
+        mProductId: 0,
+        productType: productTypeId,
+        productTypeName: ptype ,
+        codProd: codProd,
+        prodCatId: prodCatId,
+        taxName: taxName ,
+        umId: umId,
+        name: name,
+        price: price,
+        quantity: quantity,
+        categoria:categoria,
+        qtySold: qtySold,
+        taxId: selectTax,
+        umName: uM,
+        productGroupId: prodructGroupId,
+        produtGroupName: productGroupName,
+      );
 
     // Llama a un método para guardar el producto en Sqflite
     final id = await saveProductToDatabase(product);
     print('Esto es el id $id');
-   dynamic result = await createProductIdempiere(product.toMap());
-    final mProductId = result['StandardResponse']['outputFields']['outputField'][0]['@value'];
-    final codProdc = result['StandardResponse']['outputFields']['outputField'][1]['@value'];
-    print('Este es el mp product id $mProductId && el codprop $codProdc');
-    // Limpia los controladores de texto después de guardar el producto
+  //  dynamic result = await createProductIdempiere(product.toMap());
+  //  print('este es el $result');
+  //  if(!result != ''){
+  //   final mProductId = result['StandardResponse']['outputFields']['outputField'][0]['@value'];
+  //   final codProdc = result['StandardResponse']['outputFields']['outputField'][1]['@value'];
+  //   print('Este es el mp product id $mProductId && el codprop $codProdc');
+  //   // Limpia los controladores de texto después de guardar el producto
 
-    await DatabaseHelper.instance.updateProductMProductIdAndCodProd(id, mProductId, codProdc);
-
+  //   await DatabaseHelper.instance.updateProductMProductIdAndCodProd(id, mProductId, codProdc);
+  // }
   //   _nameController.clear();
   //   _priceController.clear();
   //   _quantityController.clear();

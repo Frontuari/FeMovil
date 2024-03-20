@@ -275,6 +275,8 @@ class _ProductsState extends State<Products> {
   }
 
     void _verMasProducto(String productId) async {
+        print('productId: $productId'); // Añade esta línea para depurar
+
     final db = await DatabaseHelper.instance.database;
     if (db != null) {
       final product = await db.query(
