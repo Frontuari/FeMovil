@@ -1,9 +1,7 @@
-import 'dart:io';
 
-import 'package:femovil/database/create_database.dart';
+import 'package:femovil/database/gets_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 
 
@@ -116,12 +114,13 @@ void _filterByMostSold() {
 
 
  Future<void> _loadProducts() async {
-    final productos = await DatabaseHelper.instance.getProducts(); // Obtener todos los productos
+    final productos = await getProducts(); // Obtener todos los productos
 
     print("Estoy obteniendo products $products");
     setState(() {
       products = productos;
     });
+   
   }
 
 @override

@@ -18,13 +18,15 @@ List<Map<String, dynamic>> extractProductData(String responseData) {
   // Itera sobre cada DataRow y extrae los datos relevantes de los productos
 
 try {
+
+  
   
   for (var row in dataRows) {
     Map<String, dynamic> productData = {
       'cod_product': row['field'][0]['val'],
       'm_product_id': row['field'][11]['val'],
       'name': row['field'][1]['val'],
-      'price':row['field'][10]['val'] is int ? row['field'][10]['val']:0,
+      'price':row['field'][10]['val'],
       'quantity':row['field'][9]['val'] is int ? row['field'][9]['val'] : 0,
       'pro_cat_id':row['field'][3]['val'],
       'categoria':row['field'][4]['val'],

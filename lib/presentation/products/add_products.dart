@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/presentation/products/idempiere/create_product.dart';
+import 'package:femovil/presentation/products/utils/switch_generated_names_select.dart';
 import 'package:femovil/sincronization/sincronizar.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
@@ -29,8 +30,8 @@ class _AddProductFormState extends State<AddProductForm> {
   String _productGroupText = '';
 
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
+   TextEditingController _quantityController = TextEditingController();
+   TextEditingController _priceController = TextEditingController();
   final TextEditingController _qtySoldController = TextEditingController();
  
  List<Map<String, dynamic>> _taxList = []; // Lista para almacenar los impuestos disponibles
@@ -81,74 +82,17 @@ class _AddProductFormState extends State<AddProductForm> {
       }
 
 
-
-      
-String obtenerNombreCategoria(int? id) {
-  // Buscar la categoría en _categoriesList que coincide con el ID dado
-  Map<String, dynamic>? categoria = _categoriesList.firstWhere(
-    (categoria) => categoria['pro_cat_id'] == id,
-  );
-
-  // Si se encuentra la categoría, devolver su nombre, de lo contrario devolver una cadena vacía
-  return categoria != null ? categoria['categoria'] : '';
-}
-
-      
-String obtenerNombreImpuesto(int? id) {
-  // Buscar la categoría en _categoriesList que coincide con el ID dado
-  Map<String, dynamic>? impuesto = _taxList.firstWhere(
-    (taxlist) => taxlist['tax_cat_id'] == id,
-  );
-
-  // Si se encuentra la categoría, devolver su nombre, de lo contrario devolver una cadena vacía
-  return impuesto != null ? impuesto['tax_cat_name'] : '';
-}
-
-String obtenerNombreUm(int? id) {
-  // Buscar la categoría en _categoriesList que coincide con el ID dado
-  Map<String, dynamic>? um = _umList.firstWhere(
-    (umList) => umList['um_id'] == id,
-  );
-
-print("Esto es el nombre umlist $um");
-
-  return um != null ? um['um_name'] : '';
-}
-
-String obtenerNombrePG(int? id) {
-  // Buscar la categoría en _categoriesList que coincide con el ID dado
-  Map<String, dynamic>? productGroup = _productGroupList.firstWhere(
-    (productGroupList) => productGroupList['product_group_id'] == id,
-  );
-
-print("Esto es el nombre umlist $productGroup");
-
-  return productGroup != null ? productGroup['product_group_name'] : '';
-}
-
-String obtenerNombreProductType(String? type) {
-  // Buscar la categoría en _categoriesList que coincide con el ID dado
-  Map<String, dynamic>? productType = _productTpeList.firstWhere(
-    (productTypeList) => productTypeList['product_type'] == type,
-  );
-
-
-  return productType != null ? productType['product_type_name'] : '';
-}
-
-
-
-
   @override
   void initState()  {
     _loadTaxs();
     setState(() {
-      
+      _priceController.text = '0';
+      _quantityController.text = '0';
+
     });
 
     super.initState();
 
-    
   }
 
   @override
@@ -188,17 +132,18 @@ String obtenerNombreProductType(String? type) {
                     },
                   ),
                   const SizedBox(height: 10,),
-                  TextFormField(
-                    controller: _quantityController,
-                    decoration: const InputDecoration(labelText: 'Cantidad disponible', filled: true, fillColor: Colors.white),
-                    keyboardType: TextInputType.number,
-                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa la cantidad disponible del producto';
-                      }
-                      return null;
-                    },
-                  ),
+                  // TextFormField(
+                  //   readOnly: true,
+                  //   controller: _quantityController,
+                  //   decoration: const InputDecoration(labelText: 'Cantidad disponible', filled: true, fillColor: Colors.white),
+                  //   keyboardType: TextInputType.number,
+                  //    validator: (value) {
+                  //     if (value == null || value.isEmpty) {
+                  //       return 'Por favor ingresa la cantidad disponible del producto';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
                   const SizedBox(height: 10,),
                   DropdownButtonFormField<int>(
                     value: _selectedTaxIndex,
@@ -212,8 +157,7 @@ String obtenerNombreProductType(String? type) {
                     onChanged: (newValue) {
 
                       print('esto es el taxList $_taxList');
-
-                    String nameTax = obtenerNombreImpuesto(newValue);
+                    String nameTax = invoke('obtenerNombreImpuesto', newValue, _taxList);
                     print("esto es el nombre de impuesto $nameTax");
                       setState(() {
                         _taxText = nameTax;
@@ -245,8 +189,7 @@ String obtenerNombreProductType(String? type) {
                     onChanged: (newValue) {
 
 
-                String nameProductType = obtenerNombreProductType(newValue);
-         
+                String nameProductType = invoke('obtenerNombreProductType', newValue, _productTpeList);
                       setState(() {
                         _productTypeText = nameProductType;
                         _selectedProductType = newValue as String;
@@ -275,8 +218,7 @@ String obtenerNombreProductType(String? type) {
                       );
                     }).toList(),
                     onChanged: (newValue) {
-                    String nombreCategoria = obtenerNombreCategoria(newValue);
-                      
+                        String nombreCategoria = invoke('obtenerNombreCat', newValue, _categoriesList);
                       setState(() {
                         _prodCatText = nombreCategoria;
                         _selectedCategoriesIndex = newValue as int;
@@ -305,7 +247,9 @@ String obtenerNombreProductType(String? type) {
                       );
                     }).toList(),
                     onChanged: (newValue) {
-                    String nombreProductGroup = obtenerNombrePG(newValue);
+            
+
+                    String nombreProductGroup = invoke('obtenerNombreProductGroup', newValue, _productGroupList);
                       
                       setState(() {
                         _productGroupText= nombreProductGroup;
@@ -336,7 +280,9 @@ String obtenerNombreProductType(String? type) {
                       );
                     }).toList(),
                     onChanged: (newValue) {
-                      String umName = obtenerNombreUm(newValue);
+
+                      String umName = invoke('obtenerNombreUm', newValue, _umList);
+
                       setState(() {
                         _umText = umName;
                         _selectedUmIndex = newValue as int;
@@ -355,17 +301,18 @@ String obtenerNombreProductType(String? type) {
                   ),
      
                   const SizedBox(height: 10,),
-                  TextFormField(
-                    controller: _priceController,
-                    decoration: const InputDecoration(labelText: 'Precio del producto', filled: true, fillColor: Colors.white),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa el precio del producto';
-                      }
-                      return null;
-                    },
-                  ),
+                  // TextFormField(
+                  //   readOnly: true,
+                  //   controller: _priceController,
+                  //   decoration: const InputDecoration(labelText: 'Precio del producto', filled: true, fillColor: Colors.white),
+                  //   keyboardType: TextInputType.number,
+                  //   validator: (value) {
+                  //     if (value == null || value.isEmpty) {
+                  //       return 'Por favor ingresa el precio del producto';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
   
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),

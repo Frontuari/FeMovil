@@ -1,23 +1,38 @@
 import 'package:femovil/database/create_database.dart';
+import 'package:femovil/database/update_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/presentation/products/idempiere/create_product.dart';
 import 'package:femovil/presentation/products/products_http.dart';
+import 'package:femovil/sincronization/impuestos/impuesto_http.dart';
 import 'package:femovil/sincronization/sincronizar.dart';
 import 'package:flutter/material.dart';
 
+  double syncPercentage = 0.0; // Estado para mantener el porcentaje sincronizado
+  double syncPercentageClient = 0.0;
+  double syncPercentageProviders = 0.0;
+  double syncPercentageSelling = 0.0;
+  double syncPercentageImpuestos = 0.0;
+
+
 class SynchronizationScreen extends StatefulWidget {
   const SynchronizationScreen({Key? key}) : super(key: key);
+
+
 
   @override
   _SynchronizationScreenState createState() => _SynchronizationScreenState();
 }
 
 class _SynchronizationScreenState extends State<SynchronizationScreen> {
-  double _syncPercentage = 0.0; // Estado para mantener el porcentaje sincronizado
+GlobalKey<_SynchronizationScreenState> synchronizationScreenKey = GlobalKey<_SynchronizationScreenState>();
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: synchronizationScreenKey,
       backgroundColor: const Color.fromARGB(255, 236, 247, 255),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 236, 247, 255),
@@ -29,12 +44,16 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
           Align(
             alignment: Alignment.topCenter,
             child: ElevatedButton(
-              onPressed: () async {
+              onPressed: () {
                 // Llamada a la función de sincronización
+                setState(() {
+                syncPercentage = 0;
 
-                synchronizeProductsWithIdempiere();
+                  sincronizationImpuestos(setState);
+                  syncPercentageImpuestos = 0;
+                // synchronizeProductsWithIdempiere();
+                });
            
-                _synchronizeWithIdempiere();
               },
               child: const Text('Sincronizar'),
             ),
@@ -43,53 +62,256 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Column(
                   children: [
                     const Text('Productos'),
-                    Container(
-                      width: 150,
-                      color: Colors.white,
-                      child: Text(
-                        '${_syncPercentage.toStringAsFixed(1)} %',
-                        textAlign: TextAlign.center,
-                      ),
+                      Container(
+            width: 150,
+            height: 20, // Altura del contenedor
+            decoration: BoxDecoration(
+              color: Colors.white, // Color de fondo inicial
+              border: Border.all(color: Colors.green), // Borde verde
+              borderRadius: BorderRadius.circular(5.0), // Bordes redondeados
+            ),
+            child: Stack(
+              children: [
+                Container(
+                  color: Colors.green.withOpacity(0.5), // Opacidad del contenedor verde
+                  width: 150 * (syncPercentage / 100), // Ancho dinámico del contenedor verde
+                ),
+                Center(
+                  child: Text(
+                    '${syncPercentage.toStringAsFixed(1)} %', // Porcentaje visible
+                    style: const TextStyle(
+                      color: Colors.black, // Color del texto
+                      fontWeight: FontWeight.bold, // Fuente en negrita
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ),
                     // Ícono de check para mostrar que la sincronización fue exitosa
-                    _syncPercentage == 100.0
+                    syncPercentage == 100.0
                         ? const Icon(Icons.check, color: Colors.green)
                         : const SizedBox(),
+                  ],
+                ),
+
+                
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text('Clientes'),
+                          Container(
+                width: 150,
+                height: 20, // Altura del contenedor
+                decoration: BoxDecoration(
+                  color: Colors.white, // Color de fondo inicial
+                  border: Border.all(color: Colors.green), // Borde verde
+                  borderRadius: BorderRadius.circular(5.0), // Bordes redondeados
+                ),
+                child: Stack(
+                  children: [
+                    Container(
+                      color: Colors.green.withOpacity(0.5), // Opacidad del contenedor verde
+                      width: 150 * (syncPercentageClient / 100), // Ancho dinámico del contenedor verde
+                    ),
+                    Center(
+                      child: Text(
+                        '${syncPercentageClient.toStringAsFixed(1)} %', // Porcentaje visible
+                        style: const TextStyle(
+                          color: Colors.black, // Color del texto
+                          fontWeight: FontWeight.bold, // Fuente en negrita
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              syncPercentageClient == 100.0
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : const SizedBox(),
                   ],
                 ),
               ],
             ),
           ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: [
+                    const Text('Proveedores'),
+                      Container(
+            width: 150,
+            height: 20, // Altura del contenedor
+            decoration: BoxDecoration(
+              color: Colors.white, // Color de fondo inicial
+              border: Border.all(color: Colors.green), // Borde verde
+              borderRadius: BorderRadius.circular(5.0), // Bordes redondeados
+            ),
+            child: Stack(
+              children: [
+                Container(
+                  color: Colors.green.withOpacity(0.5), // Opacidad del contenedor verde
+                  width: 150 * (syncPercentageProviders / 100), // Ancho dinámico del contenedor verde
+                ),
+                Center(
+                  child: Text(
+                    '${syncPercentageProviders.toStringAsFixed(1)} %', // Porcentaje visible
+                    style: const TextStyle(
+                      color: Colors.black, // Color del texto
+                      fontWeight: FontWeight.bold, // Fuente en negrita
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+                    // Ícono de check para mostrar que la sincronización fue exitosa
+                    syncPercentageProviders == 100.0
+                        ? const Icon(Icons.check, color: Colors.green)
+                        : const SizedBox(),
+                  ],
+                ),
+
+                
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text('Ventas'),
+                          Container(
+                width: 150,
+                height: 20, // Altura del contenedor
+                decoration: BoxDecoration(
+                  color: Colors.white, // Color de fondo inicial
+                  border: Border.all(color: Colors.green), // Borde verde
+                  borderRadius: BorderRadius.circular(5.0), // Bordes redondeados
+                ),
+                child: Stack(
+                  children: [
+                    Container(
+                      color: Colors.green.withOpacity(0.5), // Opacidad del contenedor verde
+                      width: 150 * (syncPercentageSelling / 100), // Ancho dinámico del contenedor verde
+                    ),
+                    Center(
+                      child: Text(
+                        '${syncPercentageSelling.toStringAsFixed(1)} %', // Porcentaje visible
+                        style: const TextStyle(
+                          color: Colors.black, // Color del texto
+                          fontWeight: FontWeight.bold, // Fuente en negrita
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              syncPercentageSelling == 100.0
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : const SizedBox(),
+                  ],
+                ),
+              ],
+            ),
+          ),
+           Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: [
+                    const Text('Impuestos'),
+                      Container(
+            width: 150,
+            height: 20, // Altura del contenedor
+            decoration: BoxDecoration(
+              color: Colors.white, // Color de fondo inicial
+              border: Border.all(color: Colors.green), // Borde verde
+              borderRadius: BorderRadius.circular(5.0), // Bordes redondeados
+            ),
+            child: Stack(
+              children: [
+                Container(
+                  color: Colors.green.withOpacity(0.5), // Opacidad del contenedor verde
+                  width: 150 * (syncPercentageImpuestos / 100), // Ancho dinámico del contenedor verde
+                ),
+                Center(
+                  child: Text(
+                    '${syncPercentageImpuestos.toStringAsFixed(1)} %', // Porcentaje visible
+                    style: const TextStyle(
+                      color: Colors.black, // Color del texto
+                      fontWeight: FontWeight.bold, // Fuente en negrita
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+                    // Ícono de check para mostrar que la sincronización fue exitosa
+                    syncPercentageImpuestos == 100.0
+                        ? const Icon(Icons.check, color: Colors.green)
+                        : const SizedBox(),
+                  ],
+                ),
+
+                
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text('Ventas'),
+                          Container(
+                width: 150,
+                height: 20, // Altura del contenedor
+                decoration: BoxDecoration(
+                  color: Colors.white, // Color de fondo inicial
+                  border: Border.all(color: Colors.green), // Borde verde
+                  borderRadius: BorderRadius.circular(5.0), // Bordes redondeados
+                ),
+                child: Stack(
+                  children: [
+                    Container(
+                      color: Colors.green.withOpacity(0.5), // Opacidad del contenedor verde
+                      width: 150 * (syncPercentageSelling / 100), // Ancho dinámico del contenedor verde
+                    ),
+                    Center(
+                      child: Text(
+                        '${syncPercentageSelling.toStringAsFixed(1)} %', // Porcentaje visible
+                        style: const TextStyle(
+                          color: Colors.black, // Color del texto
+                          fontWeight: FontWeight.bold, // Fuente en negrita
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              syncPercentageSelling == 100.0
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : const SizedBox(),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
         ],
       ),
     );
   }
 
-  void _synchronizeWithIdempiere() {
-    // Simulación de sincronización (actualización del porcentaje cada segundo)
-    const totalSteps = 100;
-    const delay = Duration(milliseconds: 100);
-    for (int i = 1; i <= totalSteps; i++) {
-      Future.delayed(delay * i, () {
-        setState(() {
-          _syncPercentage = (i / totalSteps) * 100;
-        });
-      });
-    }
-  }
-}
-
-
-
-
-synchronizeProductsWithIdempiere() async {
-
-      sincronizationProducts();
+  synchronizeProductsWithIdempiere() async {
                 List<Map<String, dynamic>> productsWithZeroValues = await getProductsWithZeroValues();
+    
+                await sincronizationProducts(setState);
+  
+
                 for (var productData in productsWithZeroValues) {
 
                   Product product = Product(
@@ -111,6 +333,9 @@ synchronizeProductsWithIdempiere() async {
                     taxId: productData['tax_cat_id'],
                   );
 
+                  
+
+
                        dynamic result = await createProductIdempiere(product.toMap());
                            print('este es el $result');
                        
@@ -119,10 +344,16 @@ synchronizeProductsWithIdempiere() async {
                     print('Este es el mp product id $mProductId && el codprop $codProdc');
                     // Limpia los controladores de texto después de guardar el producto
 
-                    await DatabaseHelper.instance.updateProductMProductIdAndCodProd(productData['id'], mProductId, codProdc);
+                    await updateProductMProductIdAndCodProd(productData['id'], mProductId, codProdc);
                   
-
 
                 }
 
 }
+
+  
+}
+
+
+
+
