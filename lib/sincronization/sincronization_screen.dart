@@ -1,10 +1,10 @@
-import 'package:femovil/database/create_database.dart';
+import 'package:femovil/config/getPosProperties.dart';
+import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/update_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/presentation/products/idempiere/create_product.dart';
 import 'package:femovil/presentation/products/products_http.dart';
-import 'package:femovil/sincronization/impuestos/impuesto_http.dart';
-import 'package:femovil/sincronization/sincronizar.dart';
+import 'package:femovil/sincronization/https/customer_http.dart';
 import 'package:flutter/material.dart';
 
   double syncPercentage = 0.0; // Estado para mantener el porcentaje sincronizado
@@ -48,10 +48,12 @@ GlobalKey<_SynchronizationScreenState> synchronizationScreenKey = GlobalKey<_Syn
                 // Llamada a la función de sincronización
                 setState(() {
                 syncPercentage = 0;
-
-                  sincronizationImpuestos(setState);
+                getPosPropertiesInit();
+                  sincronizationCustomers(setState);
+                  // sincronizationImpuestos(setState);
+                  syncPercentageClient = 0;
                   syncPercentageImpuestos = 0;
-                // synchronizeProductsWithIdempiere();
+                // synchronizeProductsWithIdempiere(setState);
                 });
            
               },
@@ -306,7 +308,13 @@ GlobalKey<_SynchronizationScreenState> synchronizationScreenKey = GlobalKey<_Syn
     );
   }
 
-  synchronizeProductsWithIdempiere() async {
+
+  
+}
+
+
+  synchronizeProductsWithIdempiere(setState) async {
+
                 List<Map<String, dynamic>> productsWithZeroValues = await getProductsWithZeroValues();
     
                 await sincronizationProducts(setState);
@@ -333,7 +341,6 @@ GlobalKey<_SynchronizationScreenState> synchronizationScreenKey = GlobalKey<_Syn
                     taxId: productData['tax_cat_id'],
                   );
 
-                  
 
 
                        dynamic result = await createProductIdempiere(product.toMap());
@@ -350,10 +357,6 @@ GlobalKey<_SynchronizationScreenState> synchronizationScreenKey = GlobalKey<_Syn
                 }
 
 }
-
-  
-}
-
 
 
 
