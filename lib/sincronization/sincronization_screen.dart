@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
   double syncPercentageImpuestos = 0.0;
 
 
+
 class SynchronizationScreen extends StatefulWidget {
   const SynchronizationScreen({Key? key}) : super(key: key);
 
