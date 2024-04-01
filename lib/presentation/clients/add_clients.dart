@@ -4,10 +4,6 @@ import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/presentation/products/utils/switch_generated_names_select.dart';
 import 'package:flutter/material.dart';
 
-
-
-
-
 class AddClientsForm extends StatefulWidget {
   const AddClientsForm({super.key});
 
@@ -25,10 +21,10 @@ class _AddClientsFormState extends State<AddClientsForm> {
   final TextEditingController _grupoController = TextEditingController();
 
 //List
- List<Map<String, dynamic>> _countryList = [];
- List<Map<String, dynamic>> _groupList = [];
- List<Map<String, dynamic>> _taxTypeList = [];
- List<Map<String, dynamic>> _taxPayerList = [];
+  List<Map<String, dynamic>> _countryList = [];
+  List<Map<String, dynamic>> _groupList = [];
+  List<Map<String, dynamic>> _taxTypeList = [];
+  List<Map<String, dynamic>> _taxPayerList = [];
 
   // SELECTED
   int _selectedCountryIndex = 0;
@@ -36,65 +32,68 @@ class _AddClientsFormState extends State<AddClientsForm> {
   int _selectedTaxType = 0;
   int _selectedTaxPayer = 0;
 
-
 // Text
 
-String _countryText = '';
-String _groupText = '';
-String _taxTypeText = '';
-String _taxPayerText = '';
+  String _countryText = '';
+  String _groupText = '';
+  String _taxTypeText = '';
+  String _taxPayerText = '';
 
-      loadList()async {
-
-       List<Map<String, dynamic>> getCountryGroup = await  listarCountryGroup();
-        List<Map<String, dynamic>> getGroupTercero = await listarGroupTercero();
-        List<Map<String, dynamic>> getTaxType = await listarTaxType();
-        List<Map<String, dynamic>> getTaxPayer = await listarTaxPayer();
-          print('Esta es la respuesta $getCountryGroup' ) ;
-          print('Esta es la respuesta de getGroupTercero $getGroupTercero');
-          print('Esto es getTaxType $getTaxType');
-          print('Estos son los taxPayers $getTaxPayer');
-              _countryList.add({'c_country_id': 0, 'country': 'Selecciona un País'});
-              _groupList.add ({'c_bp_group_id': 0, 'group_bp_name': 'Selecciona un Grupo'});
-              _taxTypeList.add({'lco_tax_id_typeid': 0, 'tax_id_type_name' : 'Selecciona un tipo de impuesto'});
-              _taxPayerList.add({'lco_tax_payer_typeid': 0, 'tax_payer_type_name' : 'Selecciona un tipo de contribuyente'});
-        setState(() {
-          _countryList.addAll(getCountryGroup);
-          _groupList.addAll(getGroupTercero);
-          _taxTypeList.addAll(getTaxType);
-          _taxPayerList.addAll(getTaxPayer);
-        });
-
-      }
-
-      @override
-  void initState() {
-
-      loadList();
-
-
-    super.initState();
-
+  loadList() async {
+    List<Map<String, dynamic>> getCountryGroup = await listarCountryGroup();
+    List<Map<String, dynamic>> getGroupTercero = await listarGroupTercero();
+    List<Map<String, dynamic>> getTaxType = await listarTaxType();
+    List<Map<String, dynamic>> getTaxPayer = await listarTaxPayer();
+    print('Esta es la respuesta $getCountryGroup');
+    print('Esta es la respuesta de getGroupTercero $getGroupTercero');
+    print('Esto es getTaxType $getTaxType');
+    print('Estos son los taxPayers $getTaxPayer');
+    _countryList.add({'c_country_id': 0, 'country': 'Selecciona un País'});
+    _groupList
+        .add({'c_bp_group_id': 0, 'group_bp_name': 'Selecciona un Grupo'});
+    _taxTypeList.add({
+      'lco_tax_id_typeid': 0,
+      'tax_id_type_name': 'Selecciona un tipo de impuesto'
+    });
+    _taxPayerList.add({
+      'lco_tax_payer_typeid': 0,
+      'tax_payer_type_name': 'Selecciona un tipo de contribuyente'
+    });
+    setState(() {
+      _countryList.addAll(getCountryGroup);
+      _groupList.addAll(getGroupTercero);
+      _taxTypeList.addAll(getTaxType);
+      _taxPayerList.addAll(getTaxPayer);
+    });
   }
 
+  @override
+  void initState() {
+    loadList();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-      appBar: AppBar(title: const Text("Agregar Cliente", style: TextStyle(
+      appBar: AppBar(
+        title: const Text(
+          "Agregar Cliente",
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w400,
             color: Color.fromARGB(255, 105, 102, 102),
-          ),),
-             backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-             iconTheme: const IconThemeData(color: Color.fromARGB(255, 105, 102, 102)),
-    
-           ),
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 236, 247, 255),
+        iconTheme:
+            const IconThemeData(color: Color.fromARGB(255, 105, 102, 102)),
+      ),
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          
           width: 250,
           child: Form(
             key: _formKey,
@@ -103,10 +102,22 @@ String _taxPayerText = '';
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                const SizedBox(height: 15),
+                  Container(
+                    width: 300,
+                    color: Colors.blue,
+                    child: Text(
+                      "Datos Personales",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Nombre del Cliente', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                        labelText: 'Nombre del Cliente',
+                        filled: true,
+                        fillColor: Colors.white),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa el nombre del Cliente';
@@ -117,7 +128,10 @@ String _taxPayerText = '';
                   const SizedBox(height: 10),
                   TextFormField(
                     controller: _rucController,
-                    decoration: const InputDecoration(labelText: 'Ruc/Dni', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                        labelText: 'Ruc/Dni',
+                        filled: true,
+                        fillColor: Colors.white),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -126,10 +140,14 @@ String _taxPayerText = '';
                       return null;
                     },
                   ),
-                  const SizedBox(height: 10,),
-                     DropdownButtonFormField<int>(
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  DropdownButtonFormField<int>(
                     value: _selectedCountryIndex,
-                    items: _countryList.where((country) => country['c_country_id'] is int).map<DropdownMenuItem<int>>((country) {
+                    items: _countryList
+                        .where((country) => country['c_country_id'] is int)
+                        .map<DropdownMenuItem<int>>((country) {
                       print('tax $country');
                       return DropdownMenuItem<int>(
                         value: country['c_country_id'] as int,
@@ -137,10 +155,10 @@ String _taxPayerText = '';
                       );
                     }).toList(),
                     onChanged: (newValue) {
-
                       print('esto es el taxList $_countryList');
-                    String nameCountry = invoke('obtenerNombreCountry', newValue, _countryList);
-                    print("esto es el nombre de impuesto $nameCountry");
+                      String nameCountry = invoke(
+                          'obtenerNombreCountry', newValue, _countryList);
+                      print("esto es el nombre de impuesto $nameCountry");
                       setState(() {
                         _countryText = nameCountry;
                         _selectedCountryIndex = newValue as int;
@@ -157,10 +175,14 @@ String _taxPayerText = '';
                       return null;
                     },
                   ),
-                  const SizedBox(height: 10,),
-                   DropdownButtonFormField<int>(
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  DropdownButtonFormField<int>(
                     value: _selectedGroupIndex,
-                    items: _groupList.where((groupList) => groupList['c_bp_group_id'] is int).map<DropdownMenuItem<int>>((group) {
+                    items: _groupList
+                        .where((groupList) => groupList['c_bp_group_id'] is int)
+                        .map<DropdownMenuItem<int>>((group) {
                       print('tax $group');
                       return DropdownMenuItem<int>(
                         value: group['c_bp_group_id'] as int,
@@ -168,13 +190,13 @@ String _taxPayerText = '';
                       );
                     }).toList(),
                     onChanged: (newValue) {
-
                       print('esto es el taxList $_groupList');
-                    String nameGroup = invoke('obtenerNombreGroup', newValue, _groupList);
-                    print("esto es el nombre de impuesto $nameGroup");
+                      String nameGroup =
+                          invoke('obtenerNombreGroup', newValue, _groupList);
+                      print("esto es el nombre de impuesto $nameGroup");
                       setState(() {
                         _groupText = nameGroup;
-                        _selectedGroupIndex= newValue as int;
+                        _selectedGroupIndex = newValue as int;
                       });
                     },
                     decoration: const InputDecoration(
@@ -188,27 +210,30 @@ String _taxPayerText = '';
                       return null;
                     },
                   ),
-                    const SizedBox(height: 10,),
-
-                     DropdownButtonFormField<int>(
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  DropdownButtonFormField<int>(
                     value: _selectedTaxType,
-                    items: _taxTypeList.where((taxType) => taxType['lco_tax_id_typeid'] is int).map<DropdownMenuItem<int>>((taxType) {
+                    items: _taxTypeList
+                        .where((taxType) => taxType['lco_tax_id_typeid'] is int)
+                        .map<DropdownMenuItem<int>>((taxType) {
                       print('tax $taxType');
                       return DropdownMenuItem<int>(
                         value: taxType['lco_tax_id_typeid'] as int,
                         child: SizedBox(
-                          width: 200,
-                          child: Text(taxType['tax_id_type_name'] as String)),
+                            width: 200,
+                            child: Text(taxType['tax_id_type_name'] as String)),
                       );
                     }).toList(),
                     onChanged: (newValue) {
-
                       print('esto es el taxList $_taxTypeList');
-                    String nameTax = invoke('obtenerNombreTax', newValue, _taxTypeList);
-                    print("esto es el nombre del tipo de impuesto $nameTax");
+                      String nameTax =
+                          invoke('obtenerNombreTax', newValue, _taxTypeList);
+                      print("esto es el nombre del tipo de impuesto $nameTax");
                       setState(() {
                         _taxTypeText = nameTax;
-                        _selectedTaxType= newValue as int;
+                        _selectedTaxType = newValue as int;
                       });
                     },
                     decoration: const InputDecoration(
@@ -222,24 +247,29 @@ String _taxPayerText = '';
                       return null;
                     },
                   ),
-                    const SizedBox(height: 10,),
-
-                     DropdownButtonFormField<int>(
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  DropdownButtonFormField<int>(
                     value: _selectedTaxPayer,
-                     items: _taxPayerList.where((taxPayer) => taxPayer['lco_tax_payer_typeid'] is int).map<DropdownMenuItem<int>>((taxPayer) {
-                    
+                    items: _taxPayerList
+                        .where((taxPayer) =>
+                            taxPayer['lco_tax_payer_typeid'] is int)
+                        .map<DropdownMenuItem<int>>((taxPayer) {
                       return DropdownMenuItem<int>(
-                        value: taxPayer['lco_tax_payer_typeid'] ,
+                        value: taxPayer['lco_tax_payer_typeid'],
                         child: SizedBox(
-                          width: 200,
-                          child: Text(taxPayer['tax_payer_type_name'] as String)),
+                            width: 200,
+                            child: Text(
+                                taxPayer['tax_payer_type_name'] as String)),
                       );
                     }).toList(),
                     onChanged: (newValue) {
-
                       print('esto es el taxList $_taxPayerList');
-                    String nameTaxPayer = invoke('obtenerNombreTaxPayer', newValue, _taxPayerList);
-                    print("esto es el nombre del tipo de constribuyente $nameTaxPayer");
+                      String nameTaxPayer = invoke(
+                          'obtenerNombreTaxPayer', newValue, _taxPayerList);
+                      print(
+                          "esto es el nombre del tipo de constribuyente $nameTaxPayer");
                       setState(() {
                         _taxPayerText = nameTaxPayer;
                         _selectedTaxPayer = newValue as int;
@@ -256,33 +286,43 @@ String _taxPayerText = '';
                       return null;
                     },
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   TextFormField(
                     controller: _correoController,
-                    decoration: const InputDecoration(labelText: 'Correo', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                        labelText: 'Correo',
+                        filled: true,
+                        fillColor: Colors.white),
                     keyboardType: TextInputType.number,
-                     validator: (value) {
+                    validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa un correo';
                       }
                       return null;
                     },
                   ),
-                   const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   TextFormField(
                     controller: _telefonoController,
-                    decoration: const InputDecoration(labelText: 'Telefono', filled: true, fillColor: Colors.white),
+                    decoration: const InputDecoration(
+                        labelText: 'Telefono',
+                        filled: true,
+                        fillColor: Colors.white),
                     keyboardType: TextInputType.number,
-                     validator: (value) {
+                    validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa el telefono del cliente';
                       }
                       return null;
                     },
                   ),
-                   const SizedBox(height: 10,),
-                
-           
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: SizedBox(
@@ -294,13 +334,13 @@ String _taxPayerText = '';
                             _saveProduct();
                           }
                         },
-                         style: ElevatedButton.styleFrom(
+                        style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
-                         shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(10.0), 
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                         ),
-                         ),
                         child: const Text('Guardar'),
                       ),
                     ),
@@ -324,31 +364,31 @@ String _taxPayerText = '';
 
     // Crea una instancia del producto
     Customer client = Customer(
-        bpName: name,
-        ruc:ruc,
-        address: "direccion",
-        cBpGroupId: 1,
-        cBparnetLocationId: 1,
-        lcoTaxPayerTypeId: 24,
-        lvePersonTypeId: 12,
-        personTypeName: 'Qqew',
-        taxPayerTypeName: 'qweqw',
-        cCityId: '1',
-        cCountryId: '1',
-        cLocationId: 1,
-        cRegionId: '1',
-        cbPartnerId: 2,
-        city: 'Araure',
-        codClient: 1540,
-        codePostal: '23546',
-        country: 'Venezuela',
-        isBillTo: 'Y',
-        lcoTaxIdTypeId: 1,
-        region: 'No aplica',
-        taxIdTypeName: 'Cedula',
-        email: correo,
-        phone: telefono,
-        cBpGroupName: grupo,
+      bpName: name,
+      ruc: ruc,
+      address: "direccion",
+      cBpGroupId: 1,
+      cBparnetLocationId: 1,
+      lcoTaxPayerTypeId: 24,
+      lvePersonTypeId: 12,
+      personTypeName: 'Qqew',
+      taxPayerTypeName: 'qweqw',
+      cCityId: '1',
+      cCountryId: '1',
+      cLocationId: 1,
+      cRegionId: '1',
+      cbPartnerId: 2,
+      city: 'Araure',
+      codClient: 1540,
+      codePostal: '23546',
+      country: 'Venezuela',
+      isBillTo: 'Y',
+      lcoTaxIdTypeId: 1,
+      region: 'No aplica',
+      taxIdTypeName: 'Cedula',
+      email: correo,
+      phone: telefono,
+      cBpGroupName: grupo,
     );
 
     // Llama a un método para guardar el producto en Sqflite
@@ -357,7 +397,7 @@ String _taxPayerText = '';
     // Limpia los controladores de texto después de guardar el producto
     _nameController.clear();
     _rucController.clear();
-    _correoController .clear();
+    _correoController.clear();
     _telefonoController.clear();
     _grupoController.clear();
 
@@ -365,9 +405,6 @@ String _taxPayerText = '';
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Cliente guardado correctamente'),
     ));
-
-
-
   }
 
   Future<void> saveClientToDatabase(Customer product) async {
@@ -376,7 +413,8 @@ String _taxPayerText = '';
       int result = await db.insert('clients', product.toMap());
 
       if (result != -1) {
-        print('El Cliente se ha guardado correctamente en la base de datos con el id: $result');
+        print(
+            'El Cliente se ha guardado correctamente en la base de datos con el id: $result');
       } else {
         print('Error al guardar el Cliente en la base de datos');
       }
@@ -399,44 +437,3 @@ String _taxPayerText = '';
     super.dispose();
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
