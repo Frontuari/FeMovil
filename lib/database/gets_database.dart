@@ -251,3 +251,15 @@ Future<List<Map<String, dynamic>>> getProducts() async {
         }
         return [];
       }
+
+
+   Future<List<Map<String, dynamic>>> getCustomersWithZeroValues() async {
+        final db = await DatabaseHelper.instance.database;
+        if (db != null) {
+          return await db.rawQuery('''
+            SELECT * FROM clients 
+            WHERE c_bpartner_id = 0 AND cod_client = 0
+          ''');
+        }
+        return [];
+      }

@@ -64,7 +64,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Precio: \$${productPrice.toStringAsFixed(2)}'),
+                      Text('Precio: \$${productPrice != '{@nil=true}' ? productPrice.toStringAsFixed(2) : 0} '),
                       Text('Cantidad disponible: ${filteredProducts[index]['quantity']}'),
                       Text('Cantidad Seleccionada: $quantity'),
                       

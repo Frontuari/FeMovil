@@ -229,7 +229,8 @@ import 'package:sqflite/sqflite.dart';
             c_doctypereceipt_id INTEGER,
             city STRING,
             address1 STRING, 
-            m_pricelist_id INTEGER
+            m_pricelist_id INTEGER,
+            c_currency_id INTEGER
             )
         ''');
 

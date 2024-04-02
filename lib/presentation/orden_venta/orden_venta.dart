@@ -201,17 +201,30 @@ void initState() {
                 'Productos:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              Container(
-                height: 100,
+            Container(
+                height: 300,
                 child: ListView.builder(
                   itemCount: selectedProducts.length,
                   itemBuilder: (context, index) {
                     final product = selectedProducts[index];
-                    return ListTile(
-                      title: Text(product['name']),
-                      subtitle: Column(
+                    return Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            product['name'],
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -219,32 +232,50 @@ void initState() {
                               Text('Precio: ${product['price']}'),
                             ],
                           ),
+                          const SizedBox(height: 4),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Impuesto: ${product['impuesto']}%'),
-                              Text('Monto Impuesto: ${calcularMontoImpuesto(product['impuesto'],product['quantity']*product['price'])}')
+                              Text(
+                                'Monto Impuesto: ${calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])}',
+                                style: const TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             ],
                           ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Saldo Neto ${ calcularSaldoNetoProducto(product['quantity'], product['price']) }'),
-                                  Text('Monto Total ${ saldoNeto! + totalImpuesto! }'),
-
-                                ],
-                              ) 
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Saldo Neto: ${calcularSaldoNetoProducto(product['quantity'], product['price']).toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                ),
+                              ),
+                              Text(
+                                'Monto Total: ${(calcularSaldoNetoProducto(product['quantity'], product['price']) + calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])).toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                setState(() {
+                                  _removeProduct(index);
+                                });
+                              },
+                            ),
+                          ),
                         ],
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                        
-                          setState(() {
-                                _removeProduct(index);
-                        
-                          });
-                        },
                       ),
                     );
                   },
