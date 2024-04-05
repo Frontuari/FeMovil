@@ -31,6 +31,7 @@ synchronizeProductsWithIdempiere(setState) async {
       categoria: productData['categoria'],
       qtySold: productData['total_sold'],
       taxId: productData['tax_cat_id'],
+      priceListSales: productData['pricelistsales'],
     );
     dynamic result = await createProductIdempiere(product.toMap());
     print('este es el $result');

@@ -76,7 +76,7 @@ class ClientDetailsScreen extends StatelessWidget {
                   onPressed: () {
                     // Aquí puedes manejar la acción de agregar orden
                     // Por ejemplo, puedes navegar a una pantalla de agregar orden
-                   Navigator.push(context,MaterialPageRoute(builder: (context) => OrdenDeVentaScreen(clientId: client["id"] ,clientName: client["bp_name"])),
+                   Navigator.push(context,MaterialPageRoute(builder: (context) => OrdenDeVentaScreen(clientId: client["id"] ,clientName: client["bp_name"], cBPartnerId: client['c_bpartner_id'], cBPartnerLocationId: client['c_bpartner_location_id'], )),
                   );
 
                   },

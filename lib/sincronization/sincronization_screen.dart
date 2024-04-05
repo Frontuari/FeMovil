@@ -45,11 +45,10 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
             child: ElevatedButton(
               onPressed: () {
                 // Llamada a la función de sincronización
-                // synchronizeProductsWithIdempiere(setState);
+                synchronizeProductsWithIdempiere(setState);
                 // sincronizationCustomers(setState);
                 synchronizeCustomersWithIdempiere(setState);
                 sincronizationImpuestos(setState);
-                // getPosPropertiesInit();
 
                 setState(() {
                   syncPercentage = 0;

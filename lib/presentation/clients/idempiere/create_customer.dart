@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:femovil/config/getPosProperties.dart';
 import 'package:femovil/config/url.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
@@ -14,14 +15,21 @@ createCustomerIdempiere(customer) async {
     };
     
 try {
+
   
-  if(variablesG.isEmpty) {
 
-  final home = HomeState();
-      home.initV();
-
-
+   initV() async {
+    if (variablesG.isEmpty) {
+      await getPosPropertiesInit();
+      List<Map<String, dynamic>> response = await getPosPropertiesV();
+      print('variables Entre aqui');
+        variablesG = response;
+    
+    }
   }
+ 
+   initV();
+
     print('variables globales $variablesG');
     print('Esto es Customer ${customer}');
 
