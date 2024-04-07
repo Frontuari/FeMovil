@@ -59,7 +59,7 @@ class _ProductsState extends State<Products> {
   void initState() {
     _loadProducts();
 
-    // _deleteBaseDatos();
+    _deleteBaseDatos();
     super.initState();
     // sincronizationProducts();
   }

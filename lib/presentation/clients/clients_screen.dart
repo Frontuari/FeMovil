@@ -51,7 +51,7 @@ class _ClientsState extends State<Clients> {
 
   @override
   void initState() {
-    print("Esto es la variable global ${variablesG[0]['m_pricelist_id']}");
+    // print("Esto es la variable global ${variablesG[0]['m_pricelist_id']}");
     _loadClients();
     super.initState();
   }

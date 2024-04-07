@@ -1,5 +1,6 @@
 import 'package:femovil/assets/nav_bar_bottom.dart';
 import 'package:femovil/config/getPosProperties.dart';
+import 'package:femovil/database/create_database.dart';
 import 'package:femovil/infrastructure/models/info_perfil.dart';
 import 'package:femovil/presentation/cobranzas/cobranzas_list.dart';
 import 'package:femovil/presentation/clients/clients_screen.dart';
@@ -48,10 +49,11 @@ class HomeState extends State<Home> {
 
   @override
   void initState() {
+    DatabaseHelper.instance.initDatabase();
     getPosPropertiesInit();
     initV();
-    print('Esto es la variable global de country_id ${variablesG}');
     super.initState();
+    print('Esto es la variable global de country_id ${variablesG}');
     print("me monte");
   }
 
