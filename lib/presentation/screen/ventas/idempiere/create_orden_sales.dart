@@ -31,6 +31,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
     var variablesLogin = await getLogin();
     final uri = Uri.parse(
         '${map['URL']}ADInterface/services/rest/composite_service/composite_operation');
+
     final request = await httpClient.postUrl(uri);
 
     final info = await getApplicationSupportDirectory();
@@ -86,6 +87,18 @@ createOrdenSalesIdempiere(orderSalesList) async {
                       {
                         "@column": "C_BPartner_ID",
                         "val": orderSales['c_bpartner_id'],
+                      },
+                      {
+                        "@column": "C_BPartner_Location_ID",
+                        "val": orderSales['c_bpartner_location_id'],
+                      },
+                      {
+                        "@column": "C_Currency_ID",
+                        "val": "100",
+                      },
+                      {
+                        "@column": "Description",
+                        "val": orderSales['descripcion'],
                       },
                       {
                         "@column": "C_ConversionType_ID",
@@ -171,10 +184,10 @@ createLines(lines, rePId) {
             {"@column": "AD_Client_ID", "val": line['ad_client_id']},
             {"@column": "AD_Org_ID", "val": line['ad_org_id']},
             {"@column": "C_Order_ID", "val": "@C_Order.C_Order_ID"},
-            {"@column": "Line", "val": line['line_id']},
             {"@column": "PriceEntered", "val": line['price_entered']},
             {"@column": "PriceActual", "val": line['price_entered']},
             {"@column": "M_Product_ID", "val": line['m_product_id']},
+            {"@column": "QtyOrdered", "val": line['qty_entered']},
             {"@column": "QtyEntered", "val": line['qty_entered']},
             {"@column": "SalesRep_ID", "val": rePId},
           ]
