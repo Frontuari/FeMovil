@@ -8,6 +8,7 @@ import 'package:femovil/presentation/products/idempiere/create_product.dart';
 import 'package:femovil/presentation/products/products_http.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
 import 'package:femovil/sincronization/https/customer_http.dart';
+import 'package:femovil/sincronization/https/vendors_http.dart';
 
 synchronizeProductsWithIdempiere(setState) async {
   List<Map<String, dynamic>> productsWithZeroValues =
@@ -112,6 +113,70 @@ synchronizeCustomersWithIdempiere(setState) async {
   }
 }
 
+synchronizeVendorsWithIdempiere(setState) async {
+  // List<Map<String, dynamic>> customersWithZeroValues =
+  //     await getCustomersWithZeroValues();
+
+  await sincronizationVendors(setState);
+
+  // print('Esto es vendor en cero $customersWithZeroValues');
+  
+  // for (var customersData in customersWithZeroValues) {
+  //   Customer customer = Customer(
+  //       cbPartnerId: customersData['c_bpartner_id'],
+  //       codClient: customersData['cod_client'],
+  //       isBillTo: 'Y',
+  //       address: customersData['address'],
+  //       bpName: customersData['bp_name'],
+  //       cBpGroupId: customersData['c_bp_group_id'],
+  //       cBpGroupName: customersData['group_bp_name'],
+  //       cBparnetLocationId: 0,
+  //       cCityId: customersData['c_city_id'],
+  //       cCountryId: customersData['c_country_id'],
+  //       cLocationId: 0, 
+  //       cRegionId: 0,
+  //       city: customersData['city'],
+  //       codePostal: customersData['code_postal'],
+  //       country: customersData['country'],
+  //       email: customersData['email'],
+  //       lcoTaxIdTypeId: customersData['lco_tax_id_typeid'],
+  //       lcoTaxPayerTypeId: customersData['lco_tax_payer_typeid'],
+  //       lvePersonTypeId: customersData['lve_person_type_id'],
+  //       personTypeName: customersData['person_type_name'],
+  //       phone: customersData['phone'],
+  //       region: customersData['region'],
+  //       ruc: customersData['ruc'],
+  //       taxIdTypeName: customersData['tax_id_type_name'],
+  //       taxPayerTypeName: customersData['tax_payer_type_name']
+
+  //   );
+  //   dynamic result = await createCustomerIdempiere(customer.toMap());
+  //   print('este es el $result');
+
+  //   final cBParnertId =
+  //       result['CompositeResponses']['CompositeResponse']
+  //       ['StandardResponse'][0]['outputFields']
+  //       ['outputField'][0]['@value'];
+  //   final newCodClient =
+  //       result['CompositeResponses']['CompositeResponse']
+  //       ['StandardResponse'][0]['outputFields']
+  //       ['outputField'][1]['@value'];
+  //   final cLocationId =  result['CompositeResponses']['CompositeResponse']
+  //       ['StandardResponse'][1]['outputFields']
+  //       ['outputField']['@value'];
+  //   final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
+  //       ['StandardResponse'][2]['outputFields']
+  //       ['outputField']['@value'];
+
+  //   print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
+
+
+  //   await updateCustomerCBPartnerIdAndCodClient(
+  //       customersData['id'], cBParnertId, newCodClient, cLocationId, cBPartnerLocationId );
+  // }
+}
+
+
 
 synchronizeOrderSalesWithIdempiere(setState) async {
   List<Map<String, dynamic>> orderSalesWithZeroValues =
@@ -123,7 +188,7 @@ synchronizeOrderSalesWithIdempiere(setState) async {
   
   for (var orderSales in orderSalesWithZeroValues) {
     OrderSales orderSale = OrderSales(
-            id: orderSales['orden_venta_id'],
+            id: orderSales['id'],
             cBpartnerId: orderSales['c_bpartner_id'],
             adClientId: orderSales['ad_client_id'],
             adOrgId: orderSales['ad_org_id'],
@@ -135,8 +200,7 @@ synchronizeOrderSalesWithIdempiere(setState) async {
             documentNo: orderSales['documentno'],
             fecha: orderSales['fecha'],
             mWareHouseId: orderSales['m_warehouse_id'],
-            monto: orderSales['monto'],
-            orderSaleId: orderSales['orden_venta_id'],  
+            monto: orderSales['monto'], 
             paymentRule: orderSales['paymentrule'],
             usuarioId: orderSales['usuario_id'],
             salesRedId: orderSales['salesrep_id'],
@@ -146,27 +210,12 @@ synchronizeOrderSalesWithIdempiere(setState) async {
         
     );
 
-    dynamic result = await createOrdenSalesIdempiere(orderSale.toMap());
-       String documentNo = result['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
-                        dynamic cOrderId = result['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][0]['@value'];
-                        print(' esto es el client id ${orderSale.id} Esto es el document no $documentNo y este es el orderid $cOrderId');
-
-                        Map<String, dynamic> nuevoDocumentNoAndCOrderId = {
-
-                            'documentno': documentNo,
-                            'c_order_id':cOrderId
-
-
-                        };
-
-                      String newStatus = 'Enviado';
-
-                      updateOrdereSalesForStatusSincronzed(orderSale.id, newStatus);
-
-                      actualizarDocumentNo(orderSale.id, nuevoDocumentNoAndCOrderId);
-
+     await createOrdenSalesIdempiere(orderSale.toMap());
+   
 
 
 
   }
+
+  
 }

@@ -118,3 +118,25 @@ Future<List<Map<String, dynamic>>> listarCategorias() async {
           }
           return [];
         }
+
+         Future<List<Map<String, dynamic>>> listarTypeGroupVendor() async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+            SELECT DISTINCT c_bp_group_id, groupbpname
+               FROM providers
+            ''');
+          }
+          return [];
+        }
+
+         Future<List<Map<String, dynamic>>> listarTypeTaxVendor() async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+            SELECT DISTINCT lco_tax_id_type_id, tax_id_type_name
+               FROM providers
+            ''');
+          }
+          return [];
+        }

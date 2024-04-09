@@ -45,16 +45,19 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
             child: ElevatedButton(
               onPressed: () {
                 // Llamada a la función de sincronización
-                // synchronizeProductsWithIdempiere(setState);
-                // sincronizationCustomers(setState);
-                // synchronizeCustomersWithIdempiere(setState);
-                // sincronizationImpuestos(setState);
-                synchronizeOrderSalesWithIdempiere(setState);
+                synchronizeProductsWithIdempiere(setState);
+                sincronizationCustomers(setState);
+                synchronizeCustomersWithIdempiere(setState);
+                sincronizationImpuestos(setState);
+                // synchronizeOrderSalesWithIdempiere(setState); 
+
+                synchronizeVendorsWithIdempiere(setState);
 
                 setState(() {
                   syncPercentage = 0;
                   syncPercentageClient = 0;
                   syncPercentageImpuestos = 0;
+                  syncPercentageProviders = 0;
                 });
               },
               child: const Text('Sincronizar'),

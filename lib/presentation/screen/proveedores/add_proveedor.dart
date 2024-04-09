@@ -1,6 +1,9 @@
 import 'package:femovil/database/create_database.dart';
+import 'package:femovil/database/list_database.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/infrastructure/models/providers.dart';
+import 'package:femovil/infrastructure/models/vendors.dart';
+import 'package:femovil/presentation/screen/proveedores/select_vendor.dart';
 import 'package:flutter/material.dart';
 
 
@@ -22,6 +25,56 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _grupoController = TextEditingController();
+
+
+  // List
+  final List<Map<String, dynamic>> _groupVendorList = [];
+  final List<Map<String, dynamic>> _taxTypeVendorList = [];
+  
+
+  //SELECTED 
+   int _selectedGroupIndex = 0;
+   int _selectedTaxIndexType = 0;
+
+  //Text o String
+
+   String _groupTextVendor = '';
+   String _taxTypeText = '';
+
+
+
+    loadList() async {
+
+        List<Map<String, dynamic>> getGroupVendor = await  listarTypeGroupVendor();
+        List<Map<String, dynamic>> getTaxTypeVendor = await listarTypeTaxVendor();
+
+          print('Value de getGroupVendor $getGroupVendor ');
+          print('Value de getTaxTypeVendor $getTaxTypeVendor');
+
+          _groupVendorList.add({'c_bp_group_id': 0, 'groupbpname': 'Selecciona un Grupo'});
+          _taxTypeVendorList.add({'lco_tax_id_type_id': 0, 'tax_id_type_name': 'Selecciona un tipo de impuesto'});
+
+
+        setState(() {
+          
+          _groupVendorList.addAll(getGroupVendor);
+          _taxTypeVendorList.addAll(getTaxTypeVendor);
+
+        });
+
+    }
+
+
+
+
+@override
+  void initState() {
+
+      loadList();
+
+    super.initState();
+  }
+
 
 
   @override
@@ -47,8 +100,10 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                   const ContainerBlue(label:'Datos Personales',),
+
                 const SizedBox(height: 15),
                   TextFormField(
                     controller: _nameController,
@@ -97,17 +152,29 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                     },
                   ),
                    const SizedBox(height: 10,),
-                  TextFormField(
-                    controller: _grupoController,
-                    decoration: const InputDecoration(labelText: 'Grupo', filled: true, fillColor: Colors.white),
-                    keyboardType: TextInputType.number,
-                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa el grupo del Proveedor';
-                      }
-                      return null;
-                    },
-                  ),
+                CustomDropdownButtonFormFieldVendor(identifier: 'groupTypeVendor', selectedIndex: _selectedGroupIndex, dataList: _groupVendorList, text: _groupTextVendor, onSelected: (newValue, groupText) {
+
+                    setState(() {
+
+                        _selectedGroupIndex = newValue ?? 0;
+                        _groupTextVendor = groupText;
+
+                    });
+
+                },),
+                const SizedBox(height: 10,),
+                CustomDropdownButtonFormFieldVendor(identifier: 'taxTypeVendor', selectedIndex: _selectedTaxIndexType, dataList:_taxTypeVendorList, text: _taxTypeText, onSelected: (newValue, taxTex) {
+
+                    setState(() {
+
+                        _selectedTaxIndexType = newValue ?? 0;
+                        _taxTypeText = taxTex;
+
+                    });
+
+                },),
+                const SizedBox(height: 10,),
+
            
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -149,13 +216,28 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     String grupo = _grupoController.text;
 
     // Crea una instancia del producto
-    Proveedor provider = Proveedor(
-        name: name,
-        ruc:ruc,
-        correo: correo,
-        telefono: telefono,
-        grupo: grupo,
-    );
+
+      Vendor provider = Vendor(
+        cBPartnerId: 1, 
+        cCodeId: 1, 
+        bPName: "Elias", 
+        email: "email", 
+        cBPGroupId: 1, 
+        groupBPName: "groupBPName", 
+        taxId: 1, 
+        isVendor: 'Y', 
+        lcoTaxIdTypeId: 1, 
+        taxIdTypeName: 'taxIdTypeName', 
+        cBPartnerLocationId: 1, 
+        isBillTo: 'Y', 
+        phone: "0414556887", 
+        cLocationId: 1, 
+        address: "Las palmas", 
+        city: "Araure", 
+        countryName: "Venezuela", 
+        postal: 3303, 
+        cCityId: 1, 
+        cCountryId: 1);
 
     // Llama a un método para guardar el producto en Sqflite
     await saveProviderToDatabase(provider);
@@ -176,7 +258,7 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
 
   }
 
-  Future<void> saveProviderToDatabase(Proveedor provider) async {
+  Future<void> saveProviderToDatabase(Vendor provider) async {
     final db = await DatabaseHelper.instance.database;
     if (db != null) {
       int result = await db.insert('providers', provider.toMap());
@@ -203,6 +285,26 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     _grupoController.dispose();
 
     super.dispose();
+  }
+}
+
+class ContainerBlue extends StatelessWidget {
+   final String label;
+  const ContainerBlue({
+    super.key, required this.label,
+      
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+     width: 200 ,
+     decoration: BoxDecoration(
+       color: Colors.blue,
+       borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
+     ),
+     child:  Text(label, style:  const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                      );
   }
 }
 
