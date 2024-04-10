@@ -131,7 +131,11 @@ class DatabaseHelper {
             country_name STRING,
             postal STRING,
             c_city_id INTEGER,
-            c_country_id INTEGER
+            c_country_id INTEGER,
+            lco_taxt_payer_type_id INTEGER, 
+            tax_payer_type_name STRING, 
+            lve_person_type_id INTEGER,
+            person_type_name STRING
 
         )
 

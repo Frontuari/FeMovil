@@ -3,12 +3,15 @@ import 'package:femovil/database/update_database.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/infrastructure/models/order_sales.dart';
 import 'package:femovil/infrastructure/models/products.dart';
+import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
 import 'package:femovil/presentation/products/idempiere/create_product.dart';
 import 'package:femovil/presentation/products/products_http.dart';
+import 'package:femovil/presentation/screen/proveedores/idempiere/create_vendor.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
 import 'package:femovil/sincronization/https/customer_http.dart';
 import 'package:femovil/sincronization/https/vendors_http.dart';
+import 'package:femovil/sincronization/sincronization_screen.dart';
 
 synchronizeProductsWithIdempiere(setState) async {
   List<Map<String, dynamic>> productsWithZeroValues =
@@ -114,66 +117,65 @@ synchronizeCustomersWithIdempiere(setState) async {
 }
 
 synchronizeVendorsWithIdempiere(setState) async {
-  // List<Map<String, dynamic>> customersWithZeroValues =
-  //     await getCustomersWithZeroValues();
+  List<Map<String, dynamic>> vendorWithZeroValues =
+      await getVendorWithZeroValues();
 
   await sincronizationVendors(setState);
 
-  // print('Esto es vendor en cero $customersWithZeroValues');
+  print('Esto es vendor en cero $vendorWithZeroValues');
   
-  // for (var customersData in customersWithZeroValues) {
-  //   Customer customer = Customer(
-  //       cbPartnerId: customersData['c_bpartner_id'],
-  //       codClient: customersData['cod_client'],
-  //       isBillTo: 'Y',
-  //       address: customersData['address'],
-  //       bpName: customersData['bp_name'],
-  //       cBpGroupId: customersData['c_bp_group_id'],
-  //       cBpGroupName: customersData['group_bp_name'],
-  //       cBparnetLocationId: 0,
-  //       cCityId: customersData['c_city_id'],
-  //       cCountryId: customersData['c_country_id'],
-  //       cLocationId: 0, 
-  //       cRegionId: 0,
-  //       city: customersData['city'],
-  //       codePostal: customersData['code_postal'],
-  //       country: customersData['country'],
-  //       email: customersData['email'],
-  //       lcoTaxIdTypeId: customersData['lco_tax_id_typeid'],
-  //       lcoTaxPayerTypeId: customersData['lco_tax_payer_typeid'],
-  //       lvePersonTypeId: customersData['lve_person_type_id'],
-  //       personTypeName: customersData['person_type_name'],
-  //       phone: customersData['phone'],
-  //       region: customersData['region'],
-  //       ruc: customersData['ruc'],
-  //       taxIdTypeName: customersData['tax_id_type_name'],
-  //       taxPayerTypeName: customersData['tax_payer_type_name']
+  for (var vendorsData in vendorWithZeroValues) {
+    Vendor provider = Vendor(
+      cBPartnerId: vendorsData['c_bpartner_id'],
+      cCodeId: vendorsData['c_code_id'],
+      cBPGroupId: vendorsData['c_bp_group_id'],
+      bPName: vendorsData['bpname'],
+      email: vendorsData['email'],
+      groupBPName: vendorsData['groupbpname'],
+      taxId: vendorsData['tax_id'],
+      isVendor: vendorsData['is_vendor'],
+      lcoTaxIdTypeId: vendorsData['lco_tax_id_type_id'],
+      taxIdTypeName: vendorsData['tax_id_type_name'],
+      cBPartnerLocationId: vendorsData['c_bpartner_location_id'],
+      isBillTo: vendorsData['is_bill_to'],
+      phone: vendorsData['phone'],
+      cLocationId: vendorsData['c_location_id'],
+      address: vendorsData['address'],
+      city: vendorsData['city'],
+      countryName: vendorsData['country_name'],
+      postal: vendorsData['postal'],
+      cCityId: vendorsData['c_city_id'],
+      cCountryId: vendorsData['c_country_id'],
+      lcoTaxtPayerTypeId: vendorsData['lco_taxt_payer_type_id'],
+      taxPayerTypeName: vendorsData['tax_payer_type_name'],
+      lvePersonTypeId: vendorsData['lve_person_type_id'],
+      personTypeName: vendorsData['person_type_name'],
 
-  //   );
-  //   dynamic result = await createCustomerIdempiere(customer.toMap());
-  //   print('este es el $result');
+    );
+    dynamic result = await createVendorIdempiere(provider.toMap());
+    print('este es el $result');
 
-  //   final cBParnertId =
-  //       result['CompositeResponses']['CompositeResponse']
-  //       ['StandardResponse'][0]['outputFields']
-  //       ['outputField'][0]['@value'];
-  //   final newCodClient =
-  //       result['CompositeResponses']['CompositeResponse']
-  //       ['StandardResponse'][0]['outputFields']
-  //       ['outputField'][1]['@value'];
-  //   final cLocationId =  result['CompositeResponses']['CompositeResponse']
-  //       ['StandardResponse'][1]['outputFields']
-  //       ['outputField']['@value'];
-  //   final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
-  //       ['StandardResponse'][2]['outputFields']
-  //       ['outputField']['@value'];
+    final cBParnertId =
+        result['CompositeResponses']['CompositeResponse']
+        ['StandardResponse'][0]['outputFields']
+        ['outputField'][0]['@value'];
+    final newCodClient =
+        result['CompositeResponses']['CompositeResponse']
+        ['StandardResponse'][0]['outputFields']
+        ['outputField'][1]['@value'];
+    final cLocationId =  result['CompositeResponses']['CompositeResponse']
+        ['StandardResponse'][1]['outputFields']
+        ['outputField']['@value'];
+    final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
+        ['StandardResponse'][2]['outputFields']
+        ['outputField']['@value'];
 
-  //   print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
+    print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
 
 
-  //   await updateCustomerCBPartnerIdAndCodClient(
-  //       customersData['id'], cBParnertId, newCodClient, cLocationId, cBPartnerLocationId );
-  // }
+    await updateCustomerCBPartnerIdAndCodClientVendor(
+        vendorsData['id'], cBParnertId, newCodClient, cLocationId, cBPartnerLocationId );
+  }
 }
 
 
@@ -181,10 +183,29 @@ synchronizeVendorsWithIdempiere(setState) async {
 synchronizeOrderSalesWithIdempiere(setState) async {
   List<Map<String, dynamic>> orderSalesWithZeroValues =
       await obtenerOrdenesDeVentaConLineas();
+ 
+  int contador = 0;
 
   // await sincronizationCustomers(setState);
 
   print('Esto es custommer en cero $orderSalesWithZeroValues');
+
+
+
+                  if(orderSalesWithZeroValues.isEmpty){
+
+
+                    setState(() {
+                      
+                          syncPercentageSelling = 100;
+
+                    });
+                    
+
+                  }
+            
+
+
   
   for (var orderSales in orderSalesWithZeroValues) {
     OrderSales orderSale = OrderSales(
@@ -209,6 +230,16 @@ synchronizeOrderSalesWithIdempiere(setState) async {
             lines: orderSales['lines']
         
     );
+    contador++;
+
+    print('El valor del contador $contador');
+
+     setState(() {
+      syncPercentageSelling =  (contador / orderSalesWithZeroValues.length) * 100;
+
+     });
+
+    print('el valor de syncPercentageSelling $syncPercentageSelling');
 
      await createOrdenSalesIdempiere(orderSale.toMap());
    

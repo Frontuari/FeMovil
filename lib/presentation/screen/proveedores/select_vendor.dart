@@ -33,8 +33,8 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                     onChanged: (newValue) {
                       print('esto es el taxList ${dataList}');
                       String nameGroup =
-                          invoke('obtenerNombreGroup', newValue, dataList);
-                      print("esto es el nombre de impuesto $nameGroup");
+                          invoke('obtenerNombreGroupVendor', newValue, dataList);
+                      print("esto es el nombre de los grupos de proveedores $nameGroup");
                       onSelected(newValue, nameGroup);
                    
                     },
@@ -54,7 +54,7 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
         return    DropdownButtonFormField<int>(
                     value: selectedIndex,
                     items: dataList
-                        .where((groupList) => groupList['lco_tax_id_type_id'] is int && groupList['groupbpname'] != '')
+                        .where((groupList) => groupList['lco_tax_id_type_id'] is int && groupList['tax_id_type_name'] != '')
                         .map<DropdownMenuItem<int>>((group) {
                       print('tax $group');
                       return DropdownMenuItem<int>(
@@ -67,8 +67,76 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                     onChanged: (newValue) {
                       print('esto es el taxList ${dataList}');
                       String nameGroup =
-                          invoke('obtenerNombreGroup', newValue, dataList);
-                      print("esto es el nombre de impuesto $nameGroup");
+                          invoke('obtenerNombreTaxVendor', newValue, dataList);
+                      print("esto es el nombre del tipo de contribuyente proveedor $nameGroup");
+                      onSelected(newValue, nameGroup);
+                   
+                    },
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    validator: (value) {
+                      if (value == null || value == 0) {
+                        return 'Por favor selecciona un grupo';
+                      }
+                      return null;
+                    },
+                  );
+       case 'countryVendor' : 
+
+         return    DropdownButtonFormField<int>(
+                    value: selectedIndex,
+                    items: dataList
+                        .where((groupList) => groupList['c_country_id'] is int && groupList['country_name'] != '')
+                        .map<DropdownMenuItem<int>>((group) {
+                      print('tax $group');
+                      return DropdownMenuItem<int>(
+                        value: group['c_country_id'] as int,
+                        child: SizedBox(
+                          width: 200,
+                          child: Text(group['country_name'] as String)),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      print('esto es el taxList ${dataList}');
+                      String nameGroup =
+                          invoke('obtenerNombreCountryVendor', newValue, dataList);
+                      print("esto es el nombre del pais $nameGroup");
+                      onSelected(newValue, nameGroup);
+                   
+                    },
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    validator: (value) {
+                      if (value == null || value == 0) {
+                        return 'Por favor selecciona un grupo';
+                      }
+                      return null;
+                    },
+                  );
+        case 'taxPayerVendor' : 
+
+         return    DropdownButtonFormField<int>(
+                    value: selectedIndex,
+                    items: dataList
+                        .where((groupList) => groupList['lco_taxt_payer_type_id'] is int && groupList['tax_payer_type_name'] != '')
+                        .map<DropdownMenuItem<int>>((group) {
+                      print('tax $group');
+                      return DropdownMenuItem<int>(
+                        value: group['lco_taxt_payer_type_id'] as int,
+                        child: SizedBox(
+                          width: 200,
+                          child: Text(group['tax_payer_type_name'] as String)),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      print('esto es el taxList ${dataList}');
+                      String nameGroup =
+                          invoke('obtenerNombreTaxPayerVendor', newValue, dataList);
+                      print("esto es el nombre del tipo de contribuyente $nameGroup");
                       onSelected(newValue, nameGroup);
                    
                     },
@@ -84,7 +152,43 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                     },
                   );
 
-      
+          case 'typePersonVendor' :
+
+             return    DropdownButtonFormField<int>(
+                    value: selectedIndex,
+                    items: dataList
+                        .where((groupList) => groupList['lve_person_type_id'] is int && groupList['person_type_name'] != '')
+                        .map<DropdownMenuItem<int>>((group) {
+                      print('tax $group');
+                      return DropdownMenuItem<int>(
+                        value: group['lve_person_type_id'] as int,
+                        child: SizedBox(
+                          width: 200,
+                          child: Text(group['person_type_name'] as String)),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      print('esto es el taxList ${dataList}');
+                      String nameGroup =
+                          invoke('obtenerNombreTypePerson', newValue, dataList);
+
+                      print("esto es el nombre del tipo de persona $nameGroup");
+                      onSelected(newValue, nameGroup);
+                   
+                    },
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    validator: (value) {
+                      if (value == null || value == 0) {
+                        return 'Por favor selecciona un grupo';
+                      }
+                      return null;
+                    },
+                  );
+
+
         
       default:  return    DropdownButtonFormField<int>(
                     value: selectedIndex,

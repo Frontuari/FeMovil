@@ -28,6 +28,10 @@
     final dynamic postal;
     final dynamic cCityId;
     final dynamic cCountryId;
+    final dynamic lcoTaxtPayerTypeId;
+    final dynamic taxPayerTypeName;
+    final dynamic lvePersonTypeId;
+    final dynamic personTypeName;
 
   Vendor({
    this.id,
@@ -51,6 +55,11 @@
    required this.postal,
    required this.cCityId,
    required this.cCountryId,
+   required this.lcoTaxtPayerTypeId,
+   required this.taxPayerTypeName,
+   required this.lvePersonTypeId,
+   required this.personTypeName,
+
    });
 
 
@@ -79,7 +88,11 @@
           'country_name': countryName,
           'postal': postal,
           'c_city_id': cCityId,
-          'c_country_id': cCountryId
+          'c_country_id': cCountryId,
+          'lco_taxt_payer_type_id': lcoTaxtPayerTypeId,
+          'tax_payer_type_name': taxPayerTypeName,
+          'lve_person_type_id': lvePersonTypeId,
+          'person_type_name': personTypeName,
       };
 
   }

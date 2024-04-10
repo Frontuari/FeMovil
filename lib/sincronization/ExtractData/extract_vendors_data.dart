@@ -41,7 +41,10 @@ try {
       'postal': row['field'][16]['val'],
       'c_city_id': row['field'][17]['val'],
       'c_country_id': row['field'][18]['val'],
-
+      'lco_taxt_payer_type_id': row['field'][20]['val'],
+      'tax_payer_type_name': row['field'][21]['val'],
+      'lve_person_type_id': row['field'][22]['val'],
+      'person_type_name': row['field'][23]['val'],
 
      // Asegúrate de convertir la cantidad a un tipo numérico adecuado
       // Añade otros campos que necesites sincronizar

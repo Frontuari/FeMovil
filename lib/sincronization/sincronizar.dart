@@ -127,6 +127,10 @@ print('Esto es vendor Datas $vendorsData');
             postal: vendorData['postal'],
             cCityId: vendorData['c_city_id'],
             cCountryId: vendorData['c_country_id'],
+            lcoTaxtPayerTypeId: vendorData['lco_taxt_payer_type_id'],
+            taxPayerTypeName: vendorData['tax_payer_type_name'],
+            lvePersonTypeId: vendorData['lve_person_type_id'],
+            personTypeName: vendorData['person_type_name']
 
           );
           

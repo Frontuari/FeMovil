@@ -47,7 +47,7 @@ class ProvidersDetailsScreen extends StatelessWidget {
                 _buildTextFormField('Correo', '${provider['email'] != '{@nil=true}' ? provider['email'] : 'Sin registro' }'),
                 _buildTextFormField('Telefono', provider['phone'].toString() != '{@nil=true}' ? provider['phone'].toString() : 'Sin registro'),
                 _buildTextFormField('Grupo', provider['groupbpname'].toString()), 
-                _buildTextFormField('Tipo de Impuesto', provider['tax_id_type_name']),
+                _buildTextFormField('Tipo de Impuesto', provider['tax_id_type_name'].toString()),
                   const SizedBox(height: 10,),
                   Container(
                     width: screenMax ,
@@ -58,9 +58,9 @@ class ProvidersDetailsScreen extends StatelessWidget {
                     child: const Text('Domicilio Fiscal', style:  TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                   ),
                   const SizedBox(height: 10,),
-                _buildTextFormField('Direccion', provider['address'] ),
-                _buildTextFormField('Ciudad', provider['city']),
-                _buildTextFormField('Pais', provider['country_name']),
+                _buildTextFormField('Direccion', provider['address'].toString() ),
+                _buildTextFormField('Ciudad', provider['city'].toString()),
+                _buildTextFormField('Pais', provider['country_name'].toString()),
                 _buildTextFormField('Codigo Postal', provider['postal'] != '{@nil=true}' ? provider['postal'].toString(): 'Sin codigo postal' ),
 
                 const SizedBox(height: 29,),

@@ -264,6 +264,19 @@ Future<List<Map<String, dynamic>>> getProducts() async {
         return [];
       }
 
+Future<List<Map<String, dynamic>>> getVendorWithZeroValues() async {
+        final db = await DatabaseHelper.instance.database;
+        if (db != null) {
+          return await db.rawQuery('''
+            
+            SELECT * FROM providers 
+            WHERE c_bpartner_id = 0 AND c_code_id = 0
+
+          ''');
+        }
+        return [];
+      }
+
 
   // Método para obtener los datos de un usuario por ID
  Future<Map<String, dynamic>?> getUserByLogin(String user, String password) async {
