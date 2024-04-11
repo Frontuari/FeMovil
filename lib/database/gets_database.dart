@@ -460,3 +460,33 @@ Future<Map<String, dynamic>> obtenerOrdenDeVentaConLineasPorId(int orderId) asyn
   // Retornar la orden de venta con sus líneas de productos
   return ordenDeVenta;
 }
+
+
+
+
+
+Future<Map<String, dynamic>?> getClientById(int clientId) async {
+  final db = await DatabaseHelper.instance.database;
+
+  if (db != null) {
+    // Realiza la consulta para recuperar el cliente con el ID especificado
+    List<Map<String, dynamic>> results = await db.query(
+      'clients',
+      where: 'id = ?',
+      whereArgs: [clientId],
+    );
+
+    // Verifica si se encontró un cliente con el ID especificado
+    if (results.isNotEmpty) {
+      // Devuelve el primer cliente encontrado (debería ser único ya que se filtra por ID)
+      return results.first;
+    } else {
+      // Si no se encontró ningún cliente con el ID especificado, devuelve null
+      return null;
+    }
+  } else {
+    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+    print('Error: db is null');
+    return null;
+  }
+}

@@ -1,11 +1,18 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:femovil/config/getPosProperties.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_compra/product_selection.dart';
 import 'package:femovil/presentation/orden_venta/product_selection.dart';
+import 'package:femovil/presentation/perfil/perfil_http.dart';
+import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart'; // Importa la librería de formateo de fechas
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart'; // Importa la librería de formateo de fechas
 
 
 class OrdenDeCompraScreen extends StatefulWidget {
@@ -25,15 +32,21 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
   TextEditingController montoController = TextEditingController();
   TextEditingController numeroFacturaController = TextEditingController();
   TextEditingController saldoNetoController = TextEditingController();
+  TextEditingController fechaIdempiereController = TextEditingController();
+
   List<Map<String, dynamic>> selectedProducts = [];
   bool _validateDescription = false;
   DateTime selectedDate = DateTime.now();
   double? saldoNeto;
   double? totalImpuesto;
+  Map<String, dynamic> infoUserForOrder = {};
 
-    double calcularSaldoNetoProducto(cantidadProducts, price){
 
-        double multi = cantidadProducts * price;
+
+  double calcularSaldoNetoProducto(cantidadProducts, price){
+      
+
+        double multi = (cantidadProducts as num).toDouble() *  (price as num).toDouble();
 
         
           saldoNeto = multi;
@@ -70,6 +83,48 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
     return suma;
 
   }
+
+
+ initGetUser()async{
+    final info = await getApplicationSupportDirectory();
+  print("esta es la ruta ${info.path}");
+
+
+  final String filePathEnv = '${info.path}/.env';
+  final File archivo = File(filePathEnv);
+  String contenidoActual = await archivo.readAsString();
+
+    Map<String, dynamic> infoLogin =  await getLogin();
+     Map<String, dynamic> jsonData = jsonDecode(contenidoActual);
+
+
+  var orgId = jsonData["OrgID"];
+  var clientId = jsonData["ClientID"];
+  var wareHouseId = jsonData["WarehouseID"];
+
+    print('Esto es infologin $infoLogin');
+
+    // Map<String, dynamic> getUser = await getUsers(username, password);
+
+    setState(() {
+     infoUserForOrder = {'orgid': orgId, 'clientid': clientId, 'warehouseid': wareHouseId, 'userId': infoLogin['userId'] } ;
+    });
+
+print('infouserFororder $infoUserForOrder');
+
+}
+
+  initV() async {
+    if (variablesG.isEmpty) {
+       await getPosPropertiesInit();
+      List<Map<String, dynamic>> response = await getPosPropertiesV();
+      setState(() { 
+        variablesG = response;
+      });
+
+    }
+  }
+
 
 
 Future<void> _selectDate(BuildContext context) async {
@@ -136,14 +191,17 @@ void _addOrUpdateProduct(List<Map<String, dynamic>> products) {
 void _removeProduct(int index) {
   setState(() {
     selectedProducts.removeAt(index);
-    montoController.text = calcularMontoTotal().toString();
+    montoController.text = calcularMontoTotal().toString() ;
   });
 }
 
 @override
 void initState() {
-    fechaController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
+    initV();
+    initGetUser();
+    fechaController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    fechaIdempiereController.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate);
     print("Esto es el id ${widget.providerId}");
      print("Esto es el name ${widget.providerName}");
     super.initState();
@@ -164,7 +222,7 @@ void initState() {
             children: [
               TextField(
                 controller: numeroReferenciaController,
-                decoration: const InputDecoration(labelText: 'Número de Referencia'),
+                decoration: const InputDecoration(labelText: 'Número de Documento'),
               ),
               TextField(
                 controller: numeroFacturaController,
@@ -241,7 +299,7 @@ void initState() {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            product['name'],
+                            product['name'].toString(),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -374,6 +432,7 @@ void initState() {
         
                             return;
                           }
+                          
                   final order = {
                     'proveedor_id': widget.providerId,
                     'numero_referencia': numeroReferenciaController.text,

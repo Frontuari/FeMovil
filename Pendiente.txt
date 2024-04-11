@@ -39,3 +39,7 @@ si ese usuario puede ver ciertos modulos ya predeterminados
 11) Se agregara otra funcionalidad al sincronizar las ordenes, es decir puede sincronizarlo directamente
 desde la orden o puede hacerlo masivamente desde el modulo de Sincronizacion
 
+12) Se validara si no tiene mpartnerid y codigo entonces sincronizara el tercero 
+
+
+

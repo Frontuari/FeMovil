@@ -30,11 +30,15 @@ class _VentasDetailsState extends State<VentasDetails> {
 
   }
 
-
   _updateAndCreateOrders() async {
 
-    await createOrdenSalesIdempiere(ventasDate);
+   dynamic isTrue = await createOrdenSalesIdempiere(ventasDate);
 
+              if(isTrue == false){
+                return false;
+              }else{
+                return true;
+              }
                             
   }
 
@@ -97,7 +101,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      
+ 
                       Container(
                         width: screenMax ,
                         decoration: BoxDecoration(
@@ -336,16 +340,31 @@ class _VentasDetailsState extends State<VentasDetails> {
                   child: ElevatedButton(
                     onPressed:ventaData['status_sincronized'] == 'Borrador' ? ()  async{
 
-                        String newValue = 'Enviado';
-                        updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
 
-                        _updateAndCreateOrders();
+                     dynamic isTrue =  await _updateAndCreateOrders();
+
+
+                            if(isTrue != false){
+                              String newValue = 'Enviado';
+                              updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
+
+                            }else{
+                              String newValue = 'Por Enviar';
+
+                              updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
+
+
+                            }
+
+                        if(mounted){
 
                         setState(() {
                           
                           _ventaData =  _loadVentasForId();
 
                         });
+
+                        }
 
 
                     }: null,
@@ -374,21 +393,35 @@ class _VentasDetailsState extends State<VentasDetails> {
                   width: screenMax,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: ventaData['status_sincronized'] == 'Completado' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
+                    color: ventaData['status_sincronized'] == 'Completado' || ventaData['status_sincronized'] == 'Por Enviar'  ? Colors.green:Colors.grey, // Color verde para el fondo del botón
                   ),
                   child: ElevatedButton(
-                    onPressed:ventaData['status_sincronized'] == 'Completado' ? ()  {
+                    onPressed:ventaData['status_sincronized'] == 'Completado' ||  ventaData['status_sincronized'] == 'Por Enviar'  ? () async {
+                        
+                       dynamic isTrue =  await _updateAndCreateOrders();
+
+
+                          if(isTrue != false){
 
                         String newValue = 'Enviado';
                         updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
                         
-                        _updateAndCreateOrders();
+                          }else{
 
+                               String newValue = 'Por Enviar';
+                        updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
+                        
+
+                          } 
+
+                          if(mounted){
 
                         setState(() {
                           
                         _ventaData =  _loadVentasForId();
                         });
+
+                        }
 
 
                     }: null,

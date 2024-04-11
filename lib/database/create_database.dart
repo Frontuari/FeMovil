@@ -191,14 +191,30 @@ class DatabaseHelper {
           CREATE TABLE orden_compra (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           proveedor_id INTEGER,
-          numero_referencia TEXT,
+          documentno TEXT,
+          c_doc_type_target_id INTEGER, 
+          ad_client_id INTEGER,
+          ad_org_id INTEGER,
+          m_warehouse_id INTEGER,
+          payment_rule STRING, 
+          dateordered STRING,
+          sales_rep_id INTEGER,
+          c_bpartner_id INTEGER,
+          c_bpartner_location_id INTEGER,
+          m_price_list_id INTEGER, 
+          c_currency_id INTEGER,
+          lve_pay_agreement_id INTEGER,
+          c_payment_term_id INTEGER,
+          c_conversion_type_id INTEGER,
+          po_reference STRING,
+          description STRING,
+          id_factura INTEGER,
           numero_factura TEXT,
           fecha TEXT,
-          descripcion TEXT,
           monto REAL,
           saldo_neto REAL,
           usuario_id INTEGER,
-          FOREIGN KEY (proveedor_id) REFERENCES clients(id),
+          FOREIGN KEY (proveedor_id) REFERENCES providers(id),
           FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 
         )
@@ -209,8 +225,15 @@ class DatabaseHelper {
         CREATE TABLE orden_compra_lines (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             orden_compra_id INTEGER,
+            ad_client_id INTEGER,
+            ad_org_id INTEGER,
+            c_order_id INTEGER,
+            price_entered REAL,
+            price_actual REAL,
+            m_product_id INTEGER,
+            qty_entered REAL,
+            salesrep_id INTEGER,
             producto_id INTEGER,
-            cantidad INTEGER,
             FOREIGN KEY (orden_compra_id) REFERENCES orden_compra(id),
             FOREIGN KEY (producto_id) REFERENCES products(id)
         )
@@ -281,7 +304,8 @@ class DatabaseHelper {
             city STRING,
             address1 STRING, 
             m_pricelist_id INTEGER,
-            c_currency_id INTEGER
+            c_currency_id INTEGER,
+            c_doc_type_order_co INTEGER
             )
         ''');
 
