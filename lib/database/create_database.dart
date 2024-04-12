@@ -163,7 +163,7 @@ class DatabaseHelper {
           cliente_id INTEGER,
           status_sincronized STRING,
           FOREIGN KEY (cliente_id) REFERENCES clients(id),
-          FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+          FOREIGN KEY (usuario_id) REFERENCES usuarios(ad_user_id)
 
         )
       ''');
@@ -176,7 +176,6 @@ class DatabaseHelper {
             producto_id INTEGER,
             ad_client_id INTEGER,
             ad_org_id INTEGER,
-            c_order_id INTEGER,
             price_entered INTEGER,
             price_actual INTEGER,
             m_product_id INTEGER,
@@ -197,25 +196,25 @@ class DatabaseHelper {
           ad_org_id INTEGER,
           m_warehouse_id INTEGER,
           payment_rule STRING, 
+          c_order_id INTEGER,
           dateordered STRING,
           sales_rep_id INTEGER,
           c_bpartner_id INTEGER,
           c_bpartner_location_id INTEGER,
           m_price_list_id INTEGER, 
           c_currency_id INTEGER,
-          lve_pay_agreement_id INTEGER,
           c_payment_term_id INTEGER,
           c_conversion_type_id INTEGER,
           po_reference STRING,
           description STRING,
           id_factura INTEGER,
-          numero_factura TEXT,
           fecha TEXT,
           monto REAL,
           saldo_neto REAL,
           usuario_id INTEGER,
+          status_sincronized,
           FOREIGN KEY (proveedor_id) REFERENCES providers(id),
-          FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+          FOREIGN KEY (usuario_id) REFERENCES usuarios(ad_user_id)
 
         )
       ''');
@@ -227,12 +226,10 @@ class DatabaseHelper {
             orden_compra_id INTEGER,
             ad_client_id INTEGER,
             ad_org_id INTEGER,
-            c_order_id INTEGER,
             price_entered REAL,
             price_actual REAL,
             m_product_id INTEGER,
             qty_entered REAL,
-            salesrep_id INTEGER,
             producto_id INTEGER,
             FOREIGN KEY (orden_compra_id) REFERENCES orden_compra(id),
             FOREIGN KEY (producto_id) REFERENCES products(id)

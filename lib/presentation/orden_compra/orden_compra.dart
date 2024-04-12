@@ -18,8 +18,10 @@ import 'package:path_provider/path_provider.dart'; // Importa la librería de fo
 class OrdenDeCompraScreen extends StatefulWidget {
   final int providerId;
   final String providerName;
+  final int cBPartnerID;
+  final int cBPartnerLocationId;
 
-  const OrdenDeCompraScreen({super.key, required this.providerId, required this.providerName});
+  const OrdenDeCompraScreen({super.key, required this.providerId, required this.providerName, required this.cBPartnerID, required this.cBPartnerLocationId });
 
   @override
   _OrdenDeCompraScreenState createState() => _OrdenDeCompraScreenState();
@@ -397,16 +399,16 @@ void initState() {
                   // con los datos proporcionados
                   // Por ejemplo:
         
-                             if (descripcionController.text.isEmpty) {
-                                      setState(() {
-                                        _validateDescription = true; // Marcar como campo inválido si está vacío
-                                      });
+                            //  if (descripcionController.text.isEmpty) {
+                            //           setState(() {
+                            //             _validateDescription = true; // Marcar como campo inválido si está vacío
+                            //           });
         
-                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:  Text('Por favor ingrese una descripción.')));
+                            //                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:  Text('Por favor ingrese una descripción.')));
         
         
-                                      return; // Detener el proceso de agregar la orden si el campo está vacío
-                                }
+                            //           return; // Detener el proceso de agregar la orden si el campo está vacío
+                            //     }
         
         
         
@@ -435,13 +437,29 @@ void initState() {
                           
                   final order = {
                     'proveedor_id': widget.providerId,
-                    'numero_referencia': numeroReferenciaController.text,
-                    'numero_factura': numeroFacturaController.text,
+                    'documentno': numeroReferenciaController.text,
+                    'c_doc_type_target_id': variablesG[0]['c_doc_type_order_co'],
+                    'ad_client_id': infoUserForOrder['clientid'], 
+                    'ad_org_id': infoUserForOrder['orgid'],
+                    'm_warehouse_id' : infoUserForOrder['warehouseid'],
+                    'payment_rule': 'B',
+                    'dateordered': fechaIdempiereController.text,
+                    'sales_rep_id': infoUserForOrder['userId'],
+                    'c_bpartner_id': widget.cBPartnerID,
+                    'c_bpartner_location_id': widget.cBPartnerLocationId,
+                    'm_price_list_id': variablesG[0]['m_pricelist_id'],
+                    'c_currency_id': 100, 
+                    'c_payment_term_id':  variablesG[0]['c_paymentterm_id'], 
+                    'c_conversion_type_id': variablesG[0]['c_conversion_type_id'], 
+                    'po_reference': numeroFacturaController.text,
+                    'id_factura': 0,
                     'fecha': fechaController.text,
-                    'descripcion': descripcionController.text,
+                    'description': descripcionController.text,
                     'monto': double.parse(montoController.text.substring(1)),
                     'saldo_neto':double.parse(saldoNetoController.text.substring(1)),
-                    'productos': selectedProducts, // Esta lista contendría los detalles de los productos seleccionados
+                    'productos': selectedProducts, 
+                    'usuario_id' :infoUserForOrder['userId'],
+                    'status_sincronized': 'Borrador',
                   };
                  
                   // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
