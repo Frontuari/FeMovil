@@ -76,31 +76,50 @@ class _ConfiguracionState extends State<Configuracion> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-      appBar: AppBar(
-        leading: IconButton(
-          icon:
-              const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
-          onPressed: () {
-            // Acción al presionar el botón de flecha hacia atrás
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const Login()));
-          },
-        ),
-        backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-        title: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text('Configuracion',
+      appBar: PreferredSize(
+      
+      
+  preferredSize: const Size.fromHeight(200), // Altura del AppBar
+  child: ClipRRect(
+    borderRadius: const BorderRadius.only(
+      bottomLeft: Radius.circular(80), // Radio del borde redondeado
+    ),
+    child: AppBar(
+      
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
+        onPressed: () {
+          // Acción al presionar el botón de flecha hacia atrás
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const Login()));
+        },
+      ),
+      flexibleSpace: const Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 50), // Ajuste de la posición vertical
+          child: Text('Configuración',
               style: TextStyle(
-                  color: Color.fromARGB(255, 0, 0, 0),
-                  shadows: <Shadow>[
-                    Shadow(
-                      offset: Offset(2, 2),
-                      blurRadius: 3.0,
-                      color: Colors.grey,
-                    )
-                  ])),
+                fontFamily: 'Poppins ExtraBold',
+                color: Color.fromARGB(255, 255, 255, 255),
+                fontSize: 30, // Tamaño del texto
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(2, 2),
+                    blurRadius: 3.0,
+                    color: Colors.grey,
+                  )
+                ],
+              )),
         ),
       ),
+      backgroundColor: const Color(0xFF7531FF), // Color hexadecimal
+  
+    ),
+    
+  ),
+)
+,
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus(); // Cierra el teclado virtual

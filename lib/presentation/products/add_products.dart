@@ -206,7 +206,7 @@ class _AddProductFormState extends State<AddProductForm> {
                     const SizedBox(height:10,),
                    DropdownButtonFormField<int>(
                     value: _selectedCategoriesIndex,
-                    items: _categoriesList.map<DropdownMenuItem<int>>((categories) {
+                    items: _categoriesList.where((cat) => cat['pro_cat_id'] is int).map<DropdownMenuItem<int>>((categories) {
                       return DropdownMenuItem<int>(
                         value: categories['pro_cat_id'] as int,
                         child: SizedBox(
@@ -235,7 +235,7 @@ class _AddProductFormState extends State<AddProductForm> {
                     const SizedBox(height: 10,),
                         DropdownButtonFormField<int>(
                     value: _seletedProductGroup,
-                    items: _productGroupList.map<DropdownMenuItem<int>>((productGroup) {
+                    items: _productGroupList.where((group) => group['product_group_id'] is int ).map<DropdownMenuItem<int>>((productGroup) {
                       return DropdownMenuItem<int>(
                         value: productGroup['product_group_id'] as int,
                         child: SizedBox(
@@ -267,7 +267,7 @@ class _AddProductFormState extends State<AddProductForm> {
                     const SizedBox(height: 10,),
                    DropdownButtonFormField<int>(
                     value: _selectedUmIndex,
-                    items: _umList.map<DropdownMenuItem<int>>((um) {
+                    items: _umList.where((um) => um['um_id'] is int).map<DropdownMenuItem<int>>((um) {
                       print('Um $um');
                       return DropdownMenuItem<int>(
                         value: um['um_id'] as int,
@@ -410,6 +410,21 @@ class _AddProductFormState extends State<AddProductForm> {
     // setState(() {
     // _imageFile = null;
     // });
+
+
+
+    setState(() {
+
+        _nameController.clear();
+        _selectedTaxIndex = 0;
+        _selectedCategoriesIndex = 0;
+        _selectedUmIndex = 0;
+        _selectedProductType = 'first';
+        _seletedProductGroup = 0;
+
+    });
+
+
 
     // Muestra un mensaje de éxito o realiza cualquier otra acción necesaria
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

@@ -91,7 +91,10 @@ class AuthenticationService {
       }
     } catch (e) {
       print("este es el error de login $e");
+      print('esto es el user $username && password $password');
       response = await getUserByLogin(username, password);
+
+      print('Esto es la respuesta del user $response');
       if (response is! Map<String, dynamic>) {
       // No se pudo obtener una respuesta válida ni de la red ni de la base de datos local
       return "hay problemas con el internet";

@@ -35,6 +35,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
   TextEditingController numeroFacturaController = TextEditingController();
   TextEditingController saldoNetoController = TextEditingController();
   TextEditingController fechaIdempiereController = TextEditingController();
+   TextEditingController priceController = TextEditingController();
 
   List<Map<String, dynamic>> selectedProducts = [];
   bool _validateDescription = false;
@@ -77,7 +78,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
         totalNeto += product['price'] * product['quantity'];
 
     }
-    saldoNetoController.text = '\$${totalNeto.toString()}';
+    saldoNetoController.text = '\$${totalNeto.toStringAsFixed(2)}';
     suma = total + totalNeto;
 
     print('productos totales $selectedProducts');
@@ -188,6 +189,13 @@ void _addOrUpdateProduct(List<Map<String, dynamic>> products) {
     }
   }
 }
+
+  void _handlePriceChange(String newValue, int index) {
+    final double newPrice = double.tryParse(newValue) ?? 0.0;
+    setState(() {
+      selectedProducts[index]['price'] = newPrice;
+    });
+  }
 
 
 void _removeProduct(int index) {
@@ -312,18 +320,45 @@ void initState() {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Cantidad: ${product["quantity"]}'),
-                              Text('Precio: ${product['price']}'),
+                                Row(
+                                  children: [
+                                    const Text('Price: '),
+                                    SizedBox(
+                                      width: 80,
+                                      child: TextFormField(
+                                        initialValue: '${product['price']}', // Valor inicial del precio
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                        ),
+
+                                        onChanged: (newValue) {
+                                    
+                                            _handlePriceChange(newValue, index);
+                                    
+                                            setState(() {
+                                              montoController.text = calcularMontoTotal().toStringAsFixed(2) ;
+
+                                            });
+                                    
+                                        } ,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
                           const SizedBox(height: 4),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Impuesto: ${product['impuesto']}%'),
-                              Text(
-                                'Monto Impuesto: ${calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])}',
-                                style: const TextStyle(
-                                  fontStyle: FontStyle.italic,
+                              Flexible(child: Text('Impuesto: ${product['impuesto']}%')),
+                              const SizedBox(width: 10,),
+                              Flexible(
+                                child: Text(
+                                  'Monto Impuesto: ${calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])}',
+                                  style: const TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                  ),
                                 ),
                               ),
                             ],
@@ -332,16 +367,21 @@ void initState() {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Saldo Neto: ${calcularSaldoNetoProducto(product['quantity'], product['price']).toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  color: Colors.green,
+                              Flexible(
+                                child: Text(
+                                  'Saldo Neto: ${calcularSaldoNetoProducto(product['quantity'], product['price']).toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    color: Colors.green,
+                                  ),
                                 ),
                               ),
-                              Text(
-                                'Monto Total: ${(calcularSaldoNetoProducto(product['quantity'], product['price']) + calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])).toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  color: Colors.blue,
+                              const SizedBox(width: 10,),
+                              Flexible(
+                                child: Text(
+                                  'Monto Total: ${(calcularSaldoNetoProducto(product['quantity'], product['price']) + calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])).toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                  ),
                                 ),
                               ),
                             ],
