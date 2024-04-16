@@ -60,7 +60,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/assets/Ajustes.png
-    - lib/assets/logo_originn.png
     - lib/assets/Logo_Frontuari.png
     - lib/assets/progress_indicator.png
     - lib/assets/Home.png
@@ -72,6 +71,22 @@ flutter:
     - lib/assets/WhatsApp.png
     - lib/assets/IG@3x.png
     - lib/assets/Fondo@2x.png
+    - lib/assets/Atras@3x.png
+    - lib/assets/LogoFemovil.png
+    - lib/assets/Ojo Desactivado@3x.png
+    - lib/assets/Ojos Activado@3x.png
+    - lib/assets/Bande ECU@3x.png
+    - lib/assets/Productos@3x.png
+    - lib/assets/clientes@3x.png
+    - lib/assets/Precios@3x.png
+    - lib/assets/Ventas@3x.png
+    - lib/assets/proveedores.png
+    - lib/assets/Compras@3x.png
+    - lib/assets/Cobranzas@3x.png
+    - lib/assets/Retenciones@3x.png
+    - lib/assets/Sincro@3x.png
+    
+
 
     # - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
