@@ -106,7 +106,7 @@ class _PerfilState extends State<Perfil> {
       preferredSize: const Size.fromHeight(170), // Altura del AppBar
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(80), // Radio del borde redondeado
+          bottomLeft: Radius.circular(50), // Radio del borde redondeado
         ),
         child: AppBar(
          automaticallyImplyLeading: false,

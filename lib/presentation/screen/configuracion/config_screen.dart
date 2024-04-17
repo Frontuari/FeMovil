@@ -83,7 +83,7 @@ class _ConfiguracionState extends State<Configuracion> {
       preferredSize: const Size.fromHeight(170), // Altura del AppBar
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(80), // Radio del borde redondeado
+          bottomLeft: Radius.circular(50), // Radio del borde redondeado
         ),
         child: AppBar(
           leading: IconButton(

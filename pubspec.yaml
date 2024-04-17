@@ -85,6 +85,10 @@ flutter:
     - lib/assets/Cobranzas@3x.png
     - lib/assets/Retenciones@3x.png
     - lib/assets/Sincro@3x.png
+    - lib/assets/Lupa@3x.png
+    - lib/assets/Lupa.png
+    - lib/assets/filtro@3x.png
+    - lib/assets/Lupa-2@2x.png
     
 
 

@@ -80,7 +80,7 @@ class HomeState extends State<Home> {
       preferredSize: const Size.fromHeight(170), // Altura del AppBar
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(80), // Radio del borde redondeado
+          bottomLeft: Radius.circular(50), // Radio del borde redondeado
         ),
         child: AppBar(
          automaticallyImplyLeading: false,
@@ -397,7 +397,7 @@ class HomeState extends State<Home> {
                               ),
                               child: Center(child: Image.asset('lib/assets/Sincro@3x.png', width: 45, height:  45, fit: BoxFit.contain , ))),
                             const SizedBox(height: 5,)
-,                            const Text("Sincronizar", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+,                            const Text("Sincronización", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
                         
                           ],
                         ),
