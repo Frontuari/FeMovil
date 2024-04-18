@@ -312,10 +312,10 @@ createOrdenPurchaseIdempiere(orderPurchaseList) async {
                         "@column": "Description",
                         "val": orderPurchaseList['description'],
                       },
-                      {
-                        "@column": "C_ConversionType_ID",
-                        "val": variablesG[0]['c_conversion_type_id']
-                      },
+                      // {
+                      //   "@column": "C_ConversionType_ID",
+                      //   "val": variablesG[0]['c_conversion_type_id']
+                      // },
                       {
                         "@column": "C_DocTypeTarget_ID",
                         "val": orderPurchaseList['c_doc_type_target_id']

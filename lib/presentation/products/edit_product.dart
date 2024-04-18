@@ -91,8 +91,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _selectedTaxIndex = widget.product['tax_cat_id'];
     _selectedCategoriesIndex = widget.product['pro_cat_id'];
     _selectedUmIndex = widget.product['um_id'];
-    _selectedProductType = widget.product['product_type'];
-    _selectedProductGroupIndex = widget.product['product_group_id'];
+    _selectedProductType = widget.product['product_type'] == '{@nil: true}' ? 0 : widget.product['product_type'];
+    _selectedProductGroupIndex = widget.product['product_group_id'] == '{@nil: true}' ? 0 : widget.product['product_group_id']  ;
     _taxText = widget.product['tax_cat_name'];
     _prodGroupText = widget.product['product_group_name'];
     _prodCatText = widget.product['categoria'];

@@ -3,7 +3,6 @@ import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/presentation/products/utils/switch_generated_names_select.dart';
-import 'package:femovil/sincronization/sincronizar.dart';
 import 'package:flutter/material.dart';
 
 
@@ -16,6 +15,7 @@ class AddProductForm extends StatefulWidget {
 
   @override
   _AddProductFormState createState() => _AddProductFormState();
+
 }
 
 class _AddProductFormState extends State<AddProductForm> {
@@ -25,6 +25,8 @@ class _AddProductFormState extends State<AddProductForm> {
   String _umText = '';
   String _productTypeText = '';
   String _productGroupText = '';
+  late BuildContext _context;
+
 
   final TextEditingController _nameController = TextEditingController();
    TextEditingController _quantityController = TextEditingController();
@@ -94,7 +96,10 @@ class _AddProductFormState extends State<AddProductForm> {
 
   @override
   Widget build(BuildContext context) {
+        _context = context; 
+
     return Scaffold(
+
       backgroundColor: const Color.fromARGB(255, 236, 247, 255),
       appBar: AppBar(title: const Text("Agregar Producto", style: TextStyle(
             fontSize: 20,
@@ -342,7 +347,7 @@ class _AddProductFormState extends State<AddProductForm> {
     );
   }
 
-  void _saveProduct() async {
+  void _saveProduct()  {
     // Obtén los valores del formulario
     String name = _nameController.text;
     double price = double.parse(_priceController.text);
@@ -385,7 +390,7 @@ class _AddProductFormState extends State<AddProductForm> {
       );
 
     // Llama a un método para guardar el producto en Sqflite
-    final id = await saveProductToDatabase(product);
+    final id =  saveProductToDatabase(product);
     print('Esto es el id $id');
   //  dynamic result = await createProductIdempiere(product.toMap());
   //  print('este es el $result');
@@ -412,6 +417,13 @@ class _AddProductFormState extends State<AddProductForm> {
     // });
 
 
+    final scaffoldMessenger = ScaffoldMessenger.of(_context);
+    scaffoldMessenger.showSnackBar(
+      const SnackBar(
+        content: Text('Producto guardado correctamente'),
+      ),
+    );
+
 
     setState(() {
 
@@ -427,9 +439,6 @@ class _AddProductFormState extends State<AddProductForm> {
 
 
     // Muestra un mensaje de éxito o realiza cualquier otra acción necesaria
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Producto guardado correctamente'),
-    ));
 
 
 
