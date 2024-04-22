@@ -46,3 +46,8 @@ que lo sincronice y lo agregue sino que no lo agregue
 
 
 14) la aplicacion debe funcionar en offline para que al sincronizarce funcione de ambas formas. 
+
+15) En la creacion de una orden de venta tiene que tener una columna del id de la factura para asi actualizarce al
+sincronizar la orden de venta si posee factura guardar si id de la factura sino, podria ser un anticipo al hacer un pago
+a la orden 
+

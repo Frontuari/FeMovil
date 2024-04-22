@@ -98,7 +98,7 @@ class DatabaseHelper {
             c_city_id INTEGER,
             c_region_id INTEGER,
             c_country_id INTEGER,
-            ruc STRING,
+            ruc TEXT,
             address STRING,
             lco_tax_payer_typeid INTEGER,
             tax_payer_type_name STRING,
@@ -118,7 +118,7 @@ class DatabaseHelper {
             email STRING,
             c_bp_group_id INTEGER,
             groupbpname STRING,
-            tax_id STRING,
+            tax_id TEXT,
             is_vendor STRING,
             lco_tax_id_type_id INTEGER,
             tax_id_type_name STRING,
@@ -301,6 +301,7 @@ class DatabaseHelper {
             city STRING,
             address1 STRING, 
             m_pricelist_id INTEGER,
+            m_price_saleslist_id INTEGER,
             c_currency_id INTEGER,
             c_doc_type_order_co INTEGER
             )

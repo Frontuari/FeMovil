@@ -346,10 +346,10 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                   width: screenMax,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: compraData['status_sincronized'] == 'Borrador' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
+                    color: compraData['status_sincronized'] == 'Enviado' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
                   ),
                   child: ElevatedButton(
-                    onPressed:compraData['status_sincronized'] == 'Borrador' ? ()  async{
+                    onPressed:compraData['status_sincronized'] == 'Enviado' ? ()  async{
 
 
                      dynamic isTrue =  await _updateAndCreateOrders();
