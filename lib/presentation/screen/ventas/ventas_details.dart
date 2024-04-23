@@ -335,10 +335,10 @@ class _VentasDetailsState extends State<VentasDetails> {
                   width: screenMax,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: ventaData['status_sincronized'] == 'Enviado' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
+                    color: ventaData['status_sincronized'] == 'Borrador' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
                   ),
                   child: ElevatedButton(
-                    onPressed:ventaData['status_sincronized'] == 'Enviado' ? ()  async{
+                    onPressed:ventaData['status_sincronized'] == 'Borrador' ? ()  async{
 
 
                      dynamic isTrue =  await _updateAndCreateOrders();
@@ -457,7 +457,7 @@ class _VentasDetailsState extends State<VentasDetails> {
 
                         Navigator.of(context).push(
                          MaterialPageRoute(
-                            builder: (context) =>  Cobro(orderId: ventaData['id'],saldoTotal: widget.saldoTotal, loadCobranzas: _loadVentasForId),
+                            builder: (context) =>  Cobro(orderId: ventaData['id'],saldoTotal: widget.saldoTotal, loadCobranzas: _loadVentasForId, cOrderId: ventaData['c_order_id'], documentNo: ventaData['documentno'] ,idFactura: ventaData['id_factura'],),
                           ),
                          );
                       

@@ -181,7 +181,8 @@ Future<List<Map<String, dynamic>>> getPosPropertiesV() async {
           address1,
           m_pricelist_id,
           c_doc_type_order_co,
-          m_price_saleslist_id
+          m_price_saleslist_id,
+          c_currency_id
         FROM posproperties
         WHERE country_id > ?
       ''', [0]);

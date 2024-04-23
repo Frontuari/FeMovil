@@ -43,6 +43,21 @@ Future<List<Map<String, dynamic>>> getProducts() async {
     }
   }
 
+
+ Future<List<Map<String, dynamic>>> getBankAccounts() async {
+      final db = await DatabaseHelper.instance.database;
+    if (db != null) {
+      // Realiza la consulta para recuperar todos los registros de la tabla "bank_account_app"
+      return await db.query('bank_account_app');
+    } else {
+      // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+      print('Error: db is null');
+      return [];
+    }
+  }
+
+
+
     Future<List<Map<String, dynamic>>> getClients() async {
      final db = await DatabaseHelper.instance.database;
 

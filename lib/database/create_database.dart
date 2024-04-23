@@ -52,6 +52,7 @@ class DatabaseHelper {
       dbPath,
       version: 1,
       onCreate: (Database db, int version) async {
+
         await db.execute('''
           CREATE TABLE products(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,6 +77,7 @@ class DatabaseHelper {
 
           )
         ''');
+
         await db.execute('''
         CREATE TABLE clients(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -157,6 +159,7 @@ class DatabaseHelper {
           c_bpartner_location_id INTEGER,
           fecha TEXT,
           descripcion TEXT,
+          id_factura TEXT,
           monto REAL,
           saldo_neto REAL,
           usuario_id INTEGER,
@@ -240,7 +243,7 @@ class DatabaseHelper {
         await db.execute('''
           CREATE TABLE cobros(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            number_reference INTEGER,
+            documentno INTEGER,
             type_document TEXT,
             payment_type TEXT, 
             date TEXT,
@@ -249,6 +252,7 @@ class DatabaseHelper {
             bank_account TEXT,
             observation TEXT,
             sale_order_id INTEGER,
+            payment_id INTEGER,
             FOREIGN KEY (sale_order_id) REFERENCES orden_venta(id)
 
           )
@@ -318,6 +322,23 @@ class DatabaseHelper {
           iswithholding TEXT
           )
         ''');
+
+
+           await db.execute('''
+          CREATE TABLE bank_account_app(
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          c_bank_id INTEGER,
+          bank_name STRING,
+          routing_no TEXT,
+          c_bank_account_id INTEGER,
+          account_no TEXT,
+          c_currency_id INTEGER,
+          iso_code STRING
+          )
+        ''');
+
+
+
       },
     );
 

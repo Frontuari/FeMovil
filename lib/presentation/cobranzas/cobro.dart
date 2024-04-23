@@ -2,6 +2,7 @@ import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 
@@ -14,8 +15,11 @@ class Cobro extends StatefulWidget {
   final int orderId;
   final double saldoTotal;
   final Function loadCobranzas;
+  final dynamic cOrderId; 
+  final dynamic documentNo;
+  final dynamic idFactura;
   
-  const Cobro({super.key, required this.orderId, required this.saldoTotal, required this.loadCobranzas});
+  const Cobro({super.key, required this.orderId, required this.saldoTotal, required this.loadCobranzas, required this.cOrderId, required this.documentNo, required this.idFactura});
 
   @override
   State<Cobro> createState() => _CobroState();
@@ -28,25 +32,44 @@ class _CobroState extends State<Cobro> {
   TextEditingController dateController = TextEditingController();
   TextEditingController montoController = TextEditingController();
   TextEditingController observacionController = TextEditingController();
+  final TextEditingController _fechaIdempiereController = TextEditingController();
   String? paymentTypeValue = 'Efectivo';
   String? coinValue = "\$";
   String? typeDocumentValue = "Cobro";
   String? bankAccountValue = "123456";
+  DateTime selectedDate = DateTime.now();
 
 
 void _loadCurrentDate() {
   final now = DateTime.now();
   final formattedDate = DateFormat('dd/MM/yyyy').format(now);
+
   dateController.text = formattedDate; // Asigna la fecha actual al controlador del campo de texto
 }
 
 
+void _getBankAcc() async {
+
+
+    List<Map<String, dynamic>> bankAccounts = await getBankAccounts();
+
+
+    print("estos son las cuentas agregadas desde la base de datos $bankAccounts");
+
+}
+
 @override
 void initState() {
 
-  _ordenVenta =  _loadOrdenVentasForId();
-  _loadCurrentDate();
+    _ordenVenta =  _loadOrdenVentasForId();
+      _loadCurrentDate();
+      _getBankAcc();
+      
+    _fechaIdempiereController.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate);
+
   super.initState();
+
+
   
 }
 
@@ -89,7 +112,7 @@ void initState() {
                              padding: const EdgeInsets.all(16.0),
                              child: Align(
                                 alignment: Alignment.topCenter,
-                               child: SingleChildScrollView(
+                               child: SingleChildScrollView(  
                                  child: Column(
                                     crossAxisAlignment:  CrossAxisAlignment.center,
                                   children: [
@@ -119,12 +142,12 @@ void initState() {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                CustomTextInfo(
-                                                 label: "N°",
-                                                 value: orderData['numero_referencia'],
+                                                 label: "N° Document",
+                                                 value: orderData['documentno'].toString() != "" ? orderData['documentno'].toString() : "Sin registro",
                                                ),
                                                CustomTextInfo(
                                                  label: "Cliente",
-                                                 value: clientData['name'],
+                                                 value: clientData['bp_name'],
                                                ),
                                                CustomTextInfo(
                                                  label: "Ruc",
