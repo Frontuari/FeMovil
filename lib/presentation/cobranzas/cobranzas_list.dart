@@ -28,6 +28,8 @@ class _CobranzasState extends State<Cobranzas> {
       Future<void> _loadCobranzas() async {
         final CobranzasData = await getAllOrdersWithClientNames(); // Cambiar a la función de obtener Cobranzas
         
+         // ______________________________________________
+
             print("Esto es la venta Data $CobranzasData");
 
             setState(() {

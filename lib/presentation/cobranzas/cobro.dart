@@ -1,6 +1,7 @@
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
+import 'package:femovil/presentation/clients/select_customer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -38,6 +39,20 @@ class _CobroState extends State<Cobro> {
   String? typeDocumentValue = "Cobro";
   String? bankAccountValue = "123456";
   DateTime selectedDate = DateTime.now();
+  List<Map<String, dynamic>> bankAccountsList = [];
+    List<Map<String, dynamic>> typeCoinsList = [];
+
+  // Selecteds 
+
+  int _selectsBankAccountId =  0; 
+  String _selectTypePayment = "";
+  int _selectTypeCoins = 0;
+
+  //Texts
+
+  String _bankAccountText = "";
+  String _typeCoinsText = "";
+
 
 
 void _loadCurrentDate() {
@@ -53,7 +68,16 @@ void _getBankAcc() async {
 
     List<Map<String, dynamic>> bankAccounts = await getBankAccounts();
 
+      bankAccountsList
+        .add({'c_bank_id': 0, 'bank_name': 'Selecciona una Cuenta Bancaria'});
+              typeCoinsList
+        .add({'c_currency_id': 0, 'iso_code': 'Selecciona un tipo de moneda'});
+    setState(() {
 
+      bankAccountsList.addAll(bankAccounts);
+      typeCoinsList.addAll(bankAccounts);
+
+    });
     print("estos son las cuentas agregadas desde la base de datos $bankAccounts");
 
 }
@@ -70,13 +94,14 @@ void initState() {
   super.initState();
 
 
-  
 }
 
  Future<Map<String, dynamic>> _loadOrdenVentasForId() async {
     return await getOrderWithProducts(widget.orderId);
     
   }
+
+
   @override
   Widget build(BuildContext context) {
            final screenMax = MediaQuery.of(context).size.width * 0.8;
@@ -182,7 +207,7 @@ void initState() {
                                  
                                                 children: [
                                                   TextFormField(  
-                                                      
+                                                      readOnly: true,
                                                       controller: numRefController,
                                  
                                                       onChanged: (value) {
@@ -191,52 +216,87 @@ void initState() {
                                  
                                                       },
                                                        decoration: const InputDecoration(
-                                                      labelText: 'Número de Referencia', // Etiqueta que se muestra sobre el campo
+                                                      labelText: 'Número de Documento', // Etiqueta que se muestra sobre el campo
                                                       contentPadding: EdgeInsets.all(15)
                                                       ),
                                  
                                                   ), 
-                                                DropdownButtonFormField<String>(
-                                                    value: 'Cobro', // Valor predeterminado
-                                                    onChanged: (String? newValue) {
-                                                      // Aquí puedes realizar alguna acción cuando cambie la selección
-                                                            setState(() {
-                                                              typeDocumentValue = newValue;
-                                                            });
 
-                                                        print("Esto es el valor del select Cobro  $newValue");
-                                                    },
-                                                    items: <String>['Cobro'].map((String value) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: value,
-                                                        child: Text(value),
-                                                      );
-                                                    }).toList(),
-                                                    decoration: const InputDecoration(
-                                                      labelText: 'Tipo de Documento', // Etiqueta que se muestra sobre el campo
-                                                      labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5), // Estilo de la etiqueta con un margen inferior
-                                                      contentPadding: EdgeInsets.all(15),
-                                                    ),
-                                                  ),
-                                                  DropdownButtonFormField<String>(
-                                                    value: 'Efectivo', // Valor predeterminado
-                                                    onChanged: (String? newValue) {
+                                                   CustomDropdownButtonFormField(identifier: 'selectTypeAccountBank', selectedIndex: _selectsBankAccountId , dataList: bankAccountsList, text: _bankAccountText, onSelected: (newValue, bankAccText) {
                                                       setState(() {
-                                                        paymentTypeValue = newValue;
+                                                          _selectsBankAccountId = newValue ?? 0;
+                                                          _bankAccountText = bankAccText;
                                                       });
-                                                    },
-                                                    items: <String>['Efectivo'].map((String value) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: value,
-                                                        child: Text(value),
-                                                      );
-                                                    }).toList(),
-                                                    decoration: const InputDecoration(
-                                                      labelText: 'Tipo de Pago', // Etiqueta que se muestra sobre el campo
-                                                      labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5), // Estilo de la etiqueta con un margen inferior
-                                                      contentPadding: EdgeInsets.all(15),
-                                                    ),
-                                                  ),
+                                                  },),
+                                                   CustomDropdownButtonFormField(identifier: 'selectTypeCoins', selectedIndex: _selectTypeCoins , dataList: bankAccountsList, text: _typeCoinsText, onSelected: (newValue, typeCoinsText) {
+                                                      setState(() {
+                                                          _selectTypeCoins = newValue ?? 0;
+                                                          _typeCoinsText = typeCoinsText;
+                                                      });
+                                                  },),
+
+                                              DropdownButtonFormField<String>(
+                                              value: paymentTypeValue,
+                                              onChanged: (String? newValue) {
+                                                setState(() {
+                                                  paymentTypeValue = newValue;
+
+
+                                                });
+
+                                                if(newValue == 'Depósito Directo'){
+
+                                                    setState(() {
+                                                      _selectTypePayment = 'A';
+                                                    });
+
+                                                }else if(newValue == 'Tarjeta de Crédito'){
+
+                                                    setState(() {
+                                                      _selectTypePayment = 'C';
+                                                    });
+
+                                                }else if(newValue == "Cheque"){
+
+                                                    setState(() {
+                                                      _selectTypePayment = 'K';
+                                                    });
+
+                                                }else if(newValue == "Cuenta"){
+
+                                                    setState(() {
+                                                      _selectTypePayment = 'T';
+                                                    });
+
+                                                }else if(newValue == 'Efectivo' ){
+
+                                                    setState(() {
+                                                      _selectTypePayment = 'X';
+                                                    });
+
+                                                }else if(newValue == 'Débito Directo'){
+
+                                                    setState(() {
+                                                      _selectTypePayment = 'D';
+                                                    });
+
+                                                }
+
+                                                print('Este es el valor de paymentTypeValue $paymentTypeValue && este es el valor de $_selectTypePayment');
+                                              },
+                                             items: <String>['Depósito Directo', 'Tarjeta de Crédito', 'Cheque', 'Cuenta', 'Efectivo', 'Débito Directo' ].map((String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+                                            decoration: const InputDecoration(
+                                              labelText: 'Tipo de Pago',
+                                              labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5),
+                                              contentPadding: EdgeInsets.all(15),
+                                            ),
+                                          ),
+
 
                                               TextFormField(
                                                 readOnly: true,
@@ -246,23 +306,8 @@ void initState() {
                                                   contentPadding: EdgeInsets.all(15),
                                                 ),
                                               ),
-                                                 DropdownButtonFormField<String>(
-                                                    value: '\$', // Valor predeterminado
-                                                    onChanged: (String? newValue) {
-                                                      // Aquí puedes realizar alguna acción cuando cambie la selección
-                                                    },
-                                                    items: <String>['\$'].map((String value) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: value,
-                                                        child: Text(value),
-                                                      );
-                                                    }).toList(),
-                                                    decoration: const InputDecoration(
-                                                      labelText: 'Moneda', // Etiqueta que se muestra sobre el campo
-                                                      labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5), // Estilo de la etiqueta con un margen inferior
-                                                      contentPadding: EdgeInsets.all(15),
-                                                    ),
-                                                  ),
+
+                                              
 
                                               TextFormField(
                                                 controller: montoController,
@@ -311,12 +356,12 @@ void initState() {
                                         ),  
                                           const SizedBox(height: 10,),
                                         // Aqui va el boton
-                                              ElevatedButton(
-                                                onPressed:  () async {
+                                           ElevatedButton(
+                                                onPressed: orderData['status_sincronized'] == 'Enviado' ?  () async {
                                                   // Aquí puedes agregar la lógica para crear el cobro
                                                            await _createCobro(widget.loadCobranzas);
   
-                                                },
+                                                } : null,
                                                 style: ElevatedButton.styleFrom(
                                                   foregroundColor: Colors.green, // Color de fondo verde
                                                   minimumSize: Size(screenMax, 50), // Ancho máximo y altura de 50
@@ -326,6 +371,7 @@ void initState() {
                                                   style: TextStyle(fontSize: 16), // Tamaño de fuente 16
                                                 ),
                                               ),
+                                              
                                                                               
                                       ],
                                     ),
