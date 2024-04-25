@@ -1,7 +1,9 @@
+import 'package:femovil/config/getPosProperties.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/clients/select_customer.dart';
+import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -37,7 +39,7 @@ class _CobroState extends State<Cobro> {
   String? paymentTypeValue = 'Efectivo';
   String? coinValue = "\$";
   String? typeDocumentValue = "Cobro";
-  String? bankAccountValue = "123456";
+  dynamic cBPartnerIds = 0;
   DateTime selectedDate = DateTime.now();
   List<Map<String, dynamic>> bankAccountsList = [];
     List<Map<String, dynamic>> typeCoinsList = [];
@@ -45,13 +47,13 @@ class _CobroState extends State<Cobro> {
   // Selecteds 
 
   int _selectsBankAccountId =  0; 
-  String _selectTypePayment = "";
-  int _selectTypeCoins = 0;
-
+  String _selectTypePayment = "X";
+  dynamic _selectTypeCoins = 0;
   //Texts
 
   String _bankAccountText = "";
-  String _typeCoinsText = "";
+
+List<Map<String, dynamic>> uniqueISOsAndCurrencyId = [];
 
 
 
@@ -70,25 +72,62 @@ void _getBankAcc() async {
 
       bankAccountsList
         .add({'c_bank_id': 0, 'bank_name': 'Selecciona una Cuenta Bancaria'});
-              typeCoinsList
-        .add({'c_currency_id': 0, 'iso_code': 'Selecciona un tipo de moneda'});
+
+
+          for (var account in bankAccounts) {
+
+          if (!uniqueISOsAndCurrencyId.any((element) => element['iso_code'] == account['iso_code'])) {
+            setState(() {
+              
+            uniqueISOsAndCurrencyId.add({
+              'iso_code': account['iso_code'],
+              'c_currency_id': account['c_currency_id']
+            });
+            });
+          }
+          
+        }
+
+
+
     setState(() {
 
       bankAccountsList.addAll(bankAccounts);
-      typeCoinsList.addAll(bankAccounts);
 
     });
+
+
     print("estos son las cuentas agregadas desde la base de datos $bankAccounts");
 
 }
 
+    initV() async {
+
+        if (variablesG.isEmpty) {
+
+          await getPosPropertiesInit();
+          List<Map<String, dynamic>> response = await getPosPropertiesV();
+          setState(() { 
+            variablesG = response;
+          });
+
+        }
+      }
+
+
 @override
 void initState() {
 
+      initV();
     _ordenVenta =  _loadOrdenVentasForId();
+    setState(() {
+      
+       montoController.text = "0";
+       numRefController.text = "Sin registro";
+    });
       _loadCurrentDate();
       _getBankAcc();
-      
+
     _fechaIdempiereController.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate);
 
   super.initState();
@@ -132,7 +171,9 @@ void initState() {
                               final clientData = snapshot.data!['client'][0];
                               final orderData = snapshot.data!['order'];
                               print("Esto es snapshot data ${snapshot.data}");
-      
+
+                               cBPartnerIds = orderData['c_bpartner_id']; 
+
                            return  Padding(
                              padding: const EdgeInsets.all(16.0),
                              child: Align(
@@ -228,12 +269,30 @@ void initState() {
                                                           _bankAccountText = bankAccText;
                                                       });
                                                   },),
-                                                   CustomDropdownButtonFormField(identifier: 'selectTypeCoins', selectedIndex: _selectTypeCoins , dataList: bankAccountsList, text: _typeCoinsText, onSelected: (newValue, typeCoinsText) {
-                                                      setState(() {
-                                                          _selectTypeCoins = newValue ?? 0;
-                                                          _typeCoinsText = typeCoinsText;
-                                                      });
-                                                  },),
+
+                                                  DropdownButtonFormField(
+                                              items: uniqueISOsAndCurrencyId.map((Map<String, dynamic> item) {
+                                                return DropdownMenuItem<String>(
+                                                  value: item['c_currency_id'].toString(),
+                                                  child: Text(item['iso_code']),
+                                                );
+                                              }).toList(),
+                                              onChanged: (selectedValue) {
+
+
+                                                  setState(() {
+                                                    _selectTypeCoins = selectedValue ;
+                                                  });
+
+                                                print('Este es el valor seleccionado: $selectedValue y selecteTypeCoins $_selectTypeCoins');
+                                                // Aquí puedes realizar acciones adicionales con el valor seleccionado
+                                              },
+                                              decoration: const InputDecoration(
+                                                labelText: 'Tipo de Moneda',
+                                                labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5),
+                                                contentPadding: EdgeInsets.all(15),
+                                              ),
+                                            ),
 
                                               DropdownButtonFormField<String>(
                                               value: paymentTypeValue,
@@ -317,29 +376,7 @@ void initState() {
                                                 ),
                                               ),
 
-                                                  DropdownButtonFormField<String>(
-                                                    value: '123456', // Valor predeterminado
-                                                    onChanged: (String? newValue) {
-                                                      // Aquí puedes realizar alguna acción cuando cambie la selección
-
-                                                      setState(() {
-                                                        bankAccountValue = newValue;
-                                                      });
-                                                    
-                                                    },
-                                                    items: <String>['123456'].map((String value) {
-                                                      return DropdownMenuItem<String>(
-                                                        value: value,
-                                                        child: Text(value),
-                                                      );
-                                                    }).toList(),
-                                                    decoration: const InputDecoration(
-                                                      labelText: 'Cuenta Bancaria', // Etiqueta que se muestra sobre el campo
-                                                      labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5), // Estilo de la etiqueta con un margen inferior
-                                                      contentPadding: EdgeInsets.all(15),
-                                                    ),
-                                                  ),
-
+                                           
                                                     TextFormField(
                                                 controller: observacionController,
                                                 decoration: const InputDecoration(
@@ -391,20 +428,34 @@ void initState() {
   }
 
  Future<void> _createCobro(loadCobranzas) async {
-  final int numberReference = int.parse(numRefController.text);
-  final String? typeDocument = typeDocumentValue;
-  final String? paymentType = paymentTypeValue;
+  final dynamic bankAccountId = _selectsBankAccountId;
+  //Tipo del documento de cobro
+  final dynamic cDocTypeId = variablesG[0]['c_doctypereceipt_id'];
+  final dynamic dateTrx = _fechaIdempiereController.text;
+  final dynamic description = observacionController.text;
+  final dynamic cBPartnerId = cBPartnerIds;
+  final dynamic payAmt = double.parse(montoController.text);
+
+  final dynamic currencyId = _selectTypeCoins;
+  final dynamic cOrderId = widget.cOrderId;
+  final dynamic cInvoiceId = widget.idFactura;
+  final dynamic tenderType = _selectTypePayment;
+
+  print('Esto es currencyId $currencyId y este es el orderId $cOrderId y este es el id de la factura $cInvoiceId');
+
+  final int documentNo = int.parse(numRefController.text == 'Sin registro' ? numRefController.text = '0': numRefController.text);
+  
+
   final String date = dateController.text;
-  final String? coin = coinValue;
-  final double amount = double.parse(montoController.text);
-  final String? bankAccount = bankAccountValue;
-  final String observation = observacionController.text;
+
   final int saleOrderId = widget.orderId;
 
   // Obtener el saldo total de la orden
   final double saldoTotal = widget.saldoTotal;
 
-  if (amount > saldoTotal) {
+  print('esto es el saldototal $saldoTotal');
+
+  if (payAmt > saldoTotal) {
     // Si el monto del cobro es mayor al saldo total, mostrar mensaje de diálogo
     showDialog(
       context: context,
@@ -426,14 +477,18 @@ void initState() {
   } else {
     // Si el monto del cobro es menor o igual al saldo total, insertar el cobro en la base de datos
     await insertCobro(
-      numberReference: numberReference,
-      typeDocument: typeDocument,
-      paymentType: paymentType,
+      cBankAccountId: bankAccountId,
+      cDocTypeId: cDocTypeId,
+      dateTrx: dateTrx,
       date: date,
-      coin: coin,
-      amount: amount,
-      bankAccount: bankAccount,
-      observation: observation,
+      description: description,
+      cBPartnerId: cBPartnerId,
+      payAmt: payAmt,
+      cCurrencyId: currencyId,
+      cOrderId: cOrderId,
+      cInvoiceId: cInvoiceId,
+      documentNo: documentNo,
+      tenderType: tenderType ,
       saleOrderId: saleOrderId,
     );
 

@@ -243,18 +243,21 @@ class DatabaseHelper {
         await db.execute('''
           CREATE TABLE cobros(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            documentno INTEGER,
-            type_document TEXT,
-            payment_type TEXT, 
+            c_bankaccount_id INTEGER,
+            c_doctype_id INTEGER,
+            date_trx TEXT,
+            description TEXT,
+            c_bpartner_id INTEGER,
+            pay_amt REAL,
             date TEXT,
-            coin TEXT,
-            amount INTEGER,
-            bank_account TEXT,
-            observation TEXT,
+            c_currency_id INTEGER,
+            c_order_id INTEGER,
+            c_invoice_id INTEGER,
+            documentno INTEGER,
+            tender_type STRING,
             sale_order_id INTEGER,
-            payment_id INTEGER,
             FOREIGN KEY (sale_order_id) REFERENCES orden_venta(id)
-
+            
           )
         ''');
 
