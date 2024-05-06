@@ -8,6 +8,7 @@ import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_compra/product_selection.dart';
 import 'package:femovil/presentation/orden_venta/product_selection.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
+import 'package:femovil/presentation/retenciones/idempiere/create_factura_retencion.dart';
 import 'package:femovil/presentation/retenciones/idempiere/payment_terms_sincronization.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -184,7 +185,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
 
   @override
   Widget build(BuildContext context) {
-    final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final screenMedia = MediaQuery.of(context).size.width * 0.8;
     setState(() {
       currentContext = context;
     });
@@ -201,7 +202,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
         ),
         body: Center(
           child: SizedBox(
-            width: screenMax,
+            width: screenMedia,
             child: SingleChildScrollView(
               child: Form(
                 key: _formKey,
@@ -409,7 +410,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                     },
                                   ),
                                   Container(
-                                    width: 225,
+                                    width: screenMedia * 0.84,
                                     child: TextField(
                                       readOnly: true,
                                       decoration: const InputDecoration(
@@ -661,7 +662,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: SizedBox(
-                              width: 300,
+                              width: screenMedia,
                               child: Text(
                                 value,
                                 overflow: TextOverflow
@@ -856,7 +857,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
 
                     Center(
                       child: SizedBox(
-                        width: screenMax,
+                        width: screenMedia,
                         child: Column(
                           children: [
                             // ...otros widgets aquí
@@ -931,9 +932,8 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                     'productos': selectedProducts,
                                   };
 
-                                  print(
-                                      'Esto es la factura con retencion $nuevaRetencion');
-
+                                  print('Esto es la factura con retencion $nuevaRetencion');
+                                  createInvoicedWithholdingIdempiere(nuevaRetencion);
                                   insertRetencion(nuevaRetencion);
                                   _formKey.currentState?.reset();
 
