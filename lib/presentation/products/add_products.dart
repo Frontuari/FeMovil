@@ -174,6 +174,12 @@ class _AddProductFormState extends State<AddProductForm> {
                                       color: Color.fromRGBO(158, 157, 157,
                                           0.2)), // Color del borde cuando no está enfocado
                                 ),
+                                errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                      color: Colors.white
+                                    ),
+                                ),
 
                            ),
 
