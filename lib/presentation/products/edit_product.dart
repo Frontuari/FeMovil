@@ -1,4 +1,3 @@
-
 import 'package:femovil/config/app_bar_femovil.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/list_database.dart';
@@ -21,12 +20,11 @@ class EditProductScreen extends StatefulWidget {
 class _EditProductScreenState extends State<EditProductScreen> {
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController();
-   double _priceController = 0.0;
-   int _quantityController = 0;
+  double _priceController = 0.0;
+  int _quantityController = 0;
   final _minStockController = TextEditingController();
   final _maxStockController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
 
   final List<Map<String, dynamic>> _taxList =
       []; // Lista para almacenar los impuestos disponibles
@@ -103,8 +101,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _prodCatText = widget.product['categoria'];
     _umText = widget.product['um_name'];
     _prodTypeText = widget.product['product_type_name'];
-    _priceController = widget.product['price'] == '{@nil=true}' ?  0.0 : double.parse(widget.product['price'].toString());
-    _quantityController = widget.product['quantity'] == '{@nil: true}' ? 0 : widget.product['quantity'];
+    _priceController = widget.product['price'] == '{@nil=true}'
+        ? 0.0
+        : double.parse(widget.product['price'].toString());
+    _quantityController = widget.product['quantity'] == '{@nil: true}'
+        ? 0
+        : widget.product['quantity'];
 
     _loadTaxs();
 
@@ -133,12 +135,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
             scrollDirection: Axis.vertical,
             child: Form(
               key: _formKey,
-  autovalidateMode: AutovalidateMode.onUserInteraction,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Align(
-                  alignment: Alignment.center,
+                alignment: Alignment.center,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget> [
+                  children: <Widget>[
                     SizedBox(
                       height: mediaScreen * 0.05,
                     ),
@@ -155,20 +157,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       height: mediaScreen * 0.05,
                     ),
                     _buildTextFormField('Nombre', _nameController, mediaScreen),
-                       SizedBox(
+                    SizedBox(
                       height: mediaScreen * 0.05,
                     ),
-
-                       Container(
+                    Container(
                       width: mediaScreen,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
                             8.0), // Ajusta el radio del borde según sea necesario
                         boxShadow: [
-                          BoxShadow(blurRadius: 7, spreadRadius: 2, color:  Colors.grey.withOpacity(0.5) )
+                          BoxShadow(
+                              blurRadius: 7,
+                              spreadRadius: 2,
+                              color: Colors.grey.withOpacity(0.5))
                         ],
                         color: Colors.white,
-                      
                       ),
                       child: DropdownButtonFormField<String>(
                         value: _selectedProductType,
@@ -179,8 +182,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             .map<DropdownMenuItem<String>>((productType) {
                           return DropdownMenuItem<String>(
                             value: productType['product_type'] as String,
-                            child:
-                                Text(productType['product_type_name'] as String, style: const TextStyle(fontFamily: 'Poppins Regular'),),
+                            child: Text(
+                              productType['product_type_name'] as String,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Regular'),
+                            ),
                           );
                         }).toList(),
                         onChanged: (newValue) {
@@ -188,24 +194,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               'obtenerNombreProductType',
                               newValue,
                               _productTypeList);
-                
+
                           setState(() {
                             _prodTypeText = nameProductType;
                             _selectedProductType = newValue as String;
                           });
                         },
-                        decoration:  InputDecoration(
-                          labelText: 'Tipo de Producto',
-                          labelStyle: const TextStyle(fontFamily: 'Poppins Regular') ,
-                          border: InputBorder
-                              .none, // No necesitas un borde adicional aquí ya que está definido en el Container
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
-                              focusedBorder: OutlineInputBorder(
-                                 borderRadius: BorderRadius.circular(10),
-                                 borderSide: BorderSide(color: colorTheme.primary, width: 1.0)
-                              )
-                        ),
+                        decoration: InputDecoration(
+                            labelText: 'Tipo de Producto',
+                            labelStyle:
+                                const TextStyle(fontFamily: 'Poppins Regular'),
+                            border: InputBorder
+                                .none, // No necesitas un borde adicional aquí ya que está definido en el Container
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 12.0),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                    color: colorTheme.primary, width: 1.0))),
                         validator: (value) {
                           if (value == null || value == 'first') {
                             return 'Por favor selecciona un tipo de producto';
@@ -214,36 +220,36 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         },
                       ),
                     ),
-                
-                       SizedBox(
+                    SizedBox(
                       height: mediaScreen * 0.05,
                     ),
-                     Container(
-                      
+                    Container(
                       width: mediaScreen,
                       decoration: BoxDecoration(
-                        
-                        borderRadius: BorderRadius.circular(
-                            8.0), 
-                            boxShadow: [
-                              BoxShadow(blurRadius: 7, spreadRadius: 2, color: Colors.grey.withOpacity(0.5))
-                            ] ,
-                            color: Colors.white
-                          
-                      ),
+                          borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 7,
+                                spreadRadius: 2,
+                                color: Colors.grey.withOpacity(0.5))
+                          ],
+                          color: Colors.white),
                       child: DropdownButtonFormField<int>(
                         value: _selectedProductGroupIndex,
                         items: _productGroupList
-                              .where((productGroup) =>
-                                  productGroup['product_group_id'] is int &&
-                                  productGroup['product_group_name'] != '' )
+                            .where((productGroup) =>
+                                productGroup['product_group_id'] is int &&
+                                productGroup['product_group_name'] != '')
                             .map<DropdownMenuItem<int>>((productGroup) {
                           return DropdownMenuItem<int>(
                             value: productGroup['product_group_id'] as int,
                             child: Container(
                               width: mediaScreen * 0.82,
                               child: Text(
-                                  productGroup['product_group_name'] as String, style: const TextStyle(fontFamily: 'Poppins Regular'),),
+                                productGroup['product_group_name'] as String,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                              ),
                             ),
                           );
                         }).toList(),
@@ -252,22 +258,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               'obtenerNombreProductGroup',
                               newValue,
                               _productGroupList);
-                      
+
                           setState(() {
                             _prodGroupText = nameProductGroup;
                             _selectedProductGroupIndex = newValue as int;
                           });
                         },
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Grupo del Producto',
                           border: InputBorder
                               .none, // No necesitas un borde adicional aquí ya que está definido en el Container
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 12.0),
                           focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: colorTheme.primary, width: 1.0 )     
-                          ),
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: colorTheme.primary, width: 1.0)),
                         ),
                         validator: (value) {
                           print('Este es el valor de value $value');
@@ -278,57 +284,56 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         },
                       ),
                     ),
-                     SizedBox(
+                    SizedBox(
                       height: mediaScreen * 0.05,
                     ),
                     Container(
                       width: mediaScreen,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(
-                            8.0), 
+                        borderRadius: BorderRadius.circular(8.0),
                         boxShadow: [
-                            BoxShadow(
+                          BoxShadow(
                               color: Colors.grey.withOpacity(0.5),
                               blurRadius: 7,
-                              spreadRadius: 2
-                            )
-  
+                              spreadRadius: 2)
                         ],
                       ),
                       child: DropdownButtonFormField<int>(
                         value: _selectedUmIndex,
                         items: _umList
-                            .where(
-                                (um) => um['um_id'] is int && um['um_name'] != "")
+                            .where((um) =>
+                                um['um_id'] is int && um['um_name'] != "")
                             .map<DropdownMenuItem<int>>((um) {
                           return DropdownMenuItem<int>(
                             value: um['um_id'] as int,
                             child: Container(
-                              width: mediaScreen * 0.82,
-                              child: Text(um['um_name'] as String, style:const TextStyle(fontFamily: 'Poppins Regular'))),
+                                width: mediaScreen * 0.82,
+                                child: Text(um['um_name'] as String,
+                                    style: const TextStyle(
+                                        fontFamily: 'Poppins Regular'))),
                           );
                         }).toList(),
                         onChanged: (newValue) {
                           String nameUm =
                               invoke('obtenerNombreUm', newValue, _umList);
-                
+
                           setState(() {
                             _umText = nameUm;
                             _selectedUmIndex = newValue as int;
                           });
                         },
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Unidad de Medida',
-                          labelStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                          labelStyle:
+                              const TextStyle(fontFamily: 'Poppins Regular'),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
-                                color: colorTheme.primary ,
-                                width: 1.0,
+                              color: colorTheme.primary,
+                              width: 1.0,
                             ),
-
-                          ) ,
+                          ),
                           border: InputBorder
                               .none, // No necesitas un borde adicional aquí ya que está definido en el Container
                           contentPadding: const EdgeInsets.symmetric(
@@ -342,7 +347,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         },
                       ),
                     ),
-                     SizedBox(
+                    SizedBox(
                       height: mediaScreen * 0.05,
                     ),
                     SizedBox(
@@ -379,12 +384,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             .map<DropdownMenuItem<int>>((tax) {
                           return DropdownMenuItem<int>(
                             value: tax['tax_cat_id'] as int,
-                            child: Text(tax['tax_cat_name'] as String, style: const TextStyle(fontFamily: 'Poppins Regular' ),),
+                            child: Text(
+                              tax['tax_cat_name'] as String,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Regular'),
+                            ),
                           );
                         }).toList(),
                         onChanged: (newValue) {
-                          String nameTax =
-                              invoke('obtenerNombreImpuesto', newValue, _taxList);
+                          String nameTax = invoke(
+                              'obtenerNombreImpuesto', newValue, _taxList);
                           setState(() {
                             _taxText = nameTax;
                             _selectedTaxIndex = newValue as int;
@@ -397,8 +406,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               horizontal: 16.0, vertical: 19.0),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                const BorderSide(color: Colors.white, width: 15),
+                            borderSide: const BorderSide(
+                                color: Colors.white, width: 15),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(
@@ -425,8 +434,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         child: const Text(
                           'Categoría',
                           textAlign: TextAlign.left,
-                          style:
-                              TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),
+                          style: TextStyle(
+                              fontFamily: 'Poppins Bold', fontSize: 18),
                         )),
                     SizedBox(
                       height: mediaScreen * 0.05,
@@ -455,13 +464,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             .map<DropdownMenuItem<int>>((categories) {
                           return DropdownMenuItem<int>(
                             value: categories['pro_cat_id'] as int,
-                            child: Text(categories['categoria'] as String, style: const TextStyle(fontFamily: 'Poppins Regular') ,),
+                            child: Text(
+                              categories['categoria'] as String,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Regular'),
+                            ),
                           );
                         }).toList(),
                         onChanged: (newValue) {
                           String nameCat = invoke(
                               'obtenerNombreCat', newValue, _categoriesList);
-                
+
                           setState(() {
                             _prodCatText = nameCat;
                             _selectedCategoriesIndex = newValue as int;
@@ -474,12 +487,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 horizontal: 16.0, vertical: 19.0),
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    const BorderSide(color: Colors.white, width: 15)),
+                                borderSide: const BorderSide(
+                                    color: Colors.white, width: 15)),
                             focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    const BorderSide(color: Colors.white, width: 15))),
+                                borderSide: const BorderSide(
+                                    color: Colors.white, width: 15))),
                         validator: (value) {
                           if (value == null || value == 0) {
                             return 'Por favor selecciona un impuesto';
@@ -488,26 +501,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         },
                       ),
                     ),
-                     SizedBox(height: mediaScreen * 0.08),
-                 
-                 Container(
-                  width: mediaScreen,
-                  decoration: BoxDecoration(
-                    
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        blurRadius: 7,
-                        spreadRadius: 2,
-                        offset: const Offset(3, 1)
-                      )
-                    ] ,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                   child: ElevatedButton(onPressed: () {
-                   
-                      if(_formKey.currentState!.validate()){
-
+                    SizedBox(height: mediaScreen * 0.08),
+                    Container(
+                      width: mediaScreen,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2,
+                              offset: const Offset(3, 1))
+                        ],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
                             String newName = _nameController.text;
                             double newPrice = _priceController;
                             int newQuantity = _quantityController;
@@ -517,92 +526,99 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             String catProd = _prodCatText;
                             int umId = _selectedUmIndex;
                             String umName = _umText;
-                            int selectedGroupIndex = _selectedProductGroupIndex; 
+                            int selectedGroupIndex = _selectedProductGroupIndex;
                             String groupTextProd = _prodGroupText;
                             String selectedProductType = _selectedProductType;
                             String prodTypeText = _prodTypeText;
 
-
-                             Map<String, dynamic> updatedProduct = {
-                                                    
-                                                    'id': widget
-                                                        .product['id'], // Asegúrate de incluir el ID del producto
-                                                    'name': newName,
-                                                    'categoria': catProd,
-                                                    'price': newPrice,
-                                                    'quantity': newQuantity,
-                                                    'tax_cat_id': taxIndex,
-                                                    'tax_cat_name': taxString,
-                                                    'pro_cat_id': prodCat,
-                                                    'um_id': umId,
-                                                    'um_name': umName,
-                                                    'product_group_id' : selectedGroupIndex,
-                                                    'product_group_name': groupTextProd,
-                                                    'product_type': selectedProductType,
-                                                    'product_type_name': prodTypeText
-
-                                                  };
-                                   showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Producto actualizado'),
-                                          content: const Text('¡El producto se ha actualizado correctamente!'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('Aceptar'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  updateProduct(updatedProduct);
-                                    Navigator.pop(context);
-                                   showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                                backgroundColor: Colors.white,
-                                // Center the title, content, and actions using a Column
-                                content: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min, // Wrap content vertically
-                                  children: [
-                                    Image.asset('lib/assets/Check@2x.png', width: 50, height: 50), // Adjust width and height
-                                    const Text('Producto Actualizado', style: TextStyle(fontFamily: 'Poppins Bold')),
+                            Map<String, dynamic> updatedProduct = {
+                              'id': widget.product[
+                                  'id'], // Asegúrate de incluir el ID del producto
+                              'name': newName,
+                              'categoria': catProd,
+                              'price': newPrice,
+                              'quantity': newQuantity,
+                              'tax_cat_id': taxIndex,
+                              'tax_cat_name': taxString,
+                              'pro_cat_id': prodCat,
+                              'um_id': umId,
+                              'um_name': umName,
+                              'product_group_id': selectedGroupIndex,
+                              'product_group_name': groupTextProd,
+                              'product_type': selectedProductType,
+                              'product_type_name': prodTypeText
+                            };
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Producto actualizado'),
+                                  content: const Text(
+                                      '¡El producto se ha actualizado correctamente!'),
+                                  actions: <Widget>[
                                     TextButton(
-                                      onPressed: () => {
-                                        Navigator.pop(context), Navigator.pop(context)
-                                        },
-                                      child: const Text('Volver'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Aceptar'),
                                     ),
                                   ],
-                                ),
-                              );
-  },
-);
-
-
-                      }
-                   
-                   },
-                   style: ElevatedButton.styleFrom(
-                            backgroundColor: colorTheme.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                   ),
-                  child: const Text('Actualizar', style:  TextStyle(color: Colors.white, fontFamily: 'Poppins Bold'),),
-                   ),
-                 ),
-
-                  SizedBox(height: mediaScreen * 0.08,)
-                    
+                                );
+                              },
+                            );
+                            updateProduct(updatedProduct);
+                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 20),
+                                  backgroundColor: Colors.white,
+                                  // Center the title, content, and actions using a Column
+                                  content: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize
+                                        .min, // Wrap content vertically
+                                    children: [
+                                      Image.asset('lib/assets/Check@2x.png',
+                                          width: 50,
+                                          height:
+                                              50), // Adjust width and height
+                                      const Text('Producto Actualizado',
+                                          style: TextStyle(
+                                              fontFamily: 'Poppins Bold')),
+                                      TextButton(
+                                        onPressed: () => {
+                                          Navigator.pop(context),
+                                          Navigator.pop(context)
+                                        },
+                                        child: const Text('Volver'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorTheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        child: const Text(
+                          'Actualizar',
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Poppins Bold'),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: mediaScreen * 0.08,
+                    )
                   ],
                 ),
               ),
@@ -630,11 +646,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ]),
         child: TextFormField(
           validator: (value) {
-                print('Esto es el values $value');
-                  if(value!.isEmpty){
-                      return 'El campo de entrada no puede estar vacío';
-                  }
-              return null;
+            print('Esto es el values $value');
+            if (value!.isEmpty) {
+              return 'El campo de entrada no puede estar vacío';
+            }
+            return null;
           },
           controller: controller,
           decoration: InputDecoration(
@@ -664,7 +680,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     // Clean up controllers
     _nameController.dispose();
     _categoryController.dispose();
-  
+
     _minStockController.dispose();
     _maxStockController.dispose();
     super.dispose();

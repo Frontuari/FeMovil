@@ -22,7 +22,7 @@ class _ClientsState extends State<Clients> {
   late List<Map<String, dynamic>> clients = [];
   List<Map<String, dynamic>> searchClient = [];
   TextEditingController searchController = TextEditingController();
-    List<Map<String, dynamic>> filteredClients = [];
+  List<Map<String, dynamic>> filteredClients = [];
 
   String input = "";
 
@@ -41,7 +41,7 @@ class _ClientsState extends State<Clients> {
       context: context,
       builder: (context) => FilterGroups(
         clients: clients,
-      ), 
+      ),
     );
 
     print("Esto es el valor del select $selectedFilter");
@@ -113,79 +113,76 @@ class _ClientsState extends State<Clients> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 236, 247, 255),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(170),
+        preferredSize: const Size.fromHeight(170),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-
             const AppBars(labelText: 'Clientes'),
-            
-             Positioned(
-            left: 16,
-            right: 16,
-            top: 160,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                width: 300,
-                height: 50,
+            Positioned(
+              left: 16,
+              right: 16,
+              top: 160,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  width: 300,
+                  height: 50,
                   decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              9.0), // Ajusta el radio de las esquinas
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey
-                                  .withOpacity(0.2), // Color de la sombra
-                              spreadRadius: 2, // Extensión de la sombra
-                              blurRadius: 3, // Difuminado de la sombra
-                              offset: const Offset(
-                                  0, 2), // Desplazamiento de la sombra
-                            ),
-                          ],
-                        ),
-                child: TextField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    if (searchController.text.isNotEmpty) {
+                    borderRadius: BorderRadius.circular(
+                        9.0), // Ajusta el radio de las esquinas
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            Colors.grey.withOpacity(0.2), // Color de la sombra
+                        spreadRadius: 2, // Extensión de la sombra
+                        blurRadius: 3, // Difuminado de la sombra
+                        offset:
+                            const Offset(0, 2), // Desplazamiento de la sombra
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      if (searchController.text.isNotEmpty) {
+                        setState(() {
+                          _filter = "";
+                        });
+                      }
+
                       setState(() {
-                        _filter = "";
+                        input = value;
+                        filteredClients = clients;
                       });
-                    }
-                      
-                    setState(() {
-                      input = value;
-                      filteredClients = clients;
-                          
-                    });
-                  },
-                  decoration:  InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 3.0, horizontal: 20.0), 
-                    hintText: 'Nombre del Cliente o RUC',
-                    labelStyle: const TextStyle( color: Colors.black, fontFamily: 'Poppins Regular'),
-                    suffixIcon:Image.asset('lib/assets/Lupa.png'),
-                       border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
+                    },
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 3.0, horizontal: 20.0),
+                      hintText: 'Nombre del Cliente o RUC',
+                      labelStyle: const TextStyle(
+                          color: Colors.black, fontFamily: 'Poppins Regular'),
+                      suffixIcon: Image.asset('lib/assets/Lupa.png'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-
-
-          ],),
-      ) ,
+          ],
+        ),
+      ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
         child: Stack(
           children: [
-          Positioned.fill(
+            Positioned.fill(
               child: GestureDetector(
                 onTap: () {
                   // Cierra el teclado tocando en cualquier parte del Stack
@@ -198,25 +195,28 @@ class _ClientsState extends State<Clients> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                    const SizedBox(height: 25,),
-              
-                    IconButton(
-                      icon: Image.asset(
-                        'lib/assets/filtro@3x.png',
-                        width: 25,
-                        height: 35,
-                      ),
-                      onPressed: () {
-                        _showFilterOptions(context);
-                      },
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  IconButton(
+                    icon: Image.asset(
+                      'lib/assets/filtro@3x.png',
+                      width: 25,
+                      height: 35,
                     ),
-                    const SizedBox(height: 10,),
+                    onPressed: () {
+                      _showFilterOptions(context);
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: searchClient.length,
                       itemBuilder: (context, index) {
                         final client = searchClient[index];
-              
+
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
@@ -225,139 +225,192 @@ class _ClientsState extends State<Clients> {
                               Container(
                                 width: screenMax,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                     BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ]
-                                ),
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ]),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Container(
                                       height: 130,
                                       decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 255, 255, 255),
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: [
-                                      BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
+                                        color: const Color.fromARGB(
+                                            255, 255, 255, 255),
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 2,
+                                            blurRadius: 5,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
                                       ),
-                                      ],
-                                    ),
-                                    child: Stack(
-                                      children: [
-                                        Positioned(
+                                      child: Stack(
+                                        children: [
+                                          Positioned(
                                             top: 0,
                                             left: 0,
                                             right: 0,
                                             child: Container(
                                               height: 50,
-                                                    width: screenMax,
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(0xFFF0EBFC),
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      boxShadow: [
-                                              BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                ],
-                              ),
-                                      child: Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: Expanded(
-                                        child: Text(
-                                        client['bp_name'].toString(),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Poppins Bold',
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
-                                        textAlign: TextAlign.start,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                ),
-                              ),
-                            ),
-
-                              Positioned(
-                              top: 55,
-                               child: Padding(
-                                 padding: const EdgeInsets.all(8.0),
-                                 child: SizedBox(
-                                  width: screenMax *0.9,
-                                   child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start ,
-                                                  children: [
-                                   
-                                                    Row(
-                                                      children: [
-                                                        const Text('RUC/DNI: ', style: TextStyle(fontFamily:'Poppins SemiBold' ),),
-                                                        Container(
-                                                          width: screenMax * 0.45,
-                                                          child: Text('${client['ruc']}', style: const TextStyle(fontFamily: 'Poppins Regular' ), overflow: TextOverflow.ellipsis,))
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        const Text('Correo: ', style: TextStyle(fontFamily: 'Poppins SemiBold') ,),
-                                                        Container(
-                                                          width: screenMax * 0.45,
-                                                          child: Text('${!client['email'].toString().contains('{@nil: true}') ? client['email'] : 'Sin Registro'}', style: const TextStyle(fontFamily: 'Poppins Regular'),overflow: TextOverflow.ellipsis,)),
-                                                      ],
-                                                    ),
-                        
-                        
-                                                Row(
-                                                  children: [
-                                                    const Text('Teléfono: ', style: TextStyle(fontFamily: 'Poppins SemiBold'),),
-                                                    Container(
-                                                      width: screenMax * 0.45,
-                                                      child: Text('${client['phone'] is int ? client['phone'] : 'wqeqweqweqweqweqwwwe'}', style: TextStyle(fontFamily: 'Poppins Regular') , overflow: TextOverflow.ellipsis,))
-                                                  ],
-                                                ),
-                                                
+                                              width: screenMax,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFF0EBFC),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.2),
+                                                    spreadRadius: 2,
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 3),
+                                                  ),
                                                 ],
                                               ),
-                                    
-                                            GestureDetector(
-                                              onTap: () {
-                                                // _verMasProducto('${product['id']}');
-                                              },
-                                              child: Row(
-                                                children: [
-                                              const Text('Ver', style: TextStyle(color: Color(0xFF7531FF))),
-                                              const SizedBox(width: 10,),
-                                              Image.asset('lib/assets/Lupa-2@2x.png', width: 25),
-                                                    ],
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(15.0),
+                                                child: Text(
+                                                  client['bp_name'].toString(),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Poppins Bold',
+                                                    fontSize: 18,
+                                                    color: Colors.black,
                                                   ),
-                                                )
-                                              ],
+                                                  textAlign: TextAlign.start,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                          Positioned(
+                                            top: 55,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: SizedBox(
+                                                width: screenMax * 0.9,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            const Text(
+                                                              'RUC/DNI: ',
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins SemiBold'),
+                                                            ),
+                                                            SizedBox(
+                                                                width:
+                                                                    screenMax *
+                                                                        0.45,
+                                                                child: Text(
+                                                                  '${client['ruc']}',
+                                                                  style: const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular'),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                ))
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            const Text(
+                                                              'Correo: ',
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins SemiBold'),
+                                                            ),
+                                                            SizedBox(
+                                                                width:
+                                                                    screenMax *
+                                                                        0.45,
+                                                                child: Text(
+                                                                  '${!client['email'].toString().contains('{@nil: true}') ? client['email'] : 'Sin Registro'}',
+                                                                  style: const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular'),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                )),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            const Text(
+                                                              'Teléfono: ',
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins SemiBold'),
+                                                            ),
+                                                            SizedBox(
+                                                                width:
+                                                                    screenMax *
+                                                                        0.45,
+                                                                child: Text(
+                                                                  '${client['phone'] is int ? client['phone'] : 'wqeqweqweqweqweqwwwe'}',
+                                                                  style: const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular'),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                ))
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        _verMasClient(
+                                                            client['id']
+                                                                .toString());
+                                                      },
+                                                      child: Row(
+                                                        children: [
+                                                          const Text('Ver',
+                                                              style: TextStyle(
+                                                                  color: Color(
+                                                                      0xFF7531FF))),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Image.asset(
+                                                              'lib/assets/Lupa-2@2x.png',
+                                                              width: 25),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-
-                                    ],
-                                   ),
-                                  ),
+                                    ),
                                   ],
                                 ),
                               ),
