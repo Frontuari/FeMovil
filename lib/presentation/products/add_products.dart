@@ -1,4 +1,5 @@
 import 'package:femovil/config/app_bar_femovil.dart';
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
@@ -99,43 +100,45 @@ class _AddProductFormState extends State<AddProductForm> {
       },
       child: Scaffold(
         appBar: const PreferredSize(
-            preferredSize: Size.fromHeight(170),
-            child: AppBars(
-              labelText: 'Agregar Producto',
-            )),
+          preferredSize: Size.fromHeight(50),
+          child: AppBarSample(label: 'Agregar Producto',)),
         body: Align(
           alignment: Alignment.topCenter,
-          child: Container(
+          child: SizedBox(
             width: mediaScreen,
             child: Form(
               key: _formKey,
+              autovalidateMode:AutovalidateMode.onUserInteraction ,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(height: 15),
                     Container(
-                      height: mediaScreen * 0.20,
-                      width: mediaScreen,
-                      decoration: BoxDecoration(boxShadow: [
+                            height: mediaScreen * 0.20,
+                            width: mediaScreen * 0.95,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
                         BoxShadow(
                           color: Colors.black
                               .withOpacity(0.1), // Color de la sombra
                           spreadRadius: 3, // Extensión de la sombra
                           blurRadius: 4, // Desenfoque de la sombra
                           offset:
-                              const Offset(0, 3), // Desplazamiento de la sombra
+                        const Offset(0, 3), // Desplazamiento de la sombra
                         ),
                       ]),
                       child: TextFormField(
                         controller: _nameController,
                         decoration: InputDecoration(
+                          errorStyle: const TextStyle(fontFamily: 'Poppins Regular',),
                           labelText: 'Nombre del producto',
                           filled: true,
                           fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 20.0, horizontal: 20.0),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
                           labelStyle: const TextStyle(
                             fontFamily:
                                 'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
@@ -146,28 +149,33 @@ class _AddProductFormState extends State<AddProductForm> {
                           ),
                           border: const OutlineInputBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(8.0)),
-                            borderSide: BorderSide(
-                                color: Colors.black), // Color del borde
+                                BorderRadius.all(Radius.circular(15.0)),
+                            borderSide: BorderSide.none, // Color del borde
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(8.0)),
+                                BorderRadius.all(Radius.circular(15.0)),
                             borderSide: BorderSide(
-                                color: colorTheme
-                                    .primary), // Color del borde cuando está enfocado
+                                color: Colors.white ,
+                                width: 25,
+                                ), // Color del borde cuando está enfocado
                           ),
                           enabledBorder: const OutlineInputBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(8.0)),
+                                BorderRadius.all(Radius.circular(15.0)),
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(158, 157, 157,
-                                    0.2)), // Color del borde cuando no está enfocado
+                                color: Colors.white,
+                                width: 25,
+                                ), // Color del borde cuando no está enfocado
                           ),
                           errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Colors.red),
                           ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(width: 1, color: Colors.red)
+                          )
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -182,7 +190,10 @@ class _AddProductFormState extends State<AddProductForm> {
                       height: 10,
                     ),
                     Container(
+                    height: mediaScreen * 0.20,
+                    width:  mediaScreen * 0.95,
                       decoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(
                             10.0), // Mismo radio que el borde del InputDecorator
                         boxShadow: [
@@ -197,6 +208,7 @@ class _AddProductFormState extends State<AddProductForm> {
                         ],
                       ),
                       child: DropdownButtonFormField<int>(
+                        icon: Image.asset('lib/assets/Abajo.png') ,
                         value: _selectedTaxIndex,
                         items: _taxList
                             .where((tax) => tax['tax_cat_id'] is int)
@@ -220,21 +232,25 @@ class _AddProductFormState extends State<AddProductForm> {
                           });
                         },
                         decoration: InputDecoration(
+                          errorStyle: const TextStyle(fontFamily: 'Poppins Regular', color: Colors.red),
+                           contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10
+                        ),
                           filled: true,
                           fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide.none
+                          ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(
-                                10.0), // Set desired border radius
-                            borderSide:
-                                const BorderSide(style: BorderStyle.none),
+                                15.0), // Set desired border radius
+                            borderSide:BorderSide.none
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(
-                                10.0), // Maintain border radius on focus
-                            borderSide: BorderSide(
-                                color: colorTheme.primary,
-                                width:
-                                    1.0), // Change border color and thickness on focus (optional)
+                                15.0), // Maintain border radius on focus
+                            borderSide: BorderSide.none, // Change border color and thickness on focus (optional)
                           ),
                         ),
                         validator: (value) {
@@ -250,8 +266,11 @@ class _AddProductFormState extends State<AddProductForm> {
                       height: 10,
                     ),
                     Container(
+                       height: mediaScreen * 0.20,
+                       width:  mediaScreen * 0.95,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.white,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.5),
@@ -260,7 +279,6 @@ class _AddProductFormState extends State<AddProductForm> {
                               offset: const Offset(0, 3),
                             )
                           ]),
-                      width: mediaScreen,
                       child: DropdownButtonFormField<String>(
                         value: _selectedProductType,
                         items: _productTpeList
@@ -269,8 +287,8 @@ class _AddProductFormState extends State<AddProductForm> {
                             .map<DropdownMenuItem<String>>((productType) {
                           return DropdownMenuItem<String>(
                             value: productType['product_type'] as String,
-                            child: Container(
-                                width: mediaScreen * 0.83,
+                            child: SizedBox(
+                                width: mediaScreen * 0.78,
                                 child: Text(
                                   productType['product_type_name'] as String,
                                   style: const TextStyle(
@@ -670,3 +688,4 @@ class _AddProductFormState extends State<AddProductForm> {
     super.dispose();
   }
 }
+

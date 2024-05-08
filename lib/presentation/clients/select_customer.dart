@@ -15,110 +15,190 @@ class CustomDropdownButtonFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+      final mediaScreen = MediaQuery.of(context).size.width * 0.8;
+
       switch (identifier) {
       case 'groupBp':
-         return    DropdownButtonFormField<int>(
-                    value: selectedIndex,
-                    items: dataList
-                        .where((groupList) => groupList['c_bp_group_id'] is int && groupList['group_bp_name'] != '')
-                        .map<DropdownMenuItem<int>>((group) {
-                      print('tax $group');
-                      return DropdownMenuItem<int>(
-                        value: group['c_bp_group_id'] as int,
-                        child: Text(group['group_bp_name'] as String),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      print('esto es el taxList ${dataList}');
-                      String nameGroup =
-                          invoke('obtenerNombreGroup', newValue, dataList);
-                      print("esto es el nombre de impuesto $nameGroup");
-                      onSelected(newValue, nameGroup);
-                   
-                    },
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
+         return    Container(
+                            height: mediaScreen * 0.20,
+                            width: mediaScreen * 0.95,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                    blurRadius: 7,
+                                    spreadRadius: 2
+                                ),
+                              ]
+                            ),
+           child: DropdownButtonFormField<int>(
+                      icon: Image.asset('lib/assets/Abajo.png') ,
+                      value: selectedIndex,
+                      items: dataList
+                          .where((groupList) => groupList['c_bp_group_id'] is int && groupList['group_bp_name'] != '')
+                          .map<DropdownMenuItem<int>>((group) {
+                        print('tax $group');
+                        return DropdownMenuItem<int>(
+                          value: group['c_bp_group_id'] as int,
+                          child: Text(group['group_bp_name'] as String, style: const TextStyle(fontFamily: 'Poppins Regular', overflow: TextOverflow.ellipsis),),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        print('esto es el taxList ${dataList}');
+                        String nameGroup =
+                            invoke('obtenerNombreGroup', newValue, dataList);
+                        print("esto es el nombre de impuesto $nameGroup");
+                        onSelected(newValue, nameGroup);
+                     
+                      },
+                      decoration:  InputDecoration(
+                        errorStyle: const TextStyle(fontFamily: 'Poppins Regular') ,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15), 
+                          borderSide: BorderSide.none
+                        )
+                      ),
+                      validator: (value) {
+                        if (value == null || value == 0) {
+                          return 'Por favor selecciona un grupo';
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value == 0) {
-                        return 'Por favor selecciona un grupo';
-                      }
-                      return null;
-                    },
-                  );
+         );
 
         case 'taxType' :
 
-        return DropdownButtonFormField<int>(
-                      value: selectedIndex,
-                      items: dataList
-                          .where((taxType) => taxType['lco_tax_id_typeid'] is int && taxType['tax_id_type_name'] != '' )
-                          .map<DropdownMenuItem<int>>((taxType) {
-                        print('tax $taxType');
-                        return DropdownMenuItem<int>(
-                          value: taxType['lco_tax_id_typeid'] as int,
-                          child: SizedBox(
-                              width: 200,
-                              child: Text(taxType['tax_id_type_name'] as String)),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        print('esto es el taxList ${dataList}');
-                        String nameTax =
-                            invoke('obtenerNombreTax', newValue, dataList);
-                        print("esto es el nombre del tipo de impuesto $nameTax");
-
-                        onSelected(newValue, nameTax);
-
-                      },
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
+        return Container(
+                height: mediaScreen * 0.20,
+                width: mediaScreen * 0.95,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5) ,
+                      blurRadius: 7,
+                      spreadRadius: 2
+                    )
+                  ]
+                ),
+          child: DropdownButtonFormField<int>(
+            icon:Image.asset('lib/assets/Abajo.png'),
+                        value: selectedIndex,
+                        items: dataList
+                            .where((taxType) => taxType['lco_tax_id_typeid'] is int && taxType['tax_id_type_name'] != '' )
+                            .map<DropdownMenuItem<int>>((taxType) {
+                          print('tax $taxType');
+                          return DropdownMenuItem<int>(
+                            value: taxType['lco_tax_id_typeid'] as int,
+                            child: SizedBox(
+                                width: 200,
+                                child: Text(taxType['tax_id_type_name'] as String, style: const TextStyle(
+                                    fontFamily: 'Poppins Regular',  
+                                ),)),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          print('esto es el taxList ${dataList}');
+                          String nameTax =
+                              invoke('obtenerNombreTax', newValue, dataList);
+                          print("esto es el nombre del tipo de impuesto $nameTax");
+          
+                          onSelected(newValue, nameTax);
+          
+                        },
+                        decoration:  InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none
+                          ),
+                          
+                        ),
+                        validator: (value) {
+                          if (value == null || value == 0) {
+                            return 'Por favor selecciona un tipo de impuesto';
+                          }
+                          return null;
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value == 0) {
-                          return 'Por favor selecciona un tipo de impuesto';
-                        }
-                        return null;
-                      },
-                    );
+        );
           case 'taxPayer':  
            
-           return DropdownButtonFormField<int>(
-                      value: selectedIndex,
-                      items: dataList
-                          .where((taxPayer) =>
-                              taxPayer['lco_tax_payer_typeid'] is int && taxPayer['tax_payer_type_name'] != '' )
-                          .map<DropdownMenuItem<int>>((taxPayer) {
-                        return DropdownMenuItem<int>(
-                          value: taxPayer['lco_tax_payer_typeid'],
-                          child: SizedBox(
-                              width: 200,
-                              child: Text(
-                                  taxPayer['tax_payer_type_name'] as String)),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        print('esto es el taxList ${dataList}');
-                        String nameTaxPayer = invoke(
-                            'obtenerNombreTaxPayer', newValue, dataList);
-                        print(
-                            "esto es el nombre del tipo de constribuyente $nameTaxPayer");
+           return Container(
+                height: mediaScreen * 0.20,
+                width:  mediaScreen * 0.95,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                           blurRadius: 7,
+                           spreadRadius: 2
+                      )
+                    ]
+                ) ,
+             child: DropdownButtonFormField<int>(
 
-                          onSelected(newValue, nameTaxPayer);
-                      },
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
+                        icon: Image.asset('lib/assets/Abajo.png') ,
+                        value: selectedIndex,
+                        items: dataList
+                            .where((taxPayer) =>
+                                taxPayer['lco_tax_payer_typeid'] is int && taxPayer['tax_payer_type_name'] != '' )
+                            .map<DropdownMenuItem<int>>((taxPayer) {
+                          return DropdownMenuItem<int>(
+                            value: taxPayer['lco_tax_payer_typeid'],
+                            child: SizedBox(
+                                width: 200,
+                                child: Text(
+                                    taxPayer['tax_payer_type_name'] as String, style: const TextStyle(fontFamily: 'Poppins Regular'), )),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          print('esto es el taxList ${dataList}');
+                          String nameTaxPayer = invoke(
+                              'obtenerNombreTaxPayer', newValue, dataList);
+                          print(
+                              "esto es el nombre del tipo de constribuyente $nameTaxPayer");
+             
+                            onSelected(newValue, nameTaxPayer);
+                        },
+                        decoration:  InputDecoration(
+                          errorStyle: const TextStyle(fontFamily: 'Poppins Regular') ,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10) , 
+                           borderSide: BorderSide.none ,
+                           )
+                        ),
+                        validator: (value) {
+                          if (value == null || value == 0) {
+                            return 'Por favor selecciona un tipo de contribuyente';
+                          }
+                          return null;
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value == 0) {
-                          return 'Por favor selecciona un tipo de impuesto';
-                        }
-                        return null;
-                      },
-                    );
+           );
 
         case 'typePerson':
         return  DropdownButtonFormField<int>(
@@ -158,37 +238,63 @@ class CustomDropdownButtonFormField extends StatelessWidget {
                     );
         case 'selectCountry':
 
-        return DropdownButtonFormField<int>(
-                      value: selectedIndex,
-                      items:dataList
-                          .where((country) => country['c_country_id'] is int && country['country'] != '' )
-                          .map<DropdownMenuItem<int>>((country) {
-                        print('tax $country');
-                        return DropdownMenuItem<int>(
-                          value: country['c_country_id'] as int,
-                          child: Text(country['country'] as String),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        print('esto es el taxList ${dataList}');
-                        String nameCountry = invoke(
-                            'obtenerNombreCountry', newValue, dataList);
-                        print("esto es el nombre de impuesto $nameCountry");
-
-                        onSelected(newValue, nameCountry);
-
-                      },
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
+        return Container(
+            height: mediaScreen * 0.20,
+            width: mediaScreen * 0.95,
+            decoration: BoxDecoration(
+              color: Colors.white,
+                borderRadius: BorderRadius.circular(15) ,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 7,
+                    spreadRadius: 2,
+                    color: Colors.grey.withOpacity(0.5)
+                  )    
+                ],
+            ) ,
+          child: DropdownButtonFormField<int>(
+                      
+                       icon: Image.asset('lib/assets/Abajo.png') ,
+                        value: selectedIndex,
+                        items:dataList
+                            .where((country) => country['c_country_id'] is int && country['country'] != '' )
+                            .map<DropdownMenuItem<int>>((country) {
+                          print('tax $country');
+                          return DropdownMenuItem<int>(
+                            value: country['c_country_id'] as int,
+                            child: Container(
+                              width: mediaScreen * 0.5,
+                              child: Text(country['country'] as String, overflow: TextOverflow.ellipsis, style: const TextStyle(fontFamily: 'Poppins Regular', color: Colors.black),)),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {   
+                          print('esto es el countryList ${dataList}');
+                          String nameCountry = invoke(
+                              'obtenerNombreCountry', newValue, dataList);
+                          print("esto es el nombre del Pais $nameCountry");
+          
+                          onSelected(newValue, nameCountry);
+          
+                        },
+                        decoration:  InputDecoration(
+                          errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          border: OutlineInputBorder(
+                            
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        validator: (value) {
+                          if (value == null || value == 0) {
+                            return 'Por favor selecciona un Pais';
+                          }
+                          return null;
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value == 0) {
-                          return 'Por favor selecciona un Pais';
-                        }
-                        return null;
-                      },
-                    );
+        );
 
            case 'selectTypeAccountBank':
 
