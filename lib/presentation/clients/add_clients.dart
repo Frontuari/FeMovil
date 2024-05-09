@@ -649,6 +649,41 @@ class _AddClientsFormState extends State<AddClientsForm> {
                             if (_formKey.currentState!.validate()) {
                               // Guarda el producto en la base de datos Sqflite
                               _saveProduct();
+                              showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 20),
+                                  backgroundColor: Colors.white,
+                                  // Center the title, content, and actions using a Column
+                                  content: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize
+                                        .min, // Wrap content vertically
+                                    children: [
+                                      Image.asset('lib/assets/Check@2x.png',
+                                          width: 50,
+                                          height:
+                                              50), // Adjust width and height
+                                      const Text('Cliente Creado con Exito',
+                                          style: TextStyle(
+                                              fontFamily: 'Poppins Bold')),
+                                      TextButton(
+                                        onPressed: () => {
+                                          Navigator.pop(context),
+                                          Navigator.pop(context)
+
+                                        },
+                                        child: const Text('Volver'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+
+
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -658,7 +693,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                          child: const Text('Crear', style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                          child: const Text('Crear Cliente', style: TextStyle(fontFamily: 'Poppins SemiBold'),),
                         ),
                       ),
                     ),

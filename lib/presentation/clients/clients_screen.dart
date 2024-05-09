@@ -5,10 +5,7 @@ import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/presentation/clients/add_clients.dart';
 import 'package:femovil/presentation/clients/clients_details.dart';
 import 'package:femovil/presentation/clients/filter_dialog_clients.dart';
-import 'package:femovil/presentation/screen/home/home_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class Clients extends StatefulWidget {
   const Clients({super.key});
@@ -380,7 +377,7 @@ class _ClientsState extends State<Clients> {
                                                                     screenMax *
                                                                         0.45,
                                                                 child: Text(
-                                                                  '${client['phone'] is int ? client['phone'] : 'wqeqweqweqweqweqwwwe'}',
+                                                                  '${client['phone'] is int ? client['phone'] : ''}',
                                                                   style: const TextStyle(
                                                                       fontFamily:
                                                                           'Poppins Regular'),
