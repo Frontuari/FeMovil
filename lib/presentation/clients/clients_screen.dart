@@ -64,12 +64,12 @@ class _ClientsState extends State<Clients> {
   }
 
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-if (_isMounted) {
-    _loadClients();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isMounted) {
+      _loadClients();
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -433,16 +433,23 @@ if (_isMounted) {
                 ],
               ),
             ),
-             Positioned(
-              top: 450,
-              right: 15,
-              child: GestureDetector( 
-                  onTap:  () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AddClientsForm()),),
-                 child: Image.asset('lib/assets/Agregar@3x.png', width: 80,) ,)),
+            Positioned(
+                top: 450,
+                right: 15,
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AddClientsForm()),
+                  ),
+                  child: Image.asset(
+                    'lib/assets/Agregar@3x.png',
+                    width: 80,
+                  ),
+                )),
           ],
         ),
       ),
-     
     );
   }
 
