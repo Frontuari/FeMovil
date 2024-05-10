@@ -33,7 +33,6 @@ dependencies:
     sdk: flutter
   flutter_date_pickers: ^0.4.2
   flutter_feather_icons: ^2.0.0+1
-  flutter_icons: ^1.1.0
   image_picker: ^1.0.7
   intl: ^0.18.1
   path_provider: ^2.1.2
@@ -94,6 +93,13 @@ flutter:
     - lib/assets/Agregar@3x.png
     - lib/assets/Atras-2.png
     - lib/assets/Abajo.png
+    - lib/assets/Calendario.png
+    - lib/assets/Más-2.png
+    - lib/assets/menos.png
+    - lib/assets/Eliminar.png
+    - lib/assets/Más.png
+    - lib/assets/Más@3x.png
+
     # - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

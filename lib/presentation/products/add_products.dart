@@ -180,7 +180,9 @@ class _AddProductFormState extends State<AddProductForm> {
                             focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                                 borderSide: const BorderSide(
-                                    width: 1, color: Colors.red))),
+                                    width: 1, color: Colors.red))
+                                    
+                                    ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor ingresa el nombre del producto';

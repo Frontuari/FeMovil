@@ -285,7 +285,7 @@ class _ClientsState extends State<Clients> {
                                               ),
                                               child: Padding(
                                                 padding:
-                                                    const EdgeInsets.all(15.0),
+                                                    const EdgeInsets.all(10.0),
                                                 child: Text(
                                                   client['bp_name'].toString(),
                                                   style: const TextStyle(
