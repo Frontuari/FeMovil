@@ -126,7 +126,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       child: Scaffold(
         appBar: const PreferredSize(
           preferredSize: Size.fromHeight(50),
-          child: AppBarSample(label: 'Editar Producto') ,
+          child: AppBarSample(label: 'Editar Producto'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -173,6 +173,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         color: Colors.white,
                       ),
                       child: DropdownButtonFormField<String>(
+                        icon: Image.asset('lib/assets/Abajo.png'),
                         value: _selectedProductType,
                         items: _productTypeList
                             .where((productType) =>
@@ -181,10 +182,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             .map<DropdownMenuItem<String>>((productType) {
                           return DropdownMenuItem<String>(
                             value: productType['product_type'] as String,
-                            child: Text(
-                              productType['product_type_name'] as String,
-                              style: const TextStyle(
-                                  fontFamily: 'Poppins Regular'),
+                            child: Container(
+                              width: mediaScreen * 0.8,
+                              child: Text(
+                                productType['product_type_name'] as String,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                                overflow: TextOverflow.clip,
+                              ),
                             ),
                           );
                         }).toList(),
@@ -234,6 +239,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           ],
                           color: Colors.white),
                       child: DropdownButtonFormField<int>(
+                        icon: Image.asset('lib/assets/Abajo.png'),
                         value: _selectedProductGroupIndex,
                         items: _productGroupList
                             .where((productGroup) =>
@@ -243,11 +249,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           return DropdownMenuItem<int>(
                             value: productGroup['product_group_id'] as int,
                             child: Container(
-                              width: mediaScreen * 0.82,
+                              width: mediaScreen * 0.8,
                               child: Text(
                                 productGroup['product_group_name'] as String,
                                 style: const TextStyle(
-                                    fontFamily: 'Poppins Regular'),
+                                    fontFamily: 'Poppins Regular',
+                                    overflow: TextOverflow.clip),
                               ),
                             ),
                           );
@@ -299,6 +306,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         ],
                       ),
                       child: DropdownButtonFormField<int>(
+                        icon: Image.asset('lib/assets/Abajo.png'),
                         value: _selectedUmIndex,
                         items: _umList
                             .where((um) =>
@@ -307,7 +315,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           return DropdownMenuItem<int>(
                             value: um['um_id'] as int,
                             child: Container(
-                                width: mediaScreen * 0.82,
+                                width: mediaScreen * 0.8,
                                 child: Text(um['um_name'] as String,
                                     style: const TextStyle(
                                         fontFamily: 'Poppins Regular'))),
@@ -375,6 +383,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 spreadRadius: 2)
                           ]),
                       child: DropdownButtonFormField<int>(
+                        icon: Image.asset('lib/assets/Abajo.png'),
                         value: _selectedTaxIndex,
                         items: _taxList
                             .where((tax) =>
@@ -455,6 +464,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             8.0), // Ajusta el radio del borde según sea necesario
                       ),
                       child: DropdownButtonFormField<int>(
+                        icon: Image.asset('lib/assets/Abajo.png'),
                         value: _selectedCategoriesIndex,
                         items: _categoriesList
                             .where((categories) =>
@@ -547,7 +557,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               'product_type': selectedProductType,
                               'product_type_name': prodTypeText
                             };
-                       
+
                             updateProduct(updatedProduct);
                             showDialog(
                               context: context,
@@ -573,7 +583,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                         onPressed: () => {
                                           Navigator.pop(context),
                                           Navigator.pop(context)
-
                                         },
                                         child: const Text('Volver'),
                                       ),
