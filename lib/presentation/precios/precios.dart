@@ -161,16 +161,16 @@ Widget build(BuildContext context) {
                           const SizedBox(height: 10,),    
               
                  Expanded(
-  child: ListView.builder(
-    itemCount: products.length,
-    itemBuilder: (BuildContext context, int index) {
-      final product = products[index];
-      if (searchController.text.isNotEmpty &&
-          !product['name']
-              .toLowerCase()
-              .contains(searchController.text.toLowerCase())) {
-        return const SizedBox.shrink(); // Oculta el elemento si no coincide con la búsqueda
-      }
+        child: ListView.builder(
+          itemCount: products.length,
+          itemBuilder: (BuildContext context, int index) {
+            final product = products[index];
+            if (searchController.text.isNotEmpty &&
+                !product['name']
+                    .toLowerCase()
+                    .contains(searchController.text.toLowerCase())) {
+              return const SizedBox.shrink(); // Oculta el elemento si no coincide con la búsqueda
+            }
       return GestureDetector(
         onTap: () {
           setState(() {

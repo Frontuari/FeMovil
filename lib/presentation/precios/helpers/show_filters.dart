@@ -9,10 +9,17 @@ import 'package:flutter/material.dart';
     Completer<dynamic> completer = Completer<dynamic>();
 
 
- await showMenu(
-    surfaceTintColor: colorPrimary,
-    elevation: 8,
-    shadowColor: colorPrimary,
+
+  showMenu(
+    shape: RoundedRectangleBorder( // Redondear los bordes del menú emergente
+        borderRadius: BorderRadius.circular(15), 
+        side: BorderSide(
+  width: 5,
+  color: Colors.grey.withOpacity(0.5), // Establece el color transparente como punto inicial del gradiente
+        )
+      ),
+    elevation: 0,
+    shadowColor: Colors.black,
     context: context,
     position: RelativeRect.fromRect(
       Rect.fromPoints(

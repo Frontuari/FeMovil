@@ -21,8 +21,8 @@ import 'package:path_provider/path_provider.dart';
 
 
 updateAndCreateTercero(orderSalesList) async{
-
-  Map<String, dynamic>? customerIsSincronized = await getClientById(orderSalesList['cliente_id']);
+print('Esto es ordersalesList $orderSalesList');
+  Map<String, dynamic>? customerIsSincronized = await getClientById(orderSalesList[0]['id']);
 
 
       print('Esto es customer $customerIsSincronized ');
@@ -86,7 +86,7 @@ updateAndCreateTercero(orderSalesList) async{
 
         print('Entre aqui 3');
 
-        Map<String, dynamic>? customerIsSincronizedTrue = await getClientById(orderSalesList['cliente_id']);
+        Map<String, dynamic>? customerIsSincronizedTrue = await getClientById(orderSalesList[0]['id']);
              final db = await DatabaseHelper.instance.database;
 
 
@@ -112,7 +112,7 @@ updateAndCreateTercero(orderSalesList) async{
         }
 
 
-  return await obtenerOrdenDeVentaConLineasPorId(orderSalesList['id']);
+  return await getOrderWithProducts(orderSalesList[0]['id']);
 
 
 }
@@ -150,6 +150,9 @@ Future<bool> checkInternetConnectivity() async {
 // Esta funcion nos ayudara a crear una nueva orden
 
 createOrdenSalesIdempiere(orderSalesList) async {
+  
+  // se cargan las ordenes 
+  dynamic resOrdenSales = await orderSalesList;
 
 
    dynamic isConnection = await checkInternetConnectivity();
@@ -159,19 +162,17 @@ createOrdenSalesIdempiere(orderSalesList) async {
               }
     
 
-          if(orderSalesList!['c_bpartner_id'] == 0 && orderSalesList['c_bpartner_location_id'] == 0){
+          if(resOrdenSales['order']['c_bpartner_id'] == 0 && resOrdenSales['order']['c_bpartner_location_id'] == 0){
 
-            orderSalesList = await updateAndCreateTercero(orderSalesList);
+            orderSalesList = await updateAndCreateTercero(resOrdenSales['client']);
           
           }
         
 
+  
 
 
 
-
-
-    print('Esto es ordersaleslist actual $orderSalesList');
 
       HttpClient httpClient = HttpClient()
         ..badCertificateCallback = (X509Certificate cert, String host, int port) {
@@ -247,16 +248,16 @@ createOrdenSalesIdempiere(orderSalesList) async {
                       
                       {
                         "@column": "AD_Client_ID",
-                        "val": orderSalesList['ad_client_id']
+                        "val": resOrdenSales['order']['ad_client_id']
                       },
-                      {"@column": "AD_Org_ID", "val": orderSalesList['ad_org_id']},
+                      {"@column": "AD_Org_ID", "val": resOrdenSales['order']['ad_org_id']},
                       {
                         "@column": "C_BPartner_ID",
-                        "val": orderSalesList['c_bpartner_id'],
+                        "val": resOrdenSales['order']['c_bpartner_id'],
                       },
                       {
                         "@column": "C_BPartner_Location_ID",
-                        "val": orderSalesList['c_bpartner_location_id'],
+                        "val": resOrdenSales['order']['c_bpartner_location_id'],
                       },
                       {
                         "@column": "C_Currency_ID",
@@ -264,7 +265,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
                       },
                       {
                         "@column": "Description",
-                        "val": orderSalesList['descripcion'],
+                        "val": resOrdenSales['order']['descripcion'],
                       },
                       // {
                       //   "@column": "C_ConversionType_ID",
@@ -272,7 +273,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
                       // },
                       {
                         "@column": "C_DocTypeTarget_ID",
-                        "val": orderSalesList['c_doctypetarget_id']
+                        "val": resOrdenSales['order']['c_doctypetarget_id']
                       },
                       {
                         "@column": "C_PaymentTerm_ID",
@@ -280,7 +281,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
                       },
                       {
                         "@column": "DateOrdered",
-                        "val": orderSalesList['date_ordered']
+                        "val": resOrdenSales['order']['date_ordered']
                       },
                       {"@column": "IsTransferred", "val": 'Y'},
                       {
@@ -289,20 +290,20 @@ createOrdenSalesIdempiere(orderSalesList) async {
                       },
                       {
                         "@column": "M_Warehouse_ID",
-                        "val": orderSalesList['m_warehouse_id']
+                        "val": resOrdenSales['order']['m_warehouse_id']
                       },
                       {"@column": "PaymentRule", "val": 'B'},
                       {
                         "@column": "SalesRep_ID",
-                        "val": orderSalesList['usuario_id']
+                        "val": resOrdenSales['order']['usuario_id']
                       },
                       {
                         "@column": "AD_User_ID",
-                        "val": orderSalesList['usuario_id']
+                        "val": resOrdenSales['order']['usuario_id']
                       },
                       {
                         "@column": "Bill_User_ID",
-                        "val": orderSalesList['usuario_id']
+                        "val": resOrdenSales['order']['usuario_id']
                       },
      
                       // {"@column": "LVE_PayAgreement_ID", "val": '1000001'},
@@ -320,7 +321,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
       };
 
       // Crear las líneas de la orden
-  final lines = createLines(orderSalesList['lines'], orderSalesList['usuario_id']);
+  final lines = createLines(resOrdenSales['products'],resOrdenSales['order']);
 
   // Agregar las líneas de la orden al JSON de la orden
   for (var line in lines) {
@@ -389,8 +390,8 @@ createOrdenSalesIdempiere(orderSalesList) async {
        
 
                       String newStatus = 'Enviado';
-                      await updateOrdereSalesForStatusSincronzed(orderSalesList['id'], newStatus);
-                      await actualizarDocumentNo(orderSalesList['id'], nuevoDocumentNoAndCOrderId);
+                      await updateOrdereSalesForStatusSincronzed(resOrdenSales['order']['id'], newStatus);
+                      await actualizarDocumentNo(resOrdenSales['order']['id'], nuevoDocumentNoAndCOrderId);
 
 
     return parsedJson;
@@ -403,7 +404,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
 
 
 
-createLines(lines, rePId) {
+createLines(lines,order) {
   List linea = [];
 
   lines.forEach((line) => {
@@ -419,15 +420,15 @@ createLines(lines, rePId) {
                 "Action": "Create",
                 "DataRow": {
           "field": [
-            {"@column": "AD_Client_ID", "val": line['ad_client_id']},
-            {"@column": "AD_Org_ID", "val": line['ad_org_id']},
+            {"@column": "AD_Client_ID", "val": order['ad_client_id']},
+            {"@column": "AD_Org_ID", "val": order['ad_org_id']},
             {"@column": "C_Order_ID", "val": "@C_Order.C_Order_ID"},
-            {"@column": "PriceEntered", "val": line['price_entered']},
-            {"@column": "PriceActual", "val": line['price_entered']},
+            {"@column": "PriceEntered", "val": line['price_actual']},
+            {"@column": "PriceActual", "val": line['price_actual']},
             {"@column": "M_Product_ID", "val": line['m_product_id']},
             {"@column": "QtyOrdered", "val": line['qty_entered']},
             {"@column": "QtyEntered", "val": line['qty_entered']},
-            {"@column": "SalesRep_ID", "val": rePId}
+            {"@column": "SalesRep_ID", "val": order['salesrep_id']}
           ]
          }
         }

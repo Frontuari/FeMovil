@@ -7,6 +7,7 @@ import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_venta/product_selection.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -43,7 +44,6 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   TextEditingController montoController = TextEditingController();
   TextEditingController saldoNetoController = TextEditingController();
   List<Map<String, dynamic>> selectedProducts = [];
-  bool _validateDescription = false;
   DateTime selectedDate = DateTime.now();
   double? saldoNeto;
   double? totalImpuesto;
@@ -60,13 +60,16 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
           product['price'] * product['quantity'] * (product['impuesto'] / 100);
       totalNeto += product['price'] * product['quantity'];
     }
-    saldoNetoController.text = '\$${totalNeto.toString()}';
-    montoController.text = totalNeto.toString();
+    saldoNetoController.text = '\$${totalNeto.toStringAsFixed(2)}';
+    
     suma = total + totalNeto;
+
+    montoController.text = '\$${suma.toStringAsFixed(2)}';
 
     print('productos totales $selectedProducts');
 
     return suma;
+
   }
 
   double calcularSaldoTotalProducts(dynamic price, dynamic quantity) {
@@ -244,7 +247,46 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorTheme = Theme.of(context).colorScheme.primary;
     final mediaScreen = MediaQuery.of(context).size.width * 0.8;
+
+Color getColor(Set<MaterialState> states){
+
+    const Set<MaterialState> interactiveStates = <MaterialState>{
+
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused
+
+    };
+    if(states.any(interactiveStates.contains)){
+      return Colors.black;
+    }
+
+
+    return Colors.white;
+
+}
+
+
+Color getColorBg(Set<MaterialState> states){
+
+    const Set<MaterialState> interactiveStates = <MaterialState>{
+
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused
+
+    };
+    if(states.any(interactiveStates.contains)){
+      return Colors.white;
+    }
+
+
+    return colorTheme;
+
+}
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -634,7 +676,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20, vertical: 0),
-                                      child: Container(
+                                      child: SizedBox(
                                         width: mediaScreen * 0.95,
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
@@ -642,7 +684,17 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
-                                              Container(
+                                               GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            _removeProduct(
+                                                                index);
+                                                          });
+                                                        },
+                                                        child: Image.asset(
+                                                            'lib/assets/Eliminar.png')),
+                                                            const SizedBox(width: 5,),
+                                              SizedBox(
                                                   width: 70,
                                                   child: Text(product['name'])),
                                               SizedBox(
@@ -702,7 +754,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
                                                         .width *
                                                     0.13,
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: mediaScreen * 0.25,
                                                 child: Row(
                                                   mainAxisAlignment:
@@ -712,19 +764,10 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
                                                     Flexible(
                                                         child: Text(
                                                             '\$${calcularSaldoTotalProducts(product['price'].toString(), product['quantity'].toString())}')),
-                                                    GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            _removeProduct(
-                                                                index);
-                                                          });
-                                                        },
-                                                        child: Image.asset(
-                                                            'lib/assets/Eliminar.png'))
+                                                   
                                                   ],
                                                 ),
                                               ),
-                                              const Divider()
                                             ],
                                           ),
                                         ),
@@ -734,10 +777,10 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
                                 },
                               ),
                             ),
-                            Container(
-                              width: mediaScreen,
-                              height: mediaScreen * 0.13,
-                            )
+                          SizedBox(
+                            width: mediaScreen,
+                            height: mediaScreen * 0.13,
+                          )
                           ],
                         ),
                         Positioned(
@@ -771,223 +814,144 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 300,
-                    child: ListView.builder(
-                      itemCount: selectedProducts.length,
-                      itemBuilder: (context, index) {
-                        final product = selectedProducts[index];
+                  SizedBox(height: mediaScreen * 0.1,),
 
-                        print('Esto es products $product');
-                        return Container(
-                          padding: const EdgeInsets.all(10),
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                product['name'],
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Cantidad: ${product["quantity"]}'),
-                                  Text('Precio: ${product['price']}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Impuesto: ${product['impuesto']}%'),
-                                  Text(
-                                    'Monto Impuesto: ${calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])}',
-                                    style: const TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Saldo Neto: ${calcularSaldoNetoProducto(product['quantity'], product['price']).toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Monto Total: ${(calcularSaldoNetoProducto(product['quantity'], product['price']) + calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])).toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () {
-                                    setState(() {
-                                      _removeProduct(index);
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal ,
+                    child: Container(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Total', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                          SizedBox(width: mediaScreen * 0.55,),
+                          Text(montoController.text, style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),)
+                        ],
+                      ),
                     ),
                   ),
-                  TextField(
-                    readOnly: true,
-                    controller: saldoNetoController,
-                    decoration: const InputDecoration(labelText: 'Saldo Neto'),
-                    keyboardType: TextInputType.number,
-                  ),
-                  TextField(
-                    readOnly: true,
-                    controller: montoController,
-                    decoration: const InputDecoration(labelText: 'Monto Total'),
-                    keyboardType: TextInputType.number,
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Aquí puedes mostrar un diálogo o pantalla para seleccionar productos y agregarlos a la orden de venta
-                      // Puedes usar Navigator.push para navegar a una pantalla de selección de productos
-                      // y agregar los productos seleccionados a la lista selectedProducts
-                      // Por ejemplo:
-                    },
-                    child: const Text('Agregar Productos'),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Aquí puedes realizar la transacción y guardar la orden de venta en la base de datos
-                      // con los datos proporcionados
-                      // Por ejemplo:
+                
+                SizedBox(height: mediaScreen * 0.1,),
 
-                      if (infoUserForOrder.isNotEmpty) {
-                        //  if (descripcionController.text.isEmpty) {
-                        //           setState(() {
-                        //             _validateDescription = true; // Marcar como campo inválido si está vacío
-                        //           });
-
-                        //                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:  Text('Por favor ingrese una descripción.')));
-
-                        //           return; // Detener el proceso de agregar la orden si el campo está vacío
-                        //     }
-
-                        if (selectedProducts.isEmpty) {
-                          // Mostrar un diálogo o mensaje indicando que la orden debe tener productos adjuntos
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Error'),
-                                content: const Text(
-                                    'La orden debe tener productos adjuntos.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(
-                                          context); // Cerrar el diálogo
-                                    },
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-
-                          return;
-                        }
-
-                        final order = {
-                          'cliente_id': widget.clientId,
-                          'documentno': numeroReferenciaController.text,
-                          'fecha': fechaController.text,
-                          'descripcion': descripcionController.text,
-                          'monto':
-                              double.parse(montoController.text.substring(1)),
-                          'saldo_neto': double.parse(
-                              saldoNetoController.text.substring(1)),
-                          'productos': selectedProducts,
-                          'c_bpartner_id': widget.cBPartnerId,
-                          'c_bpartner_location_id': widget.cBPartnerLocationId,
-                          'c_doctypetarget_id': variablesG[0]
-                              ['c_doc_type_order_id'],
-                          'ad_client_id': infoUserForOrder['clientid'],
-                          'ad_org_id': infoUserForOrder['orgid'],
-                          'm_warehouse_id': infoUserForOrder['warehouseid'],
-                          'paymentrule': 'P',
-                          'date_ordered': fechaIdempiereController.text,
-                          'salesrep_id': infoUserForOrder['userId'],
-                          'usuario_id': infoUserForOrder['userId'],
-                          'status_sincronized': 'Borrador',
-                        };
-
-                        // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
-                        insertOrder(order).then((orderId) {
-                          if (orderId is Map<String, dynamic> &&
-                              orderId.containsKey('failure')) {
-                            if (orderId['failure'] == -1) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    orderId['Error'],
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                              return;
-                            }
-                          } else {
-                            print(
-                                'orderId no es un mapa válido o no contiene la propiedad "failure"');
+              
+                  SizedBox(
+                    width: mediaScreen,
+                    height: mediaScreen * 0.15,
+                    child: ElevatedButton(
+                      
+                      style: ButtonStyle(
+                        textStyle: MaterialStateProperty.all<TextStyle>(const TextStyle(
+                          fontFamily: 'Poppins Bold'
+                        )),
+                        foregroundColor: MaterialStateProperty.resolveWith(getColor),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)
+                        )),
+                        animationDuration: Duration.zero,
+                        elevation: MaterialStateProperty.all(0.5),
+                        backgroundColor: MaterialStateProperty.resolveWith(getColorBg)
+                      ) ,
+                      
+                      onPressed: () {
+                          
+                    
+                        if (infoUserForOrder.isNotEmpty) {
+                                    
+                          if (selectedProducts.isEmpty) {
+                    
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('Error'),
+                                  content: const Text(
+                                      'La orden debe tener productos adjuntos.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(
+                                            context); // Cerrar el diálogo
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                    
+                            return;
                           }
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Orden de venta guardada correctamente con ID: $orderId'),
-                            ),
-                          );
-
-                          numeroReferenciaController.clear();
-                          descripcionController.clear();
-                          montoController.clear();
-                          saldoNetoController.clear();
-
-                          // Limpiar la lista de productos seleccionados después de guardar la orden
-                          setState(() {
-                            selectedProducts.clear();
+                    
+                          final order = {
+                            'cliente_id': widget.clientId,
+                            'documentno': numeroReferenciaController.text,
+                            'fecha': fechaController.text,
+                            'descripcion': descripcionController.text,
+                            'monto':
+                                double.parse(montoController.text.substring(1)),
+                            'saldo_neto': double.parse(
+                                saldoNetoController.text.substring(1)),
+                            'productos': selectedProducts,
+                            'c_bpartner_id': widget.cBPartnerId,
+                            'c_bpartner_location_id': widget.cBPartnerLocationId,
+                            'c_doctypetarget_id': variablesG[0]
+                                ['c_doc_type_order_id'],
+                            'ad_client_id': infoUserForOrder['clientid'],
+                            'ad_org_id': infoUserForOrder['orgid'],
+                            'm_warehouse_id': infoUserForOrder['warehouseid'],
+                            'paymentrule': 'P',
+                            'date_ordered': fechaIdempiereController.text,
+                            'salesrep_id': infoUserForOrder['userId'],
+                            'usuario_id': infoUserForOrder['userId'],
+                            'status_sincronized': 'Borrador',
+                          };
+                    
+                          // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
+                          insertOrder(order).then((orderId) {
+                            if (orderId is Map<String, dynamic> &&
+                                orderId.containsKey('failure')) {
+                              if (orderId['failure'] == -1) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      orderId['Error'],
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+                            } else {
+                              print(
+                                  'orderId no es un mapa válido o no contiene la propiedad "failure"');
+                            }
+                    
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Orden de venta guardada correctamente con ID: $orderId'),
+                              ),
+                            );
+                    
+                            numeroReferenciaController.clear();
+                            descripcionController.clear();
+                            montoController.clear();
+                            saldoNetoController.clear();
+                    
+                            // Limpiar la lista de productos seleccionados después de guardar la orden
+                            setState(() {
+                              selectedProducts.clear();
+                            });
+                    
+                            // Notificar al usuario que la orden se ha guardado exitosamente
                           });
+                        }
+                      },
+                      child: const Text('Agregar Orden'),
 
-                          // Notificar al usuario que la orden se ha guardado exitosamente
-                        });
-                      }
-                    },
-                    child: const Text('Agregar Orden'),
+                    ),
                   ),
+                                  SizedBox(height: mediaScreen * 0.1,),
+
                 ],
               ),
             ),

@@ -164,7 +164,7 @@ Future<List<Map<String, dynamic>>> getProducts() async {
       if (orderResult.isNotEmpty) {
         // Consultar los productos asociados a la orden de venta
        List<Map<String, dynamic>> productsResult = await db.rawQuery('''
-          SELECT p.id, p.name, p.price, p.quantity, ovl.qty_entered, ovl.price_actual, t.rate AS impuesto
+          SELECT p.id, p.name, p.price, p.quantity, p.m_product_id, ovl.qty_entered, ovl.price_actual, t.rate AS impuesto
           FROM products p
           INNER JOIN orden_venta_lines ovl ON p.id = ovl.producto_id
           INNER JOIN tax t ON p.tax_cat_id  = t.c_tax_category_id
@@ -177,7 +177,7 @@ Future<List<Map<String, dynamic>>> getProducts() async {
 
 
         List<Map<String, dynamic>> clientsResult = await db.rawQuery('''
-          SELECT c.bp_name, c.ruc, c.email
+          SELECT c.bp_name, c.ruc, c.email, c.id
           FROM clients c
           WHERE  c.id = ?
         ''', [clienteId]); 

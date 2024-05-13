@@ -6,8 +6,10 @@ class AppBarSample extends StatelessWidget {
   
   const AppBarSample({
     super.key,
-    required this.label
+    required this.label,
+
   });
+  
 
   @override
   Widget build(BuildContext context) {

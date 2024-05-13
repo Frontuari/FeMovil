@@ -1,6 +1,8 @@
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class ProductSelectionScreen extends StatefulWidget {
   @override
@@ -36,108 +38,216 @@ Future<void> _loadProducts() async {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Seleccionar Productos'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () async {
-              final String? searchText = await showSearch<String>(
-                context: context,
-                delegate: ProductSearchDelegate(products!),
-              );
-
-              if (searchText != null && searchText.isNotEmpty) {
-                _filterProducts(searchText);
-              }
-            },
-          ),
-        ],
-      ),
-      body: filteredProducts.isNotEmpty
-          ? ListView.builder(
-              itemCount: filteredProducts.length,
-              itemBuilder: (context, index) {
-                final productName = filteredProducts[index]['name'];
-                final productPrice =  filteredProducts[index]['pricelistsales'] == '{@nil=true}' ? 0 :filteredProducts[index]['pricelistsales'] ;
-                final mProductId =  filteredProducts[index]['m_product_id'];
-
-                final isSelected = selectedProducts.any((product) => product['name'] == productName);
-                final quantity = productQuantities[productName] ?? 0; // Obtener la cantidad seleccionada o 0 si no hay ninguna
+    final mediaScreen = MediaQuery.of(context).size.width * 0.8;
+    final colorTheme = Theme.of(context).colorScheme.primary;
+    return GestureDetector(
+      onTap: () {
+       FocusScope.of(context).unfocus();
+      } ,
+      child: Scaffold(
+        appBar: const PreferredSize(
+          preferredSize:Size.fromHeight(50) ,
+          child: AppBarSample(label:'Productos' )),
+        body: 
+            Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                    
+                        SizedBox(height: mediaScreen * 0.05,),
                 
-                return ListTile(
-                  title: Text(productName),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Precio: \$${productPrice != '{@nil=true}' ? productPrice.toStringAsFixed(2) : 0} '),
-                      Text('Cantidad disponible: ${filteredProducts[index]['quantity']}'),
-                      Text('Cantidad Seleccionada: $quantity'),
-                    ],
+                          Container(
+                            width: mediaScreen *0.98 ,
+                            height: mediaScreen * 0.18,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 7,
+                                  spreadRadius: 2,
+                                  color: Colors.grey.withOpacity(0.5)
+                                )
+                              ]
+                            ),
+                            child: TextField(
+                                        onChanged: (query) {
+                                          setState(() {
+                                            filteredProducts = products!.where((product) => product['name'].toLowerCase().contains(query.toLowerCase())).toList();
+                                          });
+              
+                                          print('Esto es el filtro de productos $filteredProducts');
+                                        },
+                                        decoration:  InputDecoration(
+                                          labelStyle: const TextStyle(fontFamily: 'Poppins Regular', color: Colors.black),
+                                        contentPadding: const EdgeInsets.symmetric(
+                                         vertical: 25, horizontal: 20),    
+                                            border: const OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.all(Radius.circular(15.0)),
+                                          borderSide: BorderSide.none, // Color del borde
+                                        ),
+                                        focusedBorder: const OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.all(Radius.circular(15.0)),
+                                          borderSide: BorderSide(
+                                            color: Colors.white,
+                                            width: 25,
+                                          ), // Color del borde cuando está enfocado
+                                        ),
+                                        enabledBorder: const OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.all(Radius.circular(15.0)),
+                                          borderSide: BorderSide(
+                                            color: Colors.white,
+                                            width: 25,
+                                          ), // Color del borde cuando no está enfocado
+                                        ),
+                                          labelText: 'Nombre del producto',
+                                        
+                                          suffixIcon: Image.asset('lib/assets/Lupa.png'),
+                                        ),
+                                        style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                      ),
+                          ),
+                  SizedBox(height: mediaScreen * 0.05,),
+                  Expanded(
+                    child: filteredProducts.isNotEmpty
+              ?  SizedBox(
+                width: mediaScreen,
+                child: ListView.builder(
+                          itemCount: filteredProducts.length,
+                          itemBuilder: (context, index) {
+                            final productName = filteredProducts[index]['name'];
+                            final productPrice =  filteredProducts[index]['pricelistsales'] == '{@nil=true}' ? 0 :filteredProducts[index]['pricelistsales'] ;
+                            final mProductId =  filteredProducts[index]['m_product_id'];
+                      
+                            final isSelected = selectedProducts.any((product) => product['name'] == productName);
+                            final quantity = productQuantities[productName] ?? 0;
+                            
+                            return Card(
+
+                                elevation: 0,
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15) ,
+                                ),
+                                shadowColor: Colors.grey.withOpacity(0.5),
+                                child: Container(
+                                  decoration:  BoxDecoration(
+                                    color: Colors.white,
+                                borderRadius: BorderRadius.circular(15), 
+                                boxShadow: [
+                                  BoxShadow( 
+                                    color: isSelected ? colorTheme.withOpacity(0.5) : Colors.grey.withOpacity(0.5), 
+                                    spreadRadius: 2, 
+                                    blurRadius: 7, 
+                                    offset: const Offset(0, 3), 
+                                  ),
+                                ],
+                              ),
+                                child: ListTile(
+                                  title: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 7),
+                                    child: Text(productName, style: const TextStyle(fontFamily: 'Poppins Bold')),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text('Stock: ', style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                                          Text('${filteredProducts[index]['quantity']}'),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text('Precio: ', style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                                          Text('\$ ${productPrice != '{@nil=true}' ? productPrice.toStringAsFixed(2) : 0}')
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text('Cantidad Seleccionada: ', style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                                          Text(quantity.toString())
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () async {
+                                    final selectedQuantity = await _showQuantityPickerDialog(context, productName, quantity, colorTheme);
+                                    if (selectedQuantity != null) {
+                                          if (selectedQuantity > 0) {
+                                          
+                                      final selectedProductIndex = selectedProducts.indexWhere((product) => product['name'] == productName);
+                                      final int newQuantity = selectedQuantity;
+                                          
+                                      final selectedProduct = {
+                                        "id": filteredProducts[index]['id'], 
+                                        "name": productName,
+                                        "quantity_avaible" :  filteredProducts[index]['quantity'],
+                                        "quantity": newQuantity, 
+                                        "price":  productPrice,
+                                        "impuesto": filteredProducts[index]['tax_rate'],
+                                        'm_product_id': mProductId
+                                      };
+                                          
+                                      setState(() {
+                                        print("que tiene newquantity $newQuantity");
+                                        if (isSelected) {
+
+                                          selectedProducts[selectedProductIndex] = selectedProduct;
+                                        } else {
+                                          if (newQuantity > 0 && newQuantity <= filteredProducts[index]['quantity']) {
+                                            selectedProducts.add(selectedProduct);
+                                          } else {
+                                            
+                                            print('La cantidad seleccionada es mayor que la cantidad disponible');
+                                          }
+                                        }
+                                        productQuantities[productName] = newQuantity; 
+                                      });
+                                    } else{
+                                          
+                                      setState(() {
+                                        selectedProducts.removeWhere((product) => product['name'] == productName);
+                                        productQuantities.remove(productName);
+                                      });
+                                          
+                                    }
+                                    }
+                                  },
+                                
+                                ),
+                              ),
+                              
+                            );
+                          },
+                        ),
+              ): const Center(
+                     child: CircularProgressIndicator(),
+                   ),
                   ),
-                  trailing: isSelected
-                      ? const Icon(Icons.check_circle, color: Colors.green) // Icono de check si el producto está seleccionado
-                      : null,
-                  onTap: () async {
-                    final selectedQuantity = await _showQuantityPickerDialog(context, productName, quantity);
-                    if (selectedQuantity != null) {
-                          if (selectedQuantity > 0) {
-
-                      final selectedProductIndex = selectedProducts.indexWhere((product) => product['name'] == productName);
-                      final int newQuantity = selectedQuantity; // Sumar la cantidad seleccionada anteriormente con la nueva cantidad seleccionada
-
-                      final selectedProduct = {
-                        "id": filteredProducts[index]['id'], // Agregar el ID del producto seleccionado
-                        "name": productName,
-                        "quantity_avaible" :  filteredProducts[index]['quantity'],
-                        "quantity": newQuantity, // Usar la nueva cantidad calculada
-                        "price":  productPrice,
-                        "impuesto": filteredProducts[index]['tax_rate'],
-                        'm_product_id': mProductId
-                      };
-
-                      setState(() {
-                        print("que tiene newquantity $newQuantity");
-                        if (isSelected) {
-                          // Si el producto ya estaba seleccionado, actualiza su cantidad en lugar de eliminarlo
-                          selectedProducts[selectedProductIndex] = selectedProduct;
-                        } else {
-                          if (newQuantity > 0 && newQuantity <= filteredProducts[index]['quantity']) {
-                            selectedProducts.add(selectedProduct);
-                          } else {
-                            // Aquí puedes agregar una notificación o manejar la situación de otra manera
-                            print('La cantidad seleccionada es mayor que la cantidad disponible');
-                          }
-                        }
-                        productQuantities[productName] = newQuantity; // Actualizar la cantidad en el mapa de cantidades
-                      });
-                    } else{
-
-                      setState(() {
-                        selectedProducts.removeWhere((product) => product['name'] == productName);
-                        productQuantities.remove(productName);
-                      });
-
-                    }
-                    }
-                  },
-                );
-              },
-            )
-          : const Center(
-              child: CircularProgressIndicator(),
-            ), // Muestra un indicador de carga mientras se cargan los productos
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pop(context, selectedProducts); // Devuelve los productos seleccionados al presionar el botón de regresar
-        },
-        child: const Icon(Icons.check),
+                ],
+              ),
+            ),
+             // Muestra un indicador de carga mientras se cargan los productos
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pop(context, selectedProducts); // Devuelve los productos seleccionados al presionar el botón de regresar
+          },
+          backgroundColor: colorTheme,
+          foregroundColor: Colors.white,
+          child: const Icon(Icons.check),
+        ),
       ),
     );
   }
 
-  Future<int?> _showQuantityPickerDialog(BuildContext context, String productName, dynamic quantity) {
+  Future<int?> _showQuantityPickerDialog(BuildContext context, String productName, dynamic quantity, Color colorTheme) {
     int selectedQuantity = quantity; // Inicializar selectedQuantity con la cantidad pasada por parámetro
 
     return showModalBottomSheet<int>(
@@ -154,8 +264,9 @@ Future<void> _loadProducts() async {
                   children: [
                     Text(
                       'Seleccione la cantidad de $productName',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontFamily: 'Poppins SemiBold' ,fontSize: 18,),
                       textAlign: TextAlign.center,
+                      
                     ),
                     const SizedBox(height: 20),
                     Row(
@@ -173,7 +284,7 @@ Future<void> _loadProducts() async {
                         ),
                         Text(
                           selectedQuantity.toString(),
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontFamily: 'Poppins Regular' , fontSize: 20,),
                         ),
                         IconButton(
                           onPressed: () {
@@ -181,13 +292,7 @@ Future<void> _loadProducts() async {
                               final availableQuantity = filteredProducts.firstWhere((product) => product['name'] == productName)['quantity'];
                               if (selectedQuantity < availableQuantity) {
                                 selectedQuantity++;
-                              } else {
-                                // ScaffoldMessenger.of(context).showSnackBar(
-                                //   SnackBar(
-                                //     content: Text('No se puede incrementar más. No hay suficientes productos disponibles.'),
-                                //   ),
-                                // );
-                              }
+                              } 
                             });
                           },
                           icon: const Icon(Icons.add),
@@ -196,10 +301,18 @@ Future<void> _loadProducts() async {
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
+                      
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        )) ,
+                        backgroundColor: MaterialStatePropertyAll(colorTheme) ,
+                        foregroundColor: const MaterialStatePropertyAll(Colors.white)
+                      ),
                       onPressed: () {
                         Navigator.pop(context, selectedQuantity);
                       },
-                      child: const Text('Confirmar'),
+                      child: const Text('Confirmar', style: TextStyle(fontFamily: 'Poppins Bold'),),
                     ),
                   ],
                 ),
@@ -211,52 +324,6 @@ Future<void> _loadProducts() async {
     );
   }
 
-  void _filterProducts(String searchText) {
-    setState(() {
-      filteredProducts = products!.where((product) => product['name'].toLowerCase().contains(searchText.toLowerCase())).toList();
-    });
-  }
+
 }
 
-class ProductSearchDelegate extends SearchDelegate<String> {
-  final List<Map<String, dynamic>> products;
-
-  ProductSearchDelegate(this.products);
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [IconButton(icon: const Icon(Icons.clear), onPressed: () => query = '')];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => close(context, ''));
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    return _buildSearchResults(context);
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return _buildSearchResults(context);
-  }
-
-  Widget _buildSearchResults(BuildContext context) {
-    final filteredProducts = products.where((product) => product['name'].toLowerCase().contains(query.toLowerCase())).toList();
-
-    return ListView.builder(
-      itemCount: filteredProducts.length,
-      itemBuilder: (context, index) {
-        final productName = filteredProducts[index]['name'];
-        return ListTile(
-          title: Text(productName),
-          onTap: () {
-            close(context, productName);
-          },
-        );
-      },
-    );
-  }
-}

@@ -24,7 +24,7 @@ class _VentasDetailsState extends State<VentasDetails> {
   @override
   void initState() {
     super.initState();
-    _ventaData = _loadVentasForId();
+    _ventaData = _loadVentasForId(widget.ventaId);
 
     _loadOrdenesConLineas();
 
@@ -32,7 +32,7 @@ class _VentasDetailsState extends State<VentasDetails> {
 
   _updateAndCreateOrders() async {
 
-   dynamic isTrue = await createOrdenSalesIdempiere(ventasDate);
+   dynamic isTrue = await createOrdenSalesIdempiere(_ventaData);
 
               if(isTrue == false){
                 return false;
@@ -58,9 +58,9 @@ class _VentasDetailsState extends State<VentasDetails> {
   }
 
 
-  Future<Map<String, dynamic>> _loadVentasForId() async {
+  Future<Map<String, dynamic>> _loadVentasForId(ordenId) async {
   
-    return await getOrderWithProducts(widget.ventaId);
+    return await getOrderWithProducts(ordenId);
   
   }
 
@@ -94,6 +94,7 @@ class _VentasDetailsState extends State<VentasDetails> {
               final productsData = snapshot.data!['products'];
               print("Esto es lo que hay productsData ${snapshot.data}");
               print("esto es ventas data $ventaData");
+              print("Esto es snapshot data ${snapshot.data}");
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
@@ -330,7 +331,7 @@ class _VentasDetailsState extends State<VentasDetails> {
 
                         setState(() {
                           
-                          _ventaData =  _loadVentasForId();
+                          _ventaData =  _loadVentasForId(widget.ventaId);
 
                         });
 
@@ -397,7 +398,7 @@ class _VentasDetailsState extends State<VentasDetails> {
 
                         setState(() {
                           
-                        _ventaData =  _loadVentasForId();
+                        _ventaData =  _loadVentasForId(widget.ventaId);
                         });
 
                         }
