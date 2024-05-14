@@ -21,7 +21,6 @@ double syncPercentageImpuestos = 0.0;
 double syncPercentageBankAccount = 0.0;
 bool setearValoresEnCero = true;
 
-
 class SynchronizationScreen extends StatefulWidget {
   const SynchronizationScreen({Key? key}) : super(key: key);
 
@@ -29,23 +28,21 @@ class SynchronizationScreen extends StatefulWidget {
   _SynchronizationScreenState createState() => _SynchronizationScreenState();
 }
 
-  Future<void> _deleteBaseDatos() async {
-    await DatabaseHelper.instance.deleteDatabases();
-  }
+Future<void> _deleteBaseDatos() async {
+  await DatabaseHelper.instance.deleteDatabases();
+}
 
 class _SynchronizationScreenState extends State<SynchronizationScreen> {
   GlobalKey<_SynchronizationScreenState> synchronizationScreenKey =
       GlobalKey<_SynchronizationScreenState>();
 
-@override
-void initState() {
+  @override
+  void initState() {
+    //  _deleteBaseDatos();
 
-      //  _deleteBaseDatos();
+    super.initState();
+  }
 
-
-  super.initState();
-  
-}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,29 +60,27 @@ void initState() {
             child: ElevatedButton(
               onPressed: () async {
                 // Llamada a la función de sincronización
-              if(setearValoresEnCero == false) {
-                setState(() {
-                  syncPercentage = 0;
-                  syncPercentageClient = 0;
-                  syncPercentageImpuestos = 0;
-                  syncPercentageProviders = 0;
-                  syncPercentageSelling = 0;
-                  syncPercentageBankAccount = 0;
-                  setearValoresEnCero = true;
-                });
-              } 
+                if (setearValoresEnCero == false) {
+                  setState(() {
+                    syncPercentage = 0;
+                    syncPercentageClient = 0;
+                    syncPercentageImpuestos = 0;
+                    syncPercentageProviders = 0;
+                    syncPercentageSelling = 0;
+                    syncPercentageBankAccount = 0;
+                    setearValoresEnCero = true;
+                  });
+                }
 
-               await getPosPropertiesInit();
+                await getPosPropertiesInit();
 
                 if (variablesG.isEmpty) {
-
-                  List<Map<String, dynamic>> response = await getPosPropertiesV();
+                  List<Map<String, dynamic>> response =
+                      await getPosPropertiesV();
 
                   setState(() {
                     variablesG = response;
                   });
-                
-
                 }
 
                 sincronizationBankAccount(setState);
@@ -95,12 +90,11 @@ void initState() {
                 await synchronizeVendorsWithIdempiere(setState);
                 await synchronizeProductsWithIdempiere(setState);
                 // sincronizationCustomers(setState);
-                await synchronizeOrderSalesWithIdempiere(setState); 
+                await synchronizeOrderSalesWithIdempiere(setState);
 
-             setState(() {
-              setearValoresEnCero = false;
-             });
-             
+                setState(() {
+                  setearValoresEnCero = false;
+                });
               },
               child: const Text('Sincronizar'),
             ),
