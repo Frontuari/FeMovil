@@ -112,7 +112,6 @@ class _EditClientScreenState extends State<EditClientScreen> {
   @override
   Widget build(BuildContext context) {
     final mediaScreen = MediaQuery.of(context).size.width *0.8;
-    final colorTheme = Theme.of(context).colorScheme;
   
     setState(() {
       
@@ -331,7 +330,7 @@ class _EditClientScreenState extends State<EditClientScreen> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: colorTheme.primary,
+                            backgroundColor: Color(int.parse('0xFF7531FF')),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
@@ -339,7 +338,7 @@ class _EditClientScreenState extends State<EditClientScreen> {
                           ),
                           child: const Text(
                             'Actualizar',
-                            style: TextStyle(fontFamily: 'Poppins SemiBold'),
+                            style: TextStyle(fontFamily: 'Poppins SemiBold', fontSize: 15),
                           ),
                         ),
                       ),

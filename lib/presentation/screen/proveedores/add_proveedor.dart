@@ -94,6 +94,9 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
 
   @override
   Widget build(BuildContext context) {
+
+    final double mediaScreen = MediaQuery.of(context).size.width * 0.8;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 236, 247, 255),
       appBar: AppBar(title: const Text("Agregar Proveedor", style: TextStyle(
@@ -117,7 +120,7 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                   const ContainerBlue(label:'Datos Del Proveedor',),
+                    ContainerBlue(label:'Datos Del Proveedor', mediaScreen: mediaScreen, ),
 
                 const SizedBox(height: 15),
                   TextFormField(
@@ -212,7 +215,7 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
 
                 // },),
                const SizedBox(height: 15,),
-               const ContainerBlue(label:'Domicilio Fiscal',),
+                ContainerBlue(label:'Domicilio Fiscal',mediaScreen: mediaScreen,),
                const SizedBox(height: 15,),
               CustomDropdownButtonFormFieldVendor(identifier: 'countryVendor', selectedIndex: _selectedCountryIndex, dataList:_countryVendorList, text: _countryTex, onSelected: (newValue, countryText) {
 
@@ -412,20 +415,21 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
 
 class ContainerBlue extends StatelessWidget {
    final String label;
+   final double mediaScreen;
   const ContainerBlue({
     super.key, required this.label,
+    required this.mediaScreen
       
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-     width: 300 ,
+     width:  mediaScreen,
      decoration: BoxDecoration(
-       color: Colors.blue,
        borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
      ),
-     child:  Text(label, style:  const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+     child:  Text(label, style:  const TextStyle(color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18), textAlign: TextAlign.start,),
                       );
   }
 }

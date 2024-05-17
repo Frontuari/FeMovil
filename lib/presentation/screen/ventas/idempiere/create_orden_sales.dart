@@ -11,6 +11,7 @@ import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 updateAndCreateTercero(orderSalesList) async {
@@ -343,10 +344,10 @@ createOrdenSalesIdempiere(orderSalesList) async {
     dynamic isError = parsedJson['CompositeResponses']['CompositeResponse']
         ['StandardResponse'][2]['@IsError'];
 
-    if (isError) {
+    if (isError == true) {
       return false;
     }
-
+    print('LLegue aqui');
     Map<String, dynamic> nuevoDocumentNoAndCOrderId = {
       'documentno': documentNo,
       'c_order_id': cOrderId

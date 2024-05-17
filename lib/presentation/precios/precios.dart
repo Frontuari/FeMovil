@@ -184,7 +184,7 @@ Widget build(BuildContext context) {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: selectedIndex == index ? colorPrimary.withOpacity(0.5) : Colors.grey.withOpacity(0.5),
+                color: selectedIndex == index ? Color(int.parse('0xFF7531FF')).withOpacity(0.5) : Colors.grey.withOpacity(0.5),
                 blurRadius: 7,
                 spreadRadius: 2,
               ),

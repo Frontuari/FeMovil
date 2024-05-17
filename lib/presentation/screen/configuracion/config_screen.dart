@@ -445,8 +445,7 @@ class _ConfiguracionState extends State<Configuracion> {
                           borderRadius: BorderRadius.circular(
                               8.0), // Ajusta el radio de las esquinas
                         ),
-                        backgroundColor: colors
-                            .primary, // Ajusta el color de fondo del botón
+                        backgroundColor: const Color(0xFF7531FF) // Ajusta el color de fondo del botón
                       ),
                       child: const Text(
                         'Guardar',

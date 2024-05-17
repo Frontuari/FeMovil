@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/config/getPosProperties.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/insert_database.dart';
@@ -19,13 +20,19 @@ class OrdenDeCompraScreen extends StatefulWidget {
   final String providerName;
   final int cBPartnerID;
   final int cBPartnerLocationId;
-
+  final String rucProvider;
+  final String emailProvider;
+  final String phoneProvider;
   const OrdenDeCompraScreen(
       {super.key,
       required this.providerId,
       required this.providerName,
       required this.cBPartnerID,
-      required this.cBPartnerLocationId});
+      required this.cBPartnerLocationId,
+      required this.rucProvider,
+      required this.emailProvider,
+      required this.phoneProvider
+      });
 
   @override
   _OrdenDeCompraScreenState createState() => _OrdenDeCompraScreenState();
@@ -42,7 +49,6 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
   TextEditingController priceController = TextEditingController();
 
   List<Map<String, dynamic>> selectedProducts = [];
-  bool _validateDescription = false;
   DateTime selectedDate = DateTime.now();
   double? saldoNeto;
   double? totalImpuesto;
@@ -56,6 +62,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
 
     return multi;
   }
+
 
   double calcularMontoImpuesto(impuesto, monto) {
     double montoImpuesto = monto * impuesto / 100;
@@ -79,7 +86,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
     }
     saldoNetoController.text = '\$${totalNeto.toStringAsFixed(2)}';
     suma = total + totalNeto;
-
+    montoController.text = '\$${suma.toStringAsFixed(2)}';
     print('productos totales $selectedProducts');
 
     return suma;
@@ -215,338 +222,675 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final screenMedia = MediaQuery.of(context).size.width * 0.8;
+    final screenHeight = MediaQuery.of(context).size.height * 0.8;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Orden de Compra'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: numeroReferenciaController,
-                decoration:
-                    const InputDecoration(labelText: 'Número de Documento'),
-              ),
-              TextField(
-                controller: numeroFacturaController,
-                decoration:
-                    const InputDecoration(labelText: 'Número de Factura'),
-              ),
-              TextField(
-                controller: fechaController,
-                decoration: InputDecoration(
-                  labelText: 'Fecha',
-                  suffixIcon: IconButton(
-                    onPressed: () => _selectDate(context),
-                    icon: const Icon(Icons.calendar_today),
-                  ),
-                ),
-                readOnly: true,
-              ),
-              TextFormField(
-                readOnly: true,
-                controller: TextEditingController(text: widget.providerName),
-                decoration:
-                    const InputDecoration(labelText: 'Nombre del Cliente'),
-              ),
-              TextField(
-                controller: descripcionController,
-                decoration: const InputDecoration(labelText: 'Descripción'),
-                onChanged: (value) {
-                  if (value.trim().isEmpty) {
-                    setState(() {
-                      _validateDescription = true;
-                    });
-                  } else {
-                    setState(() {
-                      _validateDescription = false;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                readOnly: true,
-                controller: saldoNetoController,
-                decoration: const InputDecoration(labelText: 'Saldo Neto'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                readOnly: true,
-                controller: montoController,
-                decoration: const InputDecoration(labelText: 'Monto'),
-                keyboardType: TextInputType.number,
-              ),
-              const Text(
-                'Productos:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                height: 300,
-                child: ListView.builder(
-                  itemCount: selectedProducts.length,
-                  itemBuilder: (context, index) {
-                    final product = selectedProducts[index];
-                    return Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
+      appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(50),
+        child: AppBarSample(label: 'Orden de Compra')),
+      body: GestureDetector(
+        onTap: () {
+           FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: SingleChildScrollView(
+          child: Center(
+            child: SizedBox(
+              width: screenMedia,
+            
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: screenHeight * 0.03,),
+                  const Text('Datos del Proveedor', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18) ,),
+                  SizedBox(height: screenHeight * 0.03,),
+          
+                  Container(
+                      width: screenMedia,
+                      height: screenHeight * 0.35,
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(15),
+                        color: Colors.white,
+                        boxShadow: [
+                  
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2
+                            )
+                  
+                        ]
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            product['name'].toString(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  
+                      child: SingleChildScrollView(
+                  
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
                             children: [
-                              Text('Cantidad: ${product["quantity"]}'),
                               Row(
-                                children: [
-                                  const Text('Price: '),
-                                  SizedBox(
-                                    width: 80,
-                                    child: TextFormField(
-                                      initialValue:
-                                          '${product['price']}', // Valor inicial del precio
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                    SizedBox(
+                                      width: screenMedia * 0.5,
+                                      
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text('Nombre', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18,),textAlign: TextAlign.start,),
+                                          SizedBox(height: screenHeight * 0.02, ),
+                                          SizedBox(width: screenMedia * 0.45,),
+                                          Text(widget.providerName, style: const TextStyle(fontFamily: 'Poppins Regular', ),textAlign: TextAlign.start ,),
+                                                                                                               
+                                        ],
+                                      )),
+                              
+                                    SizedBox(
+                                      width: screenMedia * 0.3,
+                                      child: Column( 
+                                            crossAxisAlignment: CrossAxisAlignment.start,               
+                                        children: [
+                                                                  
+                                             const Text('Ruc/DNI', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18,),textAlign: TextAlign.start,),
+                                              SizedBox(height: screenMedia * 0.03, ),
+                                              Center(child: Text('${widget.rucProvider.toString()}', style: const TextStyle(fontFamily: 'Poppins Regular', ),textAlign: TextAlign.start ,))
+                                           
+                                                                  
+                                                                  
+                                        ],
+                                                                  
                                       ),
-
-                                      onChanged: (newValue) {
-                                        _handlePriceChange(newValue, index);
-
-                                        setState(() {
-                                          montoController.text =
-                                              '\$${calcularMontoTotal().toStringAsFixed(2)}';
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
+                                    )     
+                                              
+                              ],
+          
+                              
                               ),
+          
+                             SizedBox(height: screenMedia * 0.03, ),
+          
+                             SizedBox(
+                              width: screenMedia,
+                               child: const Text('Detalles', style: TextStyle(
+                                fontFamily: 'Poppins Bold', fontSize: 18
+                               ),textAlign: TextAlign.start,),
+                             ),
+                             SizedBox(height: screenMedia * 0.03, ),
+          
+                            
+                            Row(
+                              children: [
+                                          
+                                const Text('Correo: ', style:  TextStyle(fontFamily: 'Poppins SemiBold'), ),
+                                Flexible(child: Text(widget.emailProvider != '{@nil=true}' ? widget.emailProvider : '', style: const TextStyle(fontFamily: 'Poppins Regular'),))
+                                          
+                            ],),
+          
+                                  Row(
+                              children: [
+                                          
+                                const Text('Telefono: ', style:  TextStyle(fontFamily: 'Poppins SemiBold', overflow: TextOverflow.clip), ),
+                                Flexible(child: Text(widget.phoneProvider != '{@nil=true}' ? widget.phoneProvider : '', style: const TextStyle(fontFamily: 'Poppins Regular'),))
+                                          
+                            ],)          
+                                          
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                  child: Text(
-                                      'Impuesto: ${product['impuesto']}%')),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Flexible(
-                                child: Text(
-                                  'Monto Impuesto: ${calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])}',
-                                  style: const TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ),
-                            ],
+                        ),
+                      ),
+                  
+                  ),
+          
+          
+                  SizedBox(height: screenHeight * 0.05, ),
+                  const Text('Detalles de Orden', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                  SizedBox(height: screenHeight * 0.05, ),
+                
+          
+                  Container(
+                    width: screenMedia,
+                    height: screenHeight * 0.1,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(15)),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          blurRadius: 7,
+                          spreadRadius: 2
+                        )
+                      ]
+                    ),
+                    child: TextField(
+                      readOnly:  true,
+                      controller: numeroReferenciaController,
+                      decoration:
+                          const InputDecoration(labelText: 'Número de Documento',
+                          labelStyle: TextStyle(fontFamily: 'Poppins Regular', color: Colors.black),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)) ,
+                            borderSide: BorderSide.none
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  'Saldo Neto: ${calcularSaldoNetoProducto(product['quantity'], product['price']).toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    color: Colors.green,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Flexible(
-                                child: Text(
-                                  'Monto Total: ${(calcularSaldoNetoProducto(product['quantity'], product['price']) + calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])).toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderSide: BorderSide(
+                              width: 25, 
+                              color: Colors.white
+                            )
                           ),
-                          const SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () {
-                                setState(() {
-                                  _removeProduct(index);
-                                });
-                              },
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderSide: BorderSide(width: 25, color: Colors.white)
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                               borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderSide: BorderSide(width: 25, color: Colors.white)
+                          ),
+                          errorBorder:OutlineInputBorder(
+                               borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderSide: BorderSide(width: 25, color: Colors.white)
+                          ) ,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 25)
+                          ),
+                    ),
+                  ),
+                  SizedBox(height: screenMedia * 0.03, ),
+          
+                  Container(
+                    width: screenMedia,
+                    height: screenHeight * 0.1,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          blurRadius: 7,
+                          spreadRadius: 2
+                        )
+                      ]
+                    ),
+                    child: TextField(
+                      controller: numeroFacturaController,
+                      decoration:
+                          const InputDecoration(labelText: 'Número de Factura',
+          
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide.none
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 25,
+                                  )
+                                ),
+                                  enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 25,
+                                  )
+                                ),
+                                 errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 25,
+                                  )
+                                ),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                              labelStyle: TextStyle(fontFamily: 'Poppins Regular', color: Colors.black)
+          
+                          ),
+                          keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  SizedBox(height: screenMedia * 0.03, ),
+          
+                  Container(
+                    width: screenMedia,
+                    height: screenHeight * 0.1,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          blurRadius: 7,
+                          spreadRadius: 2
+                        )
+                      ]
+                    ),
+                    child: TextField(
+                      controller: fechaController,
+                      decoration: InputDecoration(
+                        labelText: 'Fecha',
+                        suffixIcon: IconButton(
+                              onPressed: () => _selectDate(context),
+                              icon: Image.asset('lib/assets/Calendario.png'),
                             ),
-                          ),
+                       border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide.none
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 25,
+                                  )
+                                ),
+                                  enabledBorder: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 25,
+                                  )
+                                ),
+                                labelStyle: const TextStyle(fontFamily: 'Poppins Regular', color: Colors.black ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25)
+                      ),
+                      readOnly: true,
+                    ),
+                  ),
+                 SizedBox(height: screenMedia * 0.03, ),
+          
+                
+                  Container(
+                    width: screenMedia,
+                    height: screenHeight * 0.18,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          blurRadius: 7,
+                          spreadRadius: 2
+                        )
+                      ]
+                    ),
+                    child: TextField(
+                      maxLines: 2,
+                      controller: descripcionController,
+                      decoration: const InputDecoration(labelText: 'Descripción',
+                      border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide.none
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 25,
+                                  )
+                                ),
+                                  enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 25,
+                                  )
+                                ),
+                                labelStyle: TextStyle(fontFamily: 'Poppins Regular', color: Colors.black ),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 25)
+                      ),
+           
+                    ),
+                  ),
+                SizedBox(height: screenHeight * 0.05, ),
+                const Text('Productos', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                SizedBox(height: screenHeight * 0.03, ),
+
+                Container(
+                    width: screenMedia,
+                    height: screenHeight * 0.32,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            blurRadius: 7,
+                            spreadRadius: 2
+                          )
+                        ]
+
+                    ),
+                  child:  Stack(
+                    children: [
+                      Column(
+                        children: [
+                      
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8 ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Nombre', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                                    Text('Cant.', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                                     Text('Precio', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),)
+                                  ],
+                                ),
+                              ),
+                      
+                              Expanded(
+                                child: ListView.builder(
+                                      itemCount: selectedProducts.length,
+                                      itemBuilder: (context, index) {
+                                      final product = selectedProducts[index];
+                      
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  
+                                                  Row(
+                                                    children: [
+                                                       GestureDetector(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                _removeProduct(
+                                                                    index);
+                                                              });
+                                                            },
+                                                            child: Image.asset(
+                                                                'lib/assets/Eliminar.png')),
+                                                                SizedBox(width: screenMedia * 0.01,),
+                                                      SizedBox(
+                                                        width: screenMedia * 0.23,
+                                                        child: Text(product['name'])),
+                      
+                                                    ],
+                                                  ),
+                                              
+                                              
+                                             Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                               children: [
+                                                 GestureDetector(
+                                                          onTap: () {
+                                                            if (product['quantity'] <=
+                                                                0) {
+                                                              return;
+                                                            }
+                                                 
+                                                            setState(() {
+                                                              product['quantity'] -= 1;
+                                                              calcularMontoTotal()
+                                                                  .toStringAsFixed(2);
+                                                 
+                                                              print(
+                                                                  'Productos ${product['quantity_avaible']}');
+                                                            });
+                                                          },
+                                                          child: Image.asset(
+                                                            'lib/assets/menos.png',
+                                                            width: 16,
+                                                          )),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(1.0),
+                                                    child: SizedBox(
+                                                      width: screenMedia * 0.15,
+                                                      child: Text(product['quantity']
+                                                          .toString(), style:  const TextStyle(fontFamily: 'Poppins Regular'),textAlign: TextAlign.center,),
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                      onTap: () {
+                                              
+                      
+                                                        setState(() {
+                                                          product['quantity'] += 1;
+                                                          calcularMontoTotal()
+                                                              .toStringAsFixed(2);
+                                                        });
+                                                      },
+                                                      child: Image.asset(
+                                                                          'lib/assets/Más-2.png',
+                                                                          width: 16,
+                                                                        )),
+                                                  
+                      
+                                               ],
+                                             ),
+                      
+                                                Container(
+                                                width: screenMedia * 0.2,
+                                                height: screenHeight * 0.06,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(15),
+                                                
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Color(int.parse('0xFF7531FF')),
+                                                      blurRadius: 7,
+                                                      spreadRadius: 2
+                                                    )
+                                                  ]
+                                                ),
+                                                child: TextFormField(
+                                                  keyboardType: TextInputType.number,
+                                                  initialValue:
+                                                      '${product['price']}', // Valor inicial del precio
+                                                  decoration: const InputDecoration(
+                                                    
+                                                    border: OutlineInputBorder(
+                                                      borderSide: BorderSide.none
+                                                    ),
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 2)
+                                                  ),
+                      
+                                                  onChanged: (newValue) {
+                                                    _handlePriceChange(newValue, index);
+                      
+                                                    setState(() {
+                                                      montoController.text =
+                                                          '\$${calcularMontoTotal().toStringAsFixed(2)}';
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                              ],
+                                            ),
+                                        SizedBox(height: screenHeight * 0.01,)
+                                          ],
+                                        
+                                        ),
+                                      );
+                      
+                      
+                                  },
+                                ),
+                              ),
+                        SizedBox(
+                            width: screenMedia,
+                            height: screenHeight * 0.07,
+                          )
                         ],
                       ),
-                    );
-                  },
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  // Aquí puedes mostrar un diálogo o pantalla para seleccionar productos y agregarlos a la orden de venta
-                  // Puedes usar Navigator.push para navegar a una pantalla de selección de productos
-                  // y agregar los productos seleccionados a la lista selectedProducts
-                  // Por ejemplo:
+                        Positioned(
+                          top: screenHeight * 0.26,
+                          left: screenMedia * 0.45,
+                          child: GestureDetector(
+                              onTap: () async {
 
-                  final selectedProductsResult = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ProductSelectionComprasScreen()),
-                  );
-                  print("Cantidad de productos $selectedProductsResult");
-                  if (selectedProductsResult != null) {
-                    setState(() {
-                      _addOrUpdateProduct(selectedProductsResult);
+                                  final selectedProductsResult = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProductSelectionComprasScreen()),
+                                );
+                                print("Cantidad de productos $selectedProductsResult");
+                                if (selectedProductsResult != null) {
+                                  setState(() {
+                                    _addOrUpdateProduct(selectedProductsResult);
+                        
+                                    montoController.text =
+                                        '\$${calcularMontoTotal().toStringAsFixed(2)}';
+                                  });
+                                }
 
-                      montoController.text =
-                          '\$${calcularMontoTotal().toStringAsFixed(2)}';
-                    });
-                  }
-                },
-                child: const Text('Agregar Productos'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Aquí puedes realizar la transacción y guardar la orden de venta en la base de datos
-                  // con los datos proporcionados
-                  // Por ejemplo:
-
-                  //  if (descripcionController.text.isEmpty) {
-                  //           setState(() {
-                  //             _validateDescription = true; // Marcar como campo inválido si está vacío
-                  //           });
-
-                  //                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:  Text('Por favor ingrese una descripción.')));
-
-                  //           return; // Detener el proceso de agregar la orden si el campo está vacío
-                  //     }
-
-                  if (selectedProducts.isEmpty) {
-                    // Mostrar un diálogo o mensaje indicando que la orden debe tener productos adjuntos
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Error'),
-                          content: const Text(
-                              'La orden debe tener productos adjuntos.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Cerrar el diálogo
                               },
-                              child: const Text('OK'),
-                            ),
-                          ],
+                              child: Image.asset(
+                                'lib/assets/Más@3x.png',
+                                width: 23,
+                              )),
+                        )
+                    ],
+                  ) ,
+
+                ),
+                
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                  
+                          const Text('Total', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                          Text(montoController.text, style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),)
+                      ],
+                  
+                  ),
+                ),
+   
+                 
+                  const SizedBox(height: 5),
+                  ElevatedButton(
+                    
+                    onPressed: () {
+                      // Aquí puedes realizar la transacción y guardar la orden de venta en la base de datos
+                      // con los datos proporcionados
+                      // Por ejemplo:
+              
+                      //  if (descripcionController.text.isEmpty) {
+                      //           setState(() {
+                      //             _validateDescription = true; // Marcar como campo inválido si está vacío
+                      //           });
+              
+                      //                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:  Text('Por favor ingrese una descripción.')));
+              
+                      //           return; // Detener el proceso de agregar la orden si el campo está vacío
+                      //     }
+              
+                      if (selectedProducts.isEmpty) {
+                        // Mostrar un diálogo o mensaje indicando que la orden debe tener productos adjuntos
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Error'),
+                              content: const Text(
+                                  'La orden debe tener productos adjuntos.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context); // Cerrar el diálogo
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
                         );
-                      },
-                    );
-
-                    return;
-                  }
-
-                  print('Esto es el monto ${montoController.text}');
-
-                  final order = {
-                    'proveedor_id': widget.providerId,
-                    'documentno': numeroReferenciaController.text,
-                    'c_doc_type_target_id': variablesG[0]
-                        ['c_doc_type_order_co'],
-                    'ad_client_id': infoUserForOrder['clientid'],
-                    'ad_org_id': infoUserForOrder['orgid'],
-                    'm_warehouse_id': infoUserForOrder['warehouseid'],
-                    'payment_rule': 'B',
-                    'dateordered': fechaIdempiereController.text,
-                    'sales_rep_id': infoUserForOrder['userId'],
-                    'c_bpartner_id': widget.cBPartnerID,
-                    'c_bpartner_location_id': widget.cBPartnerLocationId,
-                    'm_price_list_id': variablesG[0]['m_pricelist_id'],
-                    'c_currency_id': 100,
-                    'c_payment_term_id': variablesG[0]['c_paymentterm_id'],
-                    'c_conversion_type_id': variablesG[0]
-                        ['c_conversion_type_id'],
-                    'po_reference': numeroFacturaController.text,
-                    'id_factura': 0,
-                    'fecha': fechaController.text,
-                    'description': descripcionController.text,
-                    'monto': double.parse(montoController.text.substring(1)),
-                    'saldo_neto':
-                        double.parse(saldoNetoController.text.substring(1)),
-                    'productos': selectedProducts,
-                    'usuario_id': infoUserForOrder['userId'],
-                    'status_sincronized': 'Borrador',
-                  };
-
-                  // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
-                  insertOrderCompra(order).then((orderId) {
-                    // Limpiar los campos después de guardar la orden
-                    if (orderId is Map<String, dynamic> &&
-                        orderId.containsKey('failure')) {
-                      if (orderId['failure'] == -1) {
+              
+                        return;
+                      }
+              
+                      print('Esto es el monto ${montoController.text}');
+              
+                      final order = {
+                        'proveedor_id': widget.providerId,
+                        'documentno': numeroReferenciaController.text,
+                        'c_doc_type_target_id': variablesG[0]
+                            ['c_doc_type_order_co'],
+                        'ad_client_id': infoUserForOrder['clientid'],
+                        'ad_org_id': infoUserForOrder['orgid'],
+                        'm_warehouse_id': infoUserForOrder['warehouseid'],
+                        'payment_rule': 'B',
+                        'dateordered': fechaIdempiereController.text,
+                        'sales_rep_id': infoUserForOrder['userId'],
+                        'c_bpartner_id': widget.cBPartnerID,
+                        'c_bpartner_location_id': widget.cBPartnerLocationId,
+                        'm_price_list_id': variablesG[0]['m_pricelist_id'],
+                        'c_currency_id': 100,
+                        'c_payment_term_id': variablesG[0]['c_paymentterm_id'],
+                        'c_conversion_type_id': variablesG[0]
+                            ['c_conversion_type_id'],
+                        'po_reference': numeroFacturaController.text,
+                        'id_factura': 0,
+                        'fecha': fechaController.text,
+                        'description': descripcionController.text,
+                        'monto': double.parse(montoController.text.substring(1)),
+                        'saldo_neto':
+                            double.parse(saldoNetoController.text.substring(1)),
+                        'productos': selectedProducts,
+                        'usuario_id': infoUserForOrder['userId'],
+                        'status_sincronized': 'Borrador',
+                      };
+              
+                      // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
+                      insertOrderCompra(order).then((orderId) {
+                        // Limpiar los campos después de guardar la orden
+                        if (orderId is Map<String, dynamic> &&
+                            orderId.containsKey('failure')) {
+                          if (orderId['failure'] == -1) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  orderId['Error'],
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                        } else {
+                          print(
+                              'orderId no es un mapa válido o no contiene la propiedad "failure"');
+                        }
+              
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              orderId['Error'],
-                            ),
-                            backgroundColor: Colors.red,
+                                'Orden de venta guardada correctamente con ID: $orderId'),
                           ),
                         );
-                        return;
-                      }
-                    } else {
-                      print(
-                          'orderId no es un mapa válido o no contiene la propiedad "failure"');
-                    }
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Orden de venta guardada correctamente con ID: $orderId'),
-                      ),
-                    );
-
-                    numeroReferenciaController.clear();
-                    descripcionController.clear();
-                    montoController.clear();
-                    numeroFacturaController.clear();
-                    saldoNetoController.clear();
-
-                    // Limpiar la lista de productos seleccionados después de guardar la orden
-                    setState(() {
-                      selectedProducts.clear();
-                    });
-
-                    // Notificar al usuario que la orden se ha guardado exitosamente
-                  });
-                },
-                child: const Text('Completar'),
+              
+                        numeroReferenciaController.clear();
+                        descripcionController.clear();
+                        montoController.clear();
+                        numeroFacturaController.clear();
+                        saldoNetoController.clear();
+              
+                        // Limpiar la lista de productos seleccionados después de guardar la orden
+                        setState(() {
+                          selectedProducts.clear();
+                        });
+              
+                        // Notificar al usuario que la orden se ha guardado exitosamente
+                      });
+                    },
+                    style: ButtonStyle(
+                      
+                      foregroundColor: const WidgetStatePropertyAll(Colors.white),
+                      backgroundColor: WidgetStatePropertyAll(Color(int.parse('0xFF7531FF')))
+                    ),
+                    child: const Text('Completar', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15), ),
+                  ),
+                  SizedBox(height: screenHeight * 0.05,)
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

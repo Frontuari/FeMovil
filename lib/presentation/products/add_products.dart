@@ -632,7 +632,7 @@ class _AddProductFormState extends State<AddProductForm> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: colorTheme.primary,
+                            backgroundColor: Color(int.parse('0xFF7531FF')),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),

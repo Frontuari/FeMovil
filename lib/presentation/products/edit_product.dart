@@ -594,7 +594,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: colorTheme.primary,
+                          backgroundColor: Color(int.parse('0xFF7531FF')),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -603,7 +603,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         child: const Text(
                           'Actualizar',
                           style: TextStyle(
-                              color: Colors.white, fontFamily: 'Poppins Bold'),
+                              color: Colors.white, fontFamily: 'Poppins Bold', fontSize: 15),
                         ),
                       ),
                     ),

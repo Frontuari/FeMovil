@@ -1,4 +1,4 @@
-import 'package:femovil/assets/nav_bottom_menu.dart';
+import 'package:femovil/config/app_bar_femovil.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/presentation/screen/proveedores/add_proveedor.dart';
@@ -67,8 +67,11 @@ class _ProvidersState extends State<Providers> {
   }
 
   
+
+  
   @override
   Widget build(BuildContext context) {
+       
 
      if(input == ""){
 
@@ -115,183 +118,330 @@ class _ProvidersState extends State<Providers> {
             searchProvider = providers.toList();
       }
 
-
-        final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final screenHeight = MediaQuery.of(context).size.height * 0.8;
 
     
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-      appBar: AppBar(
-        title: const Text(
-          "Proveedores",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            color: Color.fromARGB(255, 105, 102, 102),
-          ),
-        ),
-        backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 105, 102, 102)),
-        leading: IconButton(
-                    icon: Image.asset(
-                      'lib/assets/Ajustes.png',
-                      width: 25,
-                      height: 35,
-                    ),
-                    onPressed: () {
-                      _showFilterOptions(context);
-                    },
-                  ),
-      ),
-      body:  Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-          
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(170),
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: (value) {
-                    print("esto es lo que tiene ${_filter}");
-      
-                    if (searchController.text.isNotEmpty) {
-                    setState(() {
-                         _filter = "";
-                        print("ESto es la categoria en blanco ${_filter}");
-                    });
-                  }
-                  
-               setState(() {
-                input = value;
-              print("Este es el valor $value");
+            const AppBars(labelText: 'Proveedores'),
+              Positioned(
+              left: 16,
+              right: 16,
+              top: 160,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  width: 300,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                        9.0), // Ajusta el radio de las esquinas
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            Colors.grey.withOpacity(0.2), // Color de la sombra
+                        spreadRadius: 2, // Extensión de la sombra
+                        blurRadius: 3, // Difuminado de la sombra
+                        offset:
+                            const Offset(0, 2), // Desplazamiento de la sombra
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      if (searchController.text.isNotEmpty) {
+                        setState(() {
+                          _filter = "";
+                        });
+                      }
 
-              print('esto es providers $providers');
+                      setState(() {
+                        input = value;
+                        searchProvider = providers.where((provider) {
+                        final valueLower = value.toLowerCase();
+                        if (int.tryParse(valueLower) != null) {
+                          // Si el valor se puede convertir a un número entero, buscar por ruc
+                          final ruc = provider['tax_id'].toString().toLowerCase();
+                          return ruc.contains(valueLower);
+                        } else {
+                          // Si no se puede convertir a un número entero, buscar por nombre
+                          final name = provider['bpname'].toString().toLowerCase();
+                                  final result = name.contains(valueLower);
+                                  
+                          print('Esto es name $result');
 
-                searchProvider = providers.where((provider) {
-                  final valueLower = value.toLowerCase();
-                  if (int.tryParse(valueLower) != null) {
-                    // Si el valor se puede convertir a un número entero, buscar por ruc
-                    final ruc = provider['tax_id'].toString().toLowerCase();
-                    return ruc.contains(valueLower);
-                  } else {
-                    // Si no se puede convertir a un número entero, buscar por nombre
-                    final name = provider['bpname'].toString().toLowerCase();
-                             final result = name.contains(valueLower);
-                             
-                    print('Esto es name $result');
+                          return name.contains(valueLower);
+                        }
+                      }).toList();
 
-                    return name.contains(valueLower);
-                  }
-                }).toList();
-
-
-                  print("cual es el valor de filteredproducts $searchProvider");
-                });
-      
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Buscar por nombre o Ruc',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+                      });
+                    },
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 3.0, horizontal: 20.0),
+                      hintText: 'Buscar por nombre o Ruc',
+                      labelStyle: const TextStyle(
+                          color: Colors.black, fontFamily: 'Poppins Regular'),
+                      suffixIcon: Image.asset('lib/assets/Lupa.png'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: searchProvider.length,
-                itemBuilder: (context, index) {
-      
-                  final provider = searchProvider[index];
-
-      
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: screenMax,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(' RUC ${provider['tax_id'].toString()}',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: screenMax,
-                          color: Colors.white,
-                          child: Padding(
+          ],
+        )) ,
+      body:  GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+        
+      },
+      child: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+          
+              
+          
+              SizedBox(height: screenMax * 0.1,),
+             
+              Expanded(
+                      child: ListView.builder(
+                        itemCount: searchProvider.length,
+                        itemBuilder: (context, index) {
+                          final provider = searchProvider[index];
+          
+                          return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                             
-                                Text('Nombre: ${provider['bpname']}'),
-                                Text('Ruc: ${provider['tax_id'].toString()}'),
-                                Text('Correo: ${provider['email'] != '{@nil=true}' ? provider['email']:'Sin registro'}'),
-                                Text('Telefono: ${provider['phone'].toString() != '{@nil=true}' ? provider['phone'] : 'Sin registro'}'),
-                                Text('Grupo: ${provider['groupbpname']}'),
+                                Container(
+                                  width: screenMax,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 130,
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 5,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                height: 50,
+                                                width: screenMax,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFF0EBFC),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.2),
+                                                      spreadRadius: 2,
+                                                      blurRadius: 5,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(15.0),
+                                                  child: Text(
+                                                   provider['bpname'].toString(),
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily: 'Poppins Bold',
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                    textAlign: TextAlign.start,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 55,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: SizedBox(
+                                                  width: screenMax * 0.9,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'RUC/DNI: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
+                                                                  child: Text(
+                                                                    '${provider['tax_id']}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Correo: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
+                                                                  child: Text(
+                                                                    provider['email'] != '{@nil=true}' ? provider['email'].toString() : '',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  )),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Teléfono: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
+                                                                  child: Text(
+                                                                    '${provider['phone'] != '{@nil=true}' ? provider['phone'] : 0}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _verMasprovider('${provider['id']}');
+                                                        },
+                                                        child: Row(
+                                                          children: [
+                                                            const Text('Ver',
+                                                                style: TextStyle(
+                                                                    color: Color(
+                                                                        0xFF7531FF))),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Image.asset(
+                                                                'lib/assets/Lupa-2@2x.png',
+                                                                width: 25),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              onPressed: () => _verMasprovider('${provider['id']}'),
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.grey,
-                                foregroundColor: Colors.white,
-                                fixedSize: Size(screenMax, 40),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: const Text('Ver más'),
-                            ),
-                          ],
-                        ),
-                      ],
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
-           
-
-          ],
-        ),
-      ),
-        
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-          onAddPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddProvidersForm()),
-              );
-            },
-            onRefreshPressed: () {
-              _loadProviders();
-            },
-            onBackPressed: () {
-              Navigator.pop(context);
-            },
+            ],
           ),
-
+          Positioned(
+              top:screenHeight * 0.75,
+              right: screenMax * 0.05,
+              child: GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AddProvidersForm()),
+                ),
+                child: Image.asset(
+                  'lib/assets/Agregar@3x.png',
+                  width: 80,
+                ),
+              )),
+      
+        ],
+      ),
+             ),
     );
   }
 
@@ -302,7 +452,7 @@ class _ProvidersState extends State<Providers> {
         'providers',
         where: 'id = ?',
         whereArgs: [int.parse(providerId)],
-      );
+      );  
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => ProvidersDetailsScreen(provider: provider.first)),

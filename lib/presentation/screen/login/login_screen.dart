@@ -354,8 +354,7 @@ class _LoginState extends State<Login> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     fixedSize: const Size(340, 50),
-                                    backgroundColor: colors
-                                        .primary, // Color de fondo del botón
+                                    backgroundColor: const Color(0xFF7531FF), // Color de fondo del botón
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
                                           15.0), // Ajusta el radio de las esquinas
@@ -388,17 +387,17 @@ class _LoginState extends State<Login> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.settings,
-                                        color: colors.primary,
-                                      ), // Icono de configuración
+                                        color: Color(0xFF7531FF),
+                                      ), 
                                       const SizedBox(
                                           width:
-                                              8), // Espacio entre el icono y el texto
+                                              8),
                                       Text(
                                         'Configuración',
                                         style: TextStyle(color: colors.primary),
-                                      ), // Texto del botón de configuración
+                                      ), 
                                     ],
                                   ),
                                 ),

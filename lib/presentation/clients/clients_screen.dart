@@ -116,9 +116,9 @@ class _ClientsState extends State<Clients> {
     }
 
     final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final screenHight = MediaQuery.of(context).size.height * 0.8;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 236, 247, 255),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(170),
         child: Stack(
@@ -431,8 +431,8 @@ class _ClientsState extends State<Clients> {
               ),
             ),
             Positioned(
-                top: 450,
-                right: 15,
+                top:screenHight * 0.75,
+                right: screenMax * 0.05,
                 child: GestureDetector(
                   onTap: () => Navigator.push(
                     context,

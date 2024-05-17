@@ -66,7 +66,7 @@ class _ProductsState extends State<Products> {
     _loadProducts();
     _isMounted = true;
 
-    _deleteBaseDatos();
+    // _deleteBaseDatos();
     super.initState();
     // sincronizationProducts();
   }
@@ -128,6 +128,7 @@ class _ProductsState extends State<Products> {
     }
 
     final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final screenHeight = MediaQuery.of(context).size.height * 0.8;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -452,8 +453,8 @@ class _ProductsState extends State<Products> {
               ),
             ),
             Positioned(
-                top: 450,
-                right: 15,
+                top:screenHeight * 0.75,
+                right: screenMax * 0.05,
                 child: GestureDetector(
                   onTap: () => Navigator.push(
                     context,

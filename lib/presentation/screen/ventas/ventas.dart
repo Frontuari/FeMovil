@@ -123,6 +123,7 @@ class _VentasState extends State<Ventas> {
     });
   }
 
+
   void _showMaxPriceDialog(BuildContext context, screenMedia) {
     showDialog(
       context: context,
@@ -206,6 +207,30 @@ class _VentasState extends State<Ventas> {
         overlay.localToGlobal(Offset.zero) & overlay.size, // Tamaño del overlay
       ),
       items: <PopupMenuEntry>[
+        PopupMenuItem(
+          child: ListTile(
+            title: Row(
+              children: [
+                Image.asset(
+                  'lib/assets/Check@3x.png',
+                  width: 25,
+                  color: colorPrimary,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.02,
+                ),
+                const Text(
+                  'Mostrar Todos',
+                  style: TextStyle(fontFamily: 'Poppins Regular'),
+                ),
+              ],
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              _loadVentas();
+            },
+          ),
+        ),
         PopupMenuItem(
           child: ListTile(
             title: Row(
@@ -379,6 +404,8 @@ class _VentasState extends State<Ventas> {
                       itemCount: filteredVentas.length,
                       itemBuilder: (context, index) {
                         final venta = filteredVentas[index];
+
+                        print('Estas son las venta $venta');
 
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -583,7 +610,16 @@ class _VentasState extends State<Ventas> {
                                                                             'nombre_cliente'],
                                                                     saldoTotal:
                                                                         venta[
-                                                                            'saldo_total']),
+                                                                            'saldo_total'],
+                                                                    rucClient:
+                                                                        venta['ruc'],
+                                                                    emailClient:
+                                                                        venta['email'],
+                                                                    phoneClient:
+                                                                        venta['phone'].toString()
+
+                                                                            
+                                                                            ),
                                                           ),
                                                         );
                                                       },

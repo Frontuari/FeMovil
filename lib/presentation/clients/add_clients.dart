@@ -647,7 +647,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              // Guarda el producto en la base de datos Sqflite
+                              
                               _saveProduct();
                               showDialog(
                               context: context,
@@ -687,7 +687,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: colorTheme.primary,
+                            backgroundColor: const Color(0xff7531FF),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),

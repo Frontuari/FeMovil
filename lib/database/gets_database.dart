@@ -108,7 +108,7 @@ Future<List<Map<String, dynamic>>> getProducts() async {
     if (db != null) {
       // Consultar todas las órdenes de venta con el nombre del cliente asociado
       List<Map<String, dynamic>> orders = await db.rawQuery('''
-        SELECT o.*, c.bp_name AS nombre_cliente, c.ruc as ruc,
+        SELECT o.*, c.bp_name AS nombre_cliente, c.ruc AS ruc, c.email AS email, c.phone AS phone,
         (o.monto - COALESCE((SELECT SUM(pay_amt) FROM cobros WHERE sale_order_id = o.id), 0)) AS saldo_total
         FROM orden_venta o
         INNER JOIN clients c ON o.cliente_id = c.id

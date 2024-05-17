@@ -15,142 +15,246 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final mediaScreen = MediaQuery.of(context).size.width * 0.8;
+
       switch (identifier) {
       case 'groupTypeVendor':
-         return    DropdownButtonFormField<int>(
-                    value: selectedIndex,
-                    items: dataList
-                        .where((groupList) => groupList['c_bp_group_id'] is int && groupList['groupbpname'] != '')
-                        .map<DropdownMenuItem<int>>((group) {
-                      print('tax $group');
-                      return DropdownMenuItem<int>(
-                        value: group['c_bp_group_id'] as int,
-                        child: SizedBox(
-                          width: 200,
-                          child: Text(group['groupbpname'] as String)),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      print('esto es el taxList ${dataList}');
-                      String nameGroup =
-                          invoke('obtenerNombreGroupVendor', newValue, dataList);
-                      print("esto es el nombre de los grupos de proveedores $nameGroup");
-                      onSelected(newValue, nameGroup);
-                   
-                    },
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
+         return    Container(
+          height: mediaScreen * 0.20,
+          width: mediaScreen ,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 7,
+                    spreadRadius: 2),
+              ]),
+           child: DropdownButtonFormField<int>(
+            icon: Image.asset('lib/assets/Abajo.png'),
+                      value: selectedIndex,
+                      items: dataList
+                          .where((groupList) => groupList['c_bp_group_id'] is int && groupList['groupbpname'] != '')
+                          .map<DropdownMenuItem<int>>((group) {
+                        print('tax $group');
+                        return DropdownMenuItem<int>(
+                          value: group['c_bp_group_id'] as int,
+                          child: SizedBox(
+                            width: 200,
+                            child: Text(group['groupbpname'] as String)),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        print('esto es el taxList ${dataList}');
+                        String nameGroup =
+                            invoke('obtenerNombreGroupVendor', newValue, dataList);
+                        print("esto es el nombre de los grupos de proveedores $nameGroup");
+                        onSelected(newValue, nameGroup);
+                     
+                      },
+                   decoration: InputDecoration(
+                errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none)),
+                      validator: (value) {
+                        if (value == null || value == 0) {
+                          return 'Por favor selecciona un grupo';
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value == 0) {
-                        return 'Por favor selecciona un grupo';
-                      }
-                      return null;
-                    },
-                  );
+         );
         case 'taxTypeVendor' : 
 
-        return    DropdownButtonFormField<int>(
-                    value: selectedIndex,
-                    items: dataList
-                        .where((groupList) => groupList['lco_tax_id_type_id'] is int && groupList['tax_id_type_name'] != '')
-                        .map<DropdownMenuItem<int>>((group) {
-                      print('tax $group');
-                      return DropdownMenuItem<int>(
-                        value: group['lco_tax_id_type_id'] as int,
-                        child: SizedBox(
-                          width: 200,
-                          child: Text(group['tax_id_type_name'] as String)),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      print('esto es el taxList ${dataList}');
-                      String nameGroup =
-                          invoke('obtenerNombreTaxVendor', newValue, dataList);
-                      print("esto es el nombre del tipo de contribuyente proveedor $nameGroup");
-                      onSelected(newValue, nameGroup);
-                   
-                    },
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
+        return    Container(
+            height: mediaScreen * 0.20,
+            width: mediaScreen,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 7,
+                    spreadRadius: 2),
+              ]),
+            child: DropdownButtonFormField<int>(
+              icon: Image.asset('lib/assets/Abajo.png'),
+                      value: selectedIndex,
+                      items: dataList
+                          .where((groupList) => groupList['lco_tax_id_type_id'] is int && groupList['tax_id_type_name'] != '')
+                          .map<DropdownMenuItem<int>>((group) {
+                        print('tax $group');
+                        return DropdownMenuItem<int>(
+                          value: group['lco_tax_id_type_id'] as int,
+                          child: SizedBox(
+                            width: 200,
+                            child: Text(group['tax_id_type_name'] as String)),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        print('esto es el taxList ${dataList}');
+                        String nameGroup =
+                            invoke('obtenerNombreTaxVendor', newValue, dataList);
+                        print("esto es el nombre del tipo de contribuyente proveedor $nameGroup");
+                        onSelected(newValue, nameGroup);
+                     
+                      },
+                      decoration: InputDecoration(
+                errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none)),
+                      validator: (value) {
+                        if (value == null || value == 0) {
+                          return 'Por favor selecciona un grupo';
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value == 0) {
-                        return 'Por favor selecciona un grupo';
-                      }
-                      return null;
-                    },
-                  );
+        );
        case 'countryVendor' : 
 
-         return    DropdownButtonFormField<int>(
-                    value: selectedIndex,
-                    items: dataList
-                        .where((groupList) => groupList['c_country_id'] is int && groupList['country_name'] != '')
-                        .map<DropdownMenuItem<int>>((group) {
-                      print('tax $group');
-                      return DropdownMenuItem<int>(
-                        value: group['c_country_id'] as int,
-                        child: SizedBox(
-                          width: 200,
-                          child: Text(group['country_name'] as String)),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      print('esto es el taxList ${dataList}');
-                      String nameGroup =
-                          invoke('obtenerNombreCountryVendor', newValue, dataList);
-                      print("esto es el nombre del pais $nameGroup");
-                      onSelected(newValue, nameGroup);
-                   
-                    },
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
+         return    Container(
+            height: mediaScreen * 0.20,
+            width: mediaScreen,
+              decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 7,
+                    spreadRadius: 2),
+              ]),
+           child: DropdownButtonFormField<int>(
+                      icon: Image.asset('lib/assets/Abajo.png'),
+
+                      value: selectedIndex,
+                      items: dataList
+                          .where((groupList) => groupList['c_country_id'] is int && groupList['country_name'] != '')
+                          .map<DropdownMenuItem<int>>((group) {
+                        print('tax $group');
+                        return DropdownMenuItem<int>(
+                          value: group['c_country_id'] as int,
+                          child: SizedBox(
+                            width: 200,
+                            child: Text(group['country_name'] as String)),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        print('esto es el taxList ${dataList}');
+                        String nameGroup =
+                            invoke('obtenerNombreCountryVendor', newValue, dataList);
+                        print("esto es el nombre del pais $nameGroup");
+                        onSelected(newValue, nameGroup);
+                     
+                      },
+                            decoration: InputDecoration(
+                errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none)),
+                      validator: (value) {
+                        if (value == null || value == 0) {
+                          return 'Por favor selecciona un grupo';
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value == 0) {
-                        return 'Por favor selecciona un grupo';
-                      }
-                      return null;
-                    },
-                  );
+         );
         case 'taxPayerVendor' : 
 
-         return    DropdownButtonFormField<int>(
-                    value: selectedIndex,
-                    items: dataList
-                        .where((groupList) => groupList['lco_taxt_payer_type_id'] is int && groupList['tax_payer_type_name'] != '')
-                        .map<DropdownMenuItem<int>>((group) {
-                      print('tax $group');
-                      return DropdownMenuItem<int>(
-                        value: group['lco_taxt_payer_type_id'] as int,
-                        child: SizedBox(
-                          width: 200,
-                          child: Text(group['tax_payer_type_name'] as String)),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      print('esto es el taxList ${dataList}');
-                      String nameGroup =
-                          invoke('obtenerNombreTaxPayerVendor', newValue, dataList);
-                      print("esto es el nombre del tipo de contribuyente $nameGroup");
-                      onSelected(newValue, nameGroup);
-                   
-                    },
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
+         return    Container(
+           height: mediaScreen * 0.20,
+           width: mediaScreen,
+           decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 7,
+                    spreadRadius: 2),
+              ]),
+           child: DropdownButtonFormField<int>(
+                      icon: Image.asset('lib/assets/Abajo.png'),
+
+                      value: selectedIndex,
+                      items: dataList
+                          .where((groupList) => groupList['lco_taxt_payer_type_id'] is int && groupList['tax_payer_type_name'] != '').toSet()
+                          .map<DropdownMenuItem<int>>((group) {
+                        print('tax $group');
+                        return DropdownMenuItem<int>(
+                          value: group['lco_taxt_payer_type_id'] as int,
+                          child: SizedBox(
+                            width: 200,
+                            child: Text(group['tax_payer_type_name'] as String)),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        print('esto es el taxList ${dataList}');
+                        String nameGroup =
+                            invoke('obtenerNombreTaxPayerVendor', newValue, dataList);
+                        print("esto es el nombre del tipo de contribuyente $nameGroup");
+                        onSelected(newValue, nameGroup);
+                     
+                      },
+                     decoration: InputDecoration(
+                errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none)),
+                      validator: (value) {
+                        if (value == null || value == 0) {
+                          return 'Por favor selecciona un grupo';
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value == 0) {
-                        return 'Por favor selecciona un grupo';
-                      }
-                      return null;
-                    },
-                  );
+         );
 
           case 'typePersonVendor' :
 

@@ -247,16 +247,15 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorTheme = Theme.of(context).colorScheme.primary;
     final mediaScreen = MediaQuery.of(context).size.width * 0.8;
 
-Color getColor(Set<MaterialState> states){
+Color getColor(Set<WidgetState> states){
 
-    const Set<MaterialState> interactiveStates = <MaterialState>{
+    const Set<WidgetState> interactiveStates = <WidgetState>{
 
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused
+        WidgetState.pressed,
+        WidgetState.hovered,
+        WidgetState.focused
 
     };
     if(states.any(interactiveStates.contains)){
@@ -269,13 +268,13 @@ Color getColor(Set<MaterialState> states){
 }
 
 
-Color getColorBg(Set<MaterialState> states){
+Color getColorBg(Set<WidgetState> states){
 
-    const Set<MaterialState> interactiveStates = <MaterialState>{
+    const Set<WidgetState> interactiveStates = <WidgetState>{
 
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused
+        WidgetState.pressed,
+        WidgetState.hovered,
+        WidgetState.focused
 
     };
     if(states.any(interactiveStates.contains)){
@@ -283,7 +282,7 @@ Color getColorBg(Set<MaterialState> states){
     }
 
 
-    return colorTheme;
+    return const Color(0xff7531FF);
 
 }
 
@@ -839,16 +838,16 @@ Color getColorBg(Set<MaterialState> states){
                     child: ElevatedButton(
                       
                       style: ButtonStyle(
-                        textStyle: MaterialStateProperty.all<TextStyle>(const TextStyle(
+                        textStyle: WidgetStateProperty.all<TextStyle>(const TextStyle(
                           fontFamily: 'Poppins Bold'
                         )),
-                        foregroundColor: MaterialStateProperty.resolveWith(getColor),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                        foregroundColor: WidgetStateProperty.resolveWith(getColor),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)
                         )),
                         animationDuration: Duration.zero,
-                        elevation: MaterialStateProperty.all(0.5),
-                        backgroundColor: MaterialStateProperty.resolveWith(getColorBg)
+                        elevation: WidgetStateProperty.all(0.5),
+                        backgroundColor: WidgetStateProperty.resolveWith(getColorBg)
                       ) ,
                       
                       onPressed: () {

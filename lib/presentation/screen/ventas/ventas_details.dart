@@ -6,16 +6,24 @@ import 'package:femovil/database/update_database.dart';
 import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class VentasDetails extends StatefulWidget {
   final int ventaId;
   final String nameClient;
   final double saldoTotal;
+  final String rucClient;
+  final String emailClient;
+  final String phoneClient;
   const VentasDetails(
       {super.key,
       required this.ventaId,
       required this.nameClient,
-      required this.saldoTotal});
+      required this.saldoTotal,
+      required this.rucClient,
+      required this.emailClient,
+      required this.phoneClient
+      });
 
   @override
   State<VentasDetails> createState() => _VentasDetailsState();
@@ -24,13 +32,20 @@ class VentasDetails extends StatefulWidget {
 class _VentasDetailsState extends State<VentasDetails> {
   late Future<Map<String, dynamic>> _ventaData;
 
+
   bool bottonEnable = true;
 
   @override
   void initState() {
+    
+      
+   
+
     super.initState();
     _ventaData = _loadVentasForId(widget.ventaId);
   }
+
+
 
   _updateAndCreateOrders() async {
     dynamic isTrue = await createOrdenSalesIdempiere(_ventaData);
@@ -40,6 +55,38 @@ class _VentasDetailsState extends State<VentasDetails> {
     } else {
       return true;
     }
+  }
+
+ 
+
+
+
+    double calcularSaldoTotalProducts(dynamic price, dynamic quantity) {
+    double prices;
+    double quantitys;
+
+    // Verificar si quantity es un String
+    if (quantity is String || price is String) {
+      // Intentar convertir el String a un número
+      try {
+        quantitys = double.parse(quantity).toDouble();
+        prices = double.parse(price).toDouble();
+      } catch (e) {
+        print('Error al convertir quantity a double: $e');
+        // Si hay un error, establecer quantitys como 0
+        prices = 0.0;
+        quantitys = 0.0;
+      }
+    } else {
+      // Si quantity no es un String, asumir que es numérico
+      quantitys = quantity.toDouble();
+      prices = price.toDouble();
+    }
+    double sum = prices * quantitys;
+
+    print('price $price & quantity is $quantity');
+    print('Suma es $sum');
+    return sum;
   }
 
   Future<Map<String, dynamic>> _loadVentasForId(ordenId) async {
@@ -79,216 +126,386 @@ class _VentasDetailsState extends State<VentasDetails> {
                       Container(
                         width: screenMax,
                         decoration: BoxDecoration(
-                          color: Colors.blue,
                           borderRadius: BorderRadius.circular(
                               8), // Establece el radio de los bordes
                         ),
                         child: const Text(
                           'Datos Del Cliente',
                           style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
+                              color: Colors.black,fontFamily: 'Poppins Bold' , fontSize: 18),
+                          textAlign: TextAlign.start,
                         ),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(
-                              8), // Establece el radio de los bordes
-                        ),
-                        width: screenMax,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment
-                                .start, // Alinea el texto hacia la izquierda
+
+                 
+                   Container(
+                    width: screenMax,
+                    height: screenMax * 0.7,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 7,
+                              spreadRadius: 2,
+                              color: Colors.grey.withOpacity(0.5))
+                        ]),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 0, vertical: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("N°"),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      ventaData['documentno'] != ''
-                                          ? ventaData['documentno'].toString()
-                                          : ventaData['id'].toString(),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ],
+                              SizedBox(
+                                width: screenMax * 0.5,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 5),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Nombre',
+                                        style: TextStyle(
+                                            fontFamily: 'Poppins Bold',
+                                            fontSize: 18),
+                                      ),
+                                      Text(widget.nameClient.length > 25
+                                          ? widget.nameClient.substring(0, 25)
+                                          : widget.nameClient)
+                                    ],
+                                  ),
                                 ),
                               ),
-                              const Divider(),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Fecha'),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(ventaData['fecha']),
-                                  ],
+                              SizedBox(
+                                width: screenMax * 0.4,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Ruc/DNI',
+                                        style: TextStyle(
+                                            fontFamily: 'Poppins Bold',
+                                            fontSize: 18),
+                                      ),
+                                      Text(widget.rucClient.length > 15
+                                          ? widget.rucClient.substring(0, 15)
+                                          : widget.rucClient),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              const Divider(),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Cliente'),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(widget.nameClient),
-                                  ],
-                                ),
-                              ),
-                              const Divider(),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Descripción'),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(ventaData['descripcion']),
-                                  ],
-                                ),
-                              ),
-                              const Divider(),
                             ],
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                          width: screenMax,
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(
-                                8), // Establece el radio de los bordes
+                        SizedBox(
+                            width: screenMax,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'Detalles',
+                                style: TextStyle(
+                                    fontFamily: 'Poppins Bold', fontSize: 18),
+                                textAlign: TextAlign.start,
+                              ),
+                            )),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Correo: ',
+                                style:
+                                    TextStyle(fontFamily: 'Poppins SemiBold'),
+                              ),
+                              Text(
+                                widget.emailClient == '{@nil: true}'
+                                    ? ''
+                                    : widget.emailClient,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          child: const Text(
-                            'Productos',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          )),
-                      const SizedBox(height: 10),
-                      Container(
-                          width: screenMax,
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(
-                                8), // Establece el radio de los bordes
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Telefono: ',
+                                style:
+                                    TextStyle(fontFamily: 'Poppins SemiBold'),
+                              ),
+                              Text(
+                                widget.phoneClient == '{@nil: true}'
+                                    ? ''
+                                    : widget.phoneClient,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
+                        )
+                      ],
+                    ),
+                  ),
+
+                      SizedBox(height: screenMax * 0.1,),
+                    Container(
+                            width: screenMax ,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
                             child: Padding(
-                              padding: EdgeInsets.only(left: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Name',
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                                  const Text("Orden N°", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
                                   ),
                                   Text(
-                                    'Cantidad',
+                                    ventaData['documentno'] != ''
+                                        ? ventaData['documentno'].toString()
+                                        : ventaData['id'].toString(),
                                     textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    'Precio',
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    'Impuesto',
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                            
                                   ),
                                 ],
                               ),
                             ),
-                          )),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: screenMax,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(
-                              8), // Establece el radio de los bordes
-                        ),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics:
-                              const NeverScrollableScrollPhysics(), // Deshabilita el desplazamiento
+                          ),
 
-                          itemCount: productsData.length,
-                          itemBuilder: (context, index) {
-                            final product = productsData[index];
-                            print('Estos son los productos $product');
-                            return Padding(
-                              padding: const EdgeInsets.all(15.0),
+                             SizedBox(height: screenMax * 0.1,),
+                    Container(
+                            width: screenMax ,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                            child: Text(
-                                          '${product['name']}',
-                                        )),
-                                        const SizedBox(
-                                          width: 50,
-                                        ),
-                                        Expanded(
-                                            child: Text(product['qty_entered']
-                                                .toString())),
-                                        Expanded(
-                                            child: Text(product['price_actual']
-                                                .toString())),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
-                                        Expanded(
-                                            child: Text(
-                                                '${product['impuesto'].toString()}%'))
-                                      ]),
-                                  const Divider(),
+                                  const Text("Fecha", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    ventaData['fecha'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
                                 ],
                               ),
-                            );
-                          },
+                            ),
+                          ),
+                                    SizedBox(height: screenMax * 0.1,),
+                    Container(
+                            width: screenMax ,
+                            height: screenMax * 0.25,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Descripción", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    ventaData['descripcion'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: screenMax * 0.1,),
+                         SizedBox(
+                            width: screenMax,
+                            child: const Text(
+                              "Productos",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'Poppins Bold',
+                                  fontSize: 18),
+                            ),
+                          ),
+                          SizedBox(
+                            height: screenMax * 0.05,
+                          ),
+
+
+                           Container(
+                    width: screenMax,
+                    height: screenMax * 0.5,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2)
+                        ]),
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                             Padding(
+                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                               child: Container(
+                                 width: 400,
+                                 decoration: const BoxDecoration(
+                                   borderRadius: BorderRadius.all(Radius.circular(15)),
+                             
+                                 ),
+                                 child: const Row(
+                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                   children: [
+                                     Text(
+                                       'Nombre',
+                                       style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                     ),
+                                     Text(
+                                       'Cant.',
+                                       style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                     ),
+                                     Text(
+                                       'Precio',
+                                                   style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                                 ),
+                                                 
+                                               ],
+                                             ),
+                                           ),
+                                         ),
+                        
+                            Expanded(
+                              child: ListView.builder(                   
+                                
+                                itemCount: productsData.length,
+                                itemBuilder: (context, index) {
+                                  final product = productsData[index];
+                        
+                                  return Column(children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 0),
+                                      child: SizedBox(
+                                        width: screenMax * 0.95,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                             Image.asset('lib/assets/Check.png'),
+                                             const SizedBox(width: 10 ,),
+                                              SizedBox(
+                                                  width: 50,
+                                                  child: Text(product['name'])),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.14,
+                                              ),
+                                          
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(product['qty_entered']
+                                                    .toString()),
+                                              ),
+                                             
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.20,
+                                              ),
+                                              SizedBox(
+                                                width: screenMax * 0.35,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Flexible(
+                                                        child: Text(
+                                                            '\$${calcularSaldoTotalProducts(product['price_actual'].toString(), product['qty_entered'].toString())}')),
+                                                   
+                                                  ],
+                                                ),
+                                              ),
+                                           
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ]);
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      ],
+                    ),
+                  ),
+                      const SizedBox(height: 10),
+            
                       Container(
                           width: screenMax,
                           decoration: BoxDecoration(
@@ -300,26 +517,15 @@ class _VentasDetailsState extends State<VentasDetails> {
                             padding: const EdgeInsets.all(15.0),
                             child: Column(
                               children: [
+              
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text('Saldo Neto',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
+                                    const Text('Total',
+                                        style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 17)),
                                     Text(
-                                        ' \$ ${ventaData['saldo_neto'].toString()}'),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('Monto',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(
-                                        ' \$ ${ventaData['monto'].toString()}'),
+                                        ' \$ ${ventaData['saldo_total'].toString()}', style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
                                   ],
                                 ),
                               ],
@@ -349,22 +555,22 @@ class _VentasDetailsState extends State<VentasDetails> {
                                           bottonEnable = false;
                                         });
 
-                                        Timer(const Duration(seconds: 3), () {
-                                          setState(() {
-                                            bottonEnable = true;
-                                          });
-                                        });
-
+                                          
                                         dynamic isTrue =
                                             await _updateAndCreateOrders();
 
                                         if (isTrue != false) {
+                                           setState(() {
+                                            bottonEnable = true;
+                                          });
                                           String newValue = 'Enviado';
                                           updateOrdereSalesForStatusSincronzed(
                                               ventaData['id'], newValue);
                                         } else {
                                           String newValue = 'Por Enviar';
-
+                                           setState(() {
+                                            bottonEnable = true;
+                                          });
                                           updateOrdereSalesForStatusSincronzed(
                                               ventaData['id'], newValue);
                                         }
@@ -422,27 +628,32 @@ class _VentasDetailsState extends State<VentasDetails> {
                                             'Por Enviar' &&
                                         bottonEnable == true
                                     ? () async {
-                                        dynamic isTrue =
-                                            await _updateAndCreateOrders();
 
                                         setState(() {
                                           bottonEnable = false;
                                         });
+                                      
+                                        dynamic isTrue =
+                                            await _updateAndCreateOrders();
 
-                                        Timer(const Duration(seconds: 3), () {
-                                          setState(() {
-                                            bottonEnable = true;
-                                          });
-                                        });
+
+                                          
+                                        
 
                                         if (isTrue != false) {
                                           String newValue = 'Enviado';
+                                          setState(() {
+                                            bottonEnable = true;
+                                          });
                                           updateOrdereSalesForStatusSincronzed(
                                               ventaData['id'], newValue);
                                         } else {
                                           String newValue = 'Por Enviar';
                                           updateOrdereSalesForStatusSincronzed(
                                               ventaData['id'], newValue);
+                                           setState(() {
+                                            bottonEnable = true;
+                                          });
                                         }
 
                                         if (mounted) {
