@@ -24,6 +24,8 @@ class _ProductsState extends State<Products> {
   TextEditingController searchController = TextEditingController();
   String input = "";
   bool _isMounted = false;
+  late ScrollController _scrollController;
+  bool _showAddButton = true;
 
   late List<Map<String, dynamic>> taxes =
       []; // Lista para almacenar los impuestos
@@ -41,6 +43,23 @@ class _ProductsState extends State<Products> {
 
   Future<void> _deleteBaseDatos() async {
     await DatabaseHelper.instance.deleteDatabases();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      if (_showAddButton) {
+        setState(() {
+          _showAddButton = false;
+        });
+      }
+    } else {
+      if (!_showAddButton) {
+        setState(() {
+          _showAddButton = true;
+        });
+      }
+    }
   }
 
   void _showFilterOptions(BuildContext context) async {
@@ -65,6 +84,9 @@ class _ProductsState extends State<Products> {
   void initState() {
     _loadProducts();
     _isMounted = true;
+    _scrollController = ScrollController();
+
+    _scrollController.addListener(_scrollListener);
 
     // _deleteBaseDatos();
     super.initState();
@@ -82,6 +104,7 @@ class _ProductsState extends State<Products> {
   @override
   void dispose() {
     _isMounted = false;
+    _scrollController.dispose();
 
     super.dispose();
   }
@@ -227,15 +250,28 @@ class _ProductsState extends State<Products> {
                     height: 25,
                   ),
 
-                  IconButton(
-                    icon: Image.asset(
-                      'lib/assets/filtro@3x.png',
-                      width: 25,
-                      height: 35,
-                    ),
-                    onPressed: () {
-                      _showFilterOptions(context);
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Image.asset(
+                          'lib/assets/filtro@3x.png',
+                          width: 25,
+                          height: 35,
+                        ),
+                        onPressed: () {
+                          _showFilterOptions(context);
+                        },
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            _loadProducts();
+                          },
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: Color(0xFF7531ff),
+                          ))
+                    ],
                   ),
 
                   const SizedBox(
@@ -244,6 +280,7 @@ class _ProductsState extends State<Products> {
 
                   Expanded(
                     child: ListView.builder(
+                      controller: _scrollController,
                       itemCount: filteredProducts.length,
                       itemBuilder: (context, index) {
                         final product = filteredProducts[index];
@@ -452,20 +489,21 @@ class _ProductsState extends State<Products> {
                 ],
               ),
             ),
-            Positioned(
-                top:screenHeight * 0.75,
-                right: screenMax * 0.05,
-                child: GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AddProductForm()),
-                  ),
-                  child: Image.asset(
-                    'lib/assets/Agregar@3x.png',
-                    width: 80,
-                  ),
-                )),
+            if (_showAddButton)
+              Positioned(
+                  top: screenHeight * 0.75,
+                  right: screenMax * 0.05,
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddProductForm()),
+                    ),
+                    child: Image.asset(
+                      'lib/assets/Agregar@3x.png',
+                      width: 80,
+                    ),
+                  )),
           ],
         ),
       ),

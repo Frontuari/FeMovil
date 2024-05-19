@@ -9,23 +9,19 @@ class FilterGroups extends StatefulWidget {
 
   @override
   State<FilterGroups> createState() => _FilterGroupsState();
-  
 }
 
-
-
 class _FilterGroupsState extends State<FilterGroups> {
-  
-  String? sgrupo; 
- // Ahora scategory es un miembro de la clase State
+  String? sgrupo;
+  // Ahora scategory es un miembro de la clase State
   @override
   Widget build(BuildContext context) {
     print("Products ${widget.clients}");
-         List<String> clients = widget.clients
-        .map<String>((clients) => clients['group_bp_name'] as String) 
+    List<String> clients = widget.clients
+        .map<String>((clients) => clients['group_bp_name'] as String)
         .toSet() // Elimina duplicados
         .toList(); //
-        clients.insert(0, "Todos");
+    clients.insert(0, "Todos");
 
     return AlertDialog(
       title: const Text('Filtrar por Grupo'),
@@ -36,17 +32,20 @@ class _FilterGroupsState extends State<FilterGroups> {
           // Lista desplegable para mostrar las categorías disponibles
           DropdownButtonFormField<String>(
             decoration: const InputDecoration(labelText: 'Grupo'),
-            value:sgrupo, // Valor inicial vacío
+            value: sgrupo, // Valor inicial vacío
             onChanged: (selectedGrupo) {
               // Aquí puedes manejar la selección de la categoría
               // Puedes actualizar el estado del diálogo y almacenar la categoría seleccionada
               sgrupo = selectedGrupo;
-              print("categoria seleccionada $selectedGrupo" );
+              print("categoria seleccionada $selectedGrupo");
             },
-            items: clients.map((category) {
+            items: clients.map((group) {
               return DropdownMenuItem<String>(
-                value: category,
-                child: Text(category),
+                value: group,
+                child: Text(
+                  group,
+                  style: const TextStyle(fontFamily: 'Poppins Regular'),
+                ),
               );
             }).toList(),
           ),
@@ -60,14 +59,21 @@ class _FilterGroupsState extends State<FilterGroups> {
             // Por ejemplo, puedes enviar la categoría seleccionada de vuelta a la pantalla principal para que se aplique el filtro
             Navigator.of(context).pop(sgrupo);
           },
-          child: const Text('Filtrar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Color(0xFF7531FF)),),
+          child: const Text(
+            'Filtrar',
+            style: TextStyle(
+                fontFamily: 'Poppins SemiBold', color: Color(0xFF7531FF)),
+          ),
         ),
         TextButton(
           onPressed: () {
             // Aquí puedes implementar la lógica para cerrar el diálogo sin aplicar el filtro
             Navigator.of(context).pop();
           },
-          child: const Text('Cancelar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),),
+          child: const Text(
+            'Cancelar',
+            style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),
+          ),
         ),
       ],
     );

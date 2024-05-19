@@ -16,6 +16,8 @@ class Clients extends StatefulWidget {
 
 class _ClientsState extends State<Clients> {
   String _filter = "";
+  late ScrollController _scrollController;
+  bool _showAddButton = true;
   late List<Map<String, dynamic>> clients = [];
   List<Map<String, dynamic>> searchClient = [];
   TextEditingController searchController = TextEditingController();
@@ -32,6 +34,23 @@ class _ClientsState extends State<Clients> {
       clients = clientes;
       searchClient = clientes;
     });
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      if (_showAddButton) {
+        setState(() {
+          _showAddButton = false;
+        });
+      }
+    } else {
+      if (!_showAddButton) {
+        setState(() {
+          _showAddButton = true;
+        });
+      }
+    }
   }
 
   void _showFilterOptions(BuildContext context) async {
@@ -57,6 +76,10 @@ class _ClientsState extends State<Clients> {
     // print("Esto es la variable global ${variablesG[0]['m_pricelist_id']}");
     _isMounted = true;
     _loadClients();
+    _scrollController = ScrollController();
+
+    _scrollController.addListener(_scrollListener);
+
     super.initState();
   }
 
@@ -205,21 +228,35 @@ class _ClientsState extends State<Clients> {
                   const SizedBox(
                     height: 25,
                   ),
-                  IconButton(
-                    icon: Image.asset(
-                      'lib/assets/filtro@3x.png',
-                      width: 25,
-                      height: 35,
-                    ),
-                    onPressed: () {
-                      _showFilterOptions(context);
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Image.asset(
+                          'lib/assets/filtro@3x.png',
+                          width: 25,
+                          height: 35,
+                        ),
+                        onPressed: () {
+                          _showFilterOptions(context);
+                        },
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            _loadClients();
+                          },
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: Color(0xff7531ff),
+                          ))
+                    ],
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   Expanded(
                     child: ListView.builder(
+                      controller: _scrollController,
                       itemCount: searchClient.length,
                       itemBuilder: (context, index) {
                         final client = searchClient[index];
@@ -430,20 +467,21 @@ class _ClientsState extends State<Clients> {
                 ],
               ),
             ),
-            Positioned(
-                top:screenHight * 0.75,
-                right: screenMax * 0.05,
-                child: GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AddClientsForm()),
-                  ),
-                  child: Image.asset(
-                    'lib/assets/Agregar@3x.png',
-                    width: 80,
-                  ),
-                )),
+            if (_showAddButton)
+              Positioned(
+                  top: screenHight * 0.75,
+                  right: screenMax * 0.05,
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddClientsForm()),
+                    ),
+                    child: Image.asset(
+                      'lib/assets/Agregar@3x.png',
+                      width: 80,
+                    ),
+                  )),
           ],
         ),
       ),
