@@ -1,16 +1,19 @@
 import 'dart:async';
 
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/update_database.dart';
-import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/compras/idempiere/create_order_purchase.dart';
-import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ComprasDetails extends StatefulWidget {
   final int compraId;
   final String nameProveedor;
-  const ComprasDetails({super.key, required this.compraId, required this.nameProveedor});
+  final String rucProveedor;
+  final String phoneProveedor;
+  final String emailProveedor;
+  const ComprasDetails({super.key, required this.compraId, required this.nameProveedor, required this.rucProveedor, required this.phoneProveedor, required this.emailProveedor });
 
   @override
   State<ComprasDetails> createState() => _ComprasDetailsState();
@@ -56,6 +59,44 @@ class _ComprasDetailsState extends State<ComprasDetails> {
   }
 
 
+  String calcularSaldoTotalProducts(dynamic price, dynamic quantity) {
+
+      print('Este es el precio $price');
+
+    double prices;
+    double quantitys;
+
+      final formatter = NumberFormat('#,##0.00', 'es_ES');
+
+
+    // Verificar si quantity es un String
+    if (quantity is String || price is String) {
+      // Intentar convertir el String a un número
+      try {
+        quantitys = double.parse(quantity).toDouble();
+        prices = double.parse(price).toDouble();
+      } catch (e) {
+        print('Error al convertir quantity a double: $e');
+        // Si hay un error, establecer quantitys como 0
+        prices = 0.0;
+        quantitys = 0.0;
+      }
+    } else {
+      // Si quantity no es un String, asumir que es numérico
+      quantitys = quantity.toDouble();
+      prices = price.toDouble();
+    }
+    double sum = prices * quantitys;
+
+    String numParsedFormatter = formatter.format(sum); 
+
+    print('price $price & quantity is $quantity');
+    print('Suma es $sum');
+    return numParsedFormatter;
+  }
+
+
+
    _loadOrdenesConLineas() async {
 
      dynamic response = await obtenerOrdenDeCompraConLineasPorId(widget.compraId);
@@ -81,19 +122,12 @@ class _ComprasDetailsState extends State<ComprasDetails> {
   @override
   Widget build(BuildContext context) {
             final screenMax = MediaQuery.of(context).size.width * 0.8;
+            final heightScreen = MediaQuery.of(context).size.height * 0.9;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-      appBar: AppBar(
-        title: const Text('Orden de Compra', style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            color: Color.fromARGB(255, 105, 102, 102),
-          ),),
-      backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-                iconTheme: const IconThemeData(color: Color.fromARGB(255, 105, 102, 102)),
-
-      ),
+      appBar:const PreferredSize(
+          preferredSize: Size.fromHeight(50),
+        child:  AppBarSample(label: 'Orden de Compra')),
       body: Align(
         alignment: Alignment.topCenter,
         child: FutureBuilder(
@@ -115,202 +149,417 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
- 
+                      
+                      SizedBox(height: heightScreen * 0.015,),
+
                       Container(
                         width: screenMax ,
                         decoration: BoxDecoration(
-                          color: Colors.blue,
                           borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
                         ),
-                        child: const Text('Datos Del Cliente', style:  TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                        child: const Text('Datos Del Cliente', style:  TextStyle(fontFamily: 'Poppins Bold', fontSize: 18), textAlign: TextAlign.start,),
                       ),
-                        const SizedBox(height: 10,),
-                       Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        width: screenMax ,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start, // Alinea el texto hacia la izquierda  
+
+                      SizedBox(height: heightScreen * 0.05,),
+
+                         Container(
+                    width: screenMax,
+                    height: screenMax * 0.7,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 7,
+                              spreadRadius: 2,
+                              color: Colors.grey.withOpacity(0.5))
+                        ]),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 0, vertical: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                     children: [
-                                      const Text("N°"),
-                                      const SizedBox(height: 5,),
-                                       Text( compraData['documentno']  != '' ? compraData['documentno'].toString(): compraData['id'].toString(), textAlign: TextAlign.start,),
-                                     ],
-                                   ),
-                                 ),
-                                 const Divider(),
-                  
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                     children: [
-                                      const Text('Fecha'),
-                                      const SizedBox(height: 5,),
-                                       Text(compraData['fecha']),
-                                     ],
-                                   ),
-                                 ),
-                                 const Divider(),
-                  
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                              SizedBox(
+                                width: screenMax * 0.5,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 5),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                        const Text('Proveedor'),
-                                        const SizedBox(height: 5,),
-                                        Text(widget.nameProveedor),
-                                   
+                                      const Text(
+                                        'Nombre',
+                                        style: TextStyle(
+                                            fontFamily: 'Poppins Bold',
+                                            fontSize: 18),
+                                      ),
+                                      Text(widget.nameProveedor.length > 25
+                                          ? widget.nameProveedor.substring(0, 25)
+                                          : widget.nameProveedor)
                                     ],
-                                   ),
-                                 ), 
-                                 const Divider(),
-                          
-                        
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                     children: [
-                                       const Text('Descripción'),
-                                       const SizedBox(height: 5,),
-                                       Text(compraData['description']),
-                                     ],
-                                   ),
-                                 ),
-        
-                                 const Divider(),
-
-                            
-                          
-                          ],),
-                        ) ,
-                      ),
-                  
-                     
-                      const SizedBox(height: 10),
-                      Container(
-                        width: screenMax,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        child: const Text('Productos', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
-                       const SizedBox(height: 10),
-        
-                        Container(
-                        width: screenMax,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Name', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                Text('Cantidad', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                Text('Precio', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                Text('Impuesto', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-
-                              ],
-                            ),
-                          ),
-                        )),
-                               const SizedBox(height: 10),
-
-                      Container(
-                        width: screenMax,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        child: ListView.builder(
-                          
-                          shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(), // Deshabilita el desplazamiento
-
-                          itemCount: productsData.length,
-                          itemBuilder: (context, index) {
-                            final product = productsData[index];
-                            print('Estos son los productos $product');
-                            return Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                        Expanded(child: Text('${product['name']}',)),
-                                        const SizedBox(width: 50,),
-                                        Expanded(child: Text(product['qty_entered'].toString())),
-                                        Expanded(child: Text(product['price_actual'].toString())),
-                                        const SizedBox(width: 15,),
-                                        Expanded(child: Text('${product['impuesto'].toString()}%'))
-                                        
-                                    ] 
-                                                         
                                   ),
-                                 const Divider(),
+                                ),
+                              ),
+                              SizedBox(
+                                width: screenMax * 0.4,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Ruc/DNI',
+                                        style: TextStyle(
+                                            fontFamily: 'Poppins Bold',
+                                            fontSize: 18),
+                                      ),
+                                      Text(widget.rucProveedor.length > 15
+                                          ? widget.rucProveedor.substring(0, 15)
+                                          : widget.rucProveedor),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                            width: screenMax,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'Detalles',
+                                style: TextStyle(
+                                    fontFamily: 'Poppins Bold', fontSize: 18),
+                                textAlign: TextAlign.start,
+                              ),
+                            )),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Correo: ',
+                                style:
+                                    TextStyle(fontFamily: 'Poppins SemiBold'),
+                              ),
+                              Text(
+                                widget.emailProveedor == '{@nil: true}'
+                                    ? ''
+                                    : widget.emailProveedor,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Telefono: ',
+                                style:
+                                    TextStyle(fontFamily: 'Poppins SemiBold'),
+                              ),
+                              Text(
+                                widget.phoneProveedor == '{@nil: true}'
+                                    ? ''
+                                    : widget.phoneProveedor,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
 
+                                        SizedBox(height: heightScreen * 0.05,),
+              
+                    Container(
+                            width: screenMax ,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Orden N°", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    compraData['documentno'] != ''
+                                        ? compraData['documentno'].toString()
+                                        : compraData['id'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
                                 ],
                               ),
-                              
-                            );
-                            
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10,),
-                    Container(
-                      width: screenMax,
-                     decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Saldo Neto', style: TextStyle(fontWeight: FontWeight.bold)),
-                                
-                                Text(' \$ ${compraData['saldo_neto'].toString()}'),
-                              ],
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Monto', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+
+                          SizedBox(height: heightScreen * 0.025,),
+
+                           Container(
+                            width: screenMax ,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Fecha", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    compraData['fecha'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                           SizedBox(height: heightScreen * 0.025,),
+                                          Container(
+                            width: screenMax ,
+                            height: screenMax * 0.25,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Descripción", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    compraData['description'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                               SizedBox(height: heightScreen * 0.025,),
+                          SizedBox(
+                            width: screenMax,
+                            child: const Text(
+                              "Productos",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'Poppins Bold',
+                                  fontSize: 18),
+                            ),
+                          ),
+                            SizedBox(height: heightScreen * 0.025,),
+                        Container(
+                    width: screenMax,
+                    height: screenMax * 0.5,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2)
+                        ]),
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                             Padding(
+                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                               child: Container(
+                                 width: 400,
+                                 decoration: const BoxDecoration(
+                                   borderRadius: BorderRadius.all(Radius.circular(15)),
+                             
+                                 ),
+                                 child: const Row(
+                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                   children: [
+                                     Text(
+                                       'Nombre',
+                                       style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                     ),
+                                     Text(
+                                       'Cant.',
+                                       style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                     ),
+                                     Text(
+                                       'Precio',
+                                                   style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                                 ),
+                                                 
+                                               ],
+                                             ),
+                                           ),
+                                         ),
+                        
+                            Expanded(
+                              child: ListView.builder(                   
                                 
-                                Text(' \$ ${compraData['monto'].toString()}'),
-                              ],
+                                itemCount: productsData.length,
+                                itemBuilder: (context, index) {
+                                  final product = productsData[index];
+                        
+                                  return Column(children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 0),
+                                      child: SizedBox(
+                                        width: screenMax * 0.95,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                             Image.asset('lib/assets/Check.png'),
+                                             const SizedBox(width: 10 ,),
+                                              SizedBox(
+                                                  width: 50,
+                                                  child: Text(product['name'])),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.14,
+                                              ),
+                                          
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(product['qty_entered']
+                                                    .toString()),
+                                              ),
+                                             
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.20,
+                                              ),
+                                              SizedBox(
+                                                width: screenMax * 0.35,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Flexible(
+                                                        child: Text(
+                                                            '\$${calcularSaldoTotalProducts(product['price_actual'].toString(), product['qty_entered'].toString())}')),
+                                                   
+                                                  ],
+                                                ),
+                                              ),
+                                           
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ]);
+                                },
+                              ),
                             ),
                           ],
                         ),
-                      )),
+                      ],
+                    ),
+                  ),
+                  
+                     
+                    
+                  
+                
+                      const SizedBox(height: 10,),
+                    
+                      Container(
+                          width: screenMax,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                8), // Establece el radio de los bordes
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(
+                              children: [
+              
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Total',
+                                        style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 17)),
+                                    Text(
+                                        ' \$ ${compraData['monto'].toString()}', style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )),
     
                 const SizedBox(height: 15,),
                  compraData['status_sincronized'] == 'Borrador' ?  Container(
                   width: screenMax,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: compraData['status_sincronized'] == 'Borrador' && bottonEnable == true ? Colors.green:Colors.grey, // Color verde para el fondo del botón
+                    color: compraData['status_sincronized'] == 'Borrador' && bottonEnable == true ? const Color(0xFF7531FF):Colors.grey, // Color verde para el fondo del botón
                   ),
                   child: ElevatedButton(
                     onPressed:compraData['status_sincronized'] == 'Borrador' && bottonEnable == true ? ()  async{
@@ -353,8 +602,8 @@ class _ComprasDetailsState extends State<ComprasDetails> {
 
                     }: null,
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      backgroundColor: WidgetStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -366,7 +615,7 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                         'Comp y Enviar',
                         style: TextStyle(
                           color: Colors.white, // Texto blanco para que se destaque sobre el fondo verde
-                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins Bold'
                         ),
                       ),
                     ),
@@ -377,7 +626,7 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                   width: screenMax,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color:  compraData['status_sincronized'] == 'Por Enviar'  ? Colors.green:Colors.grey, // Color verde para el fondo del botón
+                    color:  compraData['status_sincronized'] == 'Por Enviar'  ? const Color(0xFF7531FF):Colors.grey, // Color verde para el fondo del botón
                   ),
                   child: ElevatedButton(
                     onPressed: compraData['status_sincronized'] == 'Por Enviar'  ? () async {
@@ -420,8 +669,8 @@ class _ComprasDetailsState extends State<ComprasDetails> {
 
                     }: null,
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      backgroundColor: WidgetStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -433,7 +682,7 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                         'Enviar',
                         style: TextStyle(
                           color: Colors.white, // Texto blanco para que se destaque sobre el fondo verde
-                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins Bold'
                         ),
                       ),
                     ),

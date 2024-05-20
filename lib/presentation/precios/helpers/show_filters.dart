@@ -38,7 +38,7 @@ import 'package:flutter/material.dart';
             child:  Row(
               children: [
                 Image.asset('lib/assets/Check@3x.png', width: 25,
-                  color: colorPrimary,
+                  color: const Color(0xFF7531FF),
                 ),
                 SizedBox(width: MediaQuery.of(context).size.width *0.02,),
                 const Text('Filtrar por mayor precio', style: TextStyle(fontFamily: 'Poppins Regular',),),
@@ -58,7 +58,7 @@ import 'package:flutter/material.dart';
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Image.asset('lib/assets/Check@3x.png', width: 25, color: colorPrimary,),
+                Image.asset('lib/assets/Check@3x.png', width: 25, color: const Color(0xFF7531FF),),
                 SizedBox(width: MediaQuery.of(context).size.width *0.02,),
                 const Text('Filtrar por menor precio', style: TextStyle(fontFamily: 'Poppins Regular') ,),
               ],
@@ -76,7 +76,7 @@ import 'package:flutter/material.dart';
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Image.asset('lib/assets/Check@3x.png', width: 25,color: colorPrimary,),
+                Image.asset('lib/assets/Check@3x.png', width: 25,color: const Color(0xFF7531FF),),
                 SizedBox(width: MediaQuery.of(context).size.width *0.02,),
                 const Text('Ordenar por mas el vendido', style: TextStyle(fontFamily: 'Poppins Regular'),),
               ],

@@ -18,7 +18,7 @@ import 'package:intl/intl.dart';
 
 class Cobro extends StatefulWidget {
   final int orderId;
-  final double saldoTotal;
+  final dynamic saldoTotal;
   final Function loadCobranzas;
   final dynamic cOrderId; 
   final dynamic documentNo;
@@ -58,7 +58,19 @@ class _CobroState extends State<Cobro> {
 
 List<Map<String, dynamic>> uniqueISOsAndCurrencyId = [];
 
-
+ double parseFormattedNumber(dynamic formattedNumber) {
+    if (formattedNumber is String) {
+      // Eliminar puntos (separador de miles) y cambiar comas a puntos (separador decimal)
+      String cleanedNumber = formattedNumber.replaceAll('.', '').replaceAll(',', '.');
+      return double.parse(cleanedNumber.replaceAll('\$', '')); // Elimina el signo de moneda si está presente
+    } else if (formattedNumber is int) {
+      return formattedNumber.toDouble();
+    } else if (formattedNumber is double) {
+      return formattedNumber;
+    } else {
+      throw ArgumentError('Tipo no soportado para el saldo total');
+    }
+  }
 
 void _loadCurrentDate() {
   final now = DateTime.now();
@@ -449,7 +461,10 @@ void initState() {
   final int saleOrderId = widget.orderId;
 
   // Obtener el saldo total de la orden
-  final double saldoTotal = widget.saldoTotal;
+
+  double numberFormmated = parseFormattedNumber(widget.saldoTotal);
+
+  final double saldoTotal = numberFormmated.toDouble();
 
   print('esto es el saldototal $saldoTotal');
 
@@ -472,6 +487,27 @@ void initState() {
         );
       },
     );
+  } else if (payAmt <= 0) {
+
+       showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: const Text('El cobro no puede ser menor o igual a 0.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+      
+
   } else {
     // Si el monto del cobro es menor o igual al saldo total, insertar el cobro en la base de datos
 

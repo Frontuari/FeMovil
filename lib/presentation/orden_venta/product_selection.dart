@@ -150,7 +150,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                                   boxShadow: [
                                     BoxShadow(
                                       color: isSelected
-                                          ? colorTheme.withOpacity(0.5)
+                                          ? const Color(0xff7531FF).withOpacity(0.5)
                                           : Colors.grey.withOpacity(0.5),
                                       spreadRadius: 2,
                                       blurRadius: 7,

@@ -153,374 +153,379 @@ class _ProductsState extends State<Products> {
     final screenMax = MediaQuery.of(context).size.width * 0.8;
     final screenHeight = MediaQuery.of(context).size.height * 0.8;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(170),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            const AppBars(
-              labelText: 'Productos',
-            ),
-            Positioned(
-              left: 16,
-              right: 16,
-              top: 160,
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  width: 300,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                        9.0), // Ajusta el radio de las esquinas
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            Colors.grey.withOpacity(0.2), // Color de la sombra
-                        spreadRadius: 2, // Extensión de la sombra
-                        blurRadius: 3, // Difuminado de la sombra
-                        offset:
-                            const Offset(0, 2), // Desplazamiento de la sombra
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      if (searchController.text.isNotEmpty) {
+    return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(170),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const AppBars(
+                labelText: 'Productos',
+              ),
+              Positioned(
+                left: 16,
+                right: 16,
+                top: 160,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    width: 300,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                          9.0), // Ajusta el radio de las esquinas
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Colors.grey.withOpacity(0.2), // Color de la sombra
+                          spreadRadius: 2, // Extensión de la sombra
+                          blurRadius: 3, // Difuminado de la sombra
+                          offset:
+                              const Offset(0, 2), // Desplazamiento de la sombra
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        if (searchController.text.isNotEmpty) {
+                          setState(() {
+                            _filter = "";
+                          });
+                        }
+      
                         setState(() {
-                          _filter = "";
+                          input = value;
+                          filteredProducts = products
+                              .where((product) => product['name']
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase()))
+                              .toList();
                         });
-                      }
-
-                      setState(() {
-                        input = value;
-                        filteredProducts = products
-                            .where((product) => product['name']
-                                .toLowerCase()
-                                .contains(value.toLowerCase()))
-                            .toList();
-                      });
-                    },
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 3.0, horizontal: 20.0),
-                      hintText: 'Nombre del producto',
-                      labelStyle: const TextStyle(
-                          color: Colors.black, fontFamily: 'Poppins Regular'),
-                      suffixIcon: Image.asset('lib/assets/Lupa.png'),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
+                      },
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 3.0, horizontal: 20.0),
+                        hintText: 'Nombre del producto',
+                        labelStyle: const TextStyle(
+                            color: Colors.black, fontFamily: 'Poppins Regular'),
+                        suffixIcon: Image.asset('lib/assets/Lupa.png'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-
-      body: GestureDetector(
-        onTap: () {
-          // Cierra el teclado tocando en cualquier parte del Stack
-          FocusScope.of(context).unfocus();
-        },
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () {
-                  // Cierra el teclado tocando en cualquier parte del Stack
-                  FocusScope.of(context).unfocus();
-                },
+      
+        body: GestureDetector(
+          onTap: () {
+            // Cierra el teclado tocando en cualquier parte del Stack
+            FocusScope.of(context).unfocus();
+          },
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () {
+                    // Cierra el teclado tocando en cualquier parte del Stack
+                    FocusScope.of(context).unfocus();
+                  },
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 25,
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: Image.asset(
-                          'lib/assets/filtro@3x.png',
-                          width: 25,
-                          height: 35,
-                        ),
-                        onPressed: () {
-                          _showFilterOptions(context);
-                        },
-                      ),
-                      IconButton(
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 25,
+                    ),
+      
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Image.asset(
+                            'lib/assets/filtro@3x.png',
+                            width: 25,
+                            height: 35,
+                          ),
                           onPressed: () {
-                            _loadProducts();
+                            _showFilterOptions(context);
                           },
-                          icon: const Icon(
-                            Icons.refresh,
-                            color: Color(0xFF7531ff),
-                          ))
-                    ],
-                  ),
-
-                  const SizedBox(
-                    height: 10,
-                  ),
-
-                  Expanded(
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: filteredProducts.length,
-                      itemBuilder: (context, index) {
-                        final product = filteredProducts[index];
-
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: screenMax,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: 130,
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            255, 255, 255, 255),
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              _loadProducts();
+                            },
+                            icon: const Icon(
+                              Icons.refresh,
+                              color: Color(0xFF7531ff),
+                            ))
+                      ],
+                    ),
+      
+                    const SizedBox(
+                      height: 10,
+                    ),
+      
+                    Expanded(
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: filteredProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = filteredProducts[index];
+      
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: screenMax,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
                                       ),
-                                      child: Stack(
-                                        children: [
-                                          Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: Container(
-                                              height: 50,
-                                              width: screenMax,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFF0EBFC),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.grey
-                                                        .withOpacity(0.2),
-                                                    spreadRadius: 2,
-                                                    blurRadius: 5,
-                                                    offset: const Offset(0, 3),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(15.0),
-                                                child: Text(
-                                                  product['categoria'],
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: 'Poppins Bold',
-                                                    fontSize: 18,
-                                                    color: Colors.black,
-                                                  ),
-                                                  textAlign: TextAlign.start,
-                                                ),
-                                              ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 130,
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 5,
+                                              offset: const Offset(0, 3),
                                             ),
-                                          ),
-                                          Positioned(
-                                            top: 55,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: SizedBox(
-                                                width: screenMax * 0.9,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Nombre: ',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Poppins SemiBold'),
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenMax *
-                                                                        0.45,
-                                                                child: Text(
-                                                                  '${product['name']}',
-                                                                  style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins Regular'),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Stock: ',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Poppins SemiBold'),
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenMax *
-                                                                        0.45,
-                                                                child: Text(
-                                                                  '${product['quantity'] is int ? product['quantity'] : 0}',
-                                                                  style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins Regular'),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                )),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Precio: ',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Poppins SemiBold'),
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenMax *
-                                                                        0.45,
-                                                                child: Text(
-                                                                  '${product['price'] is double ? product['price'] : 0}\$',
-                                                                  style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins Regular'),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                      ],
+                                          ],
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                height: 50,
+                                                width: screenMax,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFF0EBFC),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.2),
+                                                      spreadRadius: 2,
+                                                      blurRadius: 5,
+                                                      offset: const Offset(0, 3),
                                                     ),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        _verMasProducto(
-                                                            '${product['id']}');
-                                                      },
-                                                      child: Row(
-                                                        children: [
-                                                          const Text('Ver',
-                                                              style: TextStyle(
-                                                                  color: Color(
-                                                                      0xFF7531FF))),
-                                                          const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          Image.asset(
-                                                              'lib/assets/Lupa-2@2x.png',
-                                                              width: 25),
-                                                        ],
-                                                      ),
-                                                    )
                                                   ],
                                                 ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(15.0),
+                                                  child: Text(
+                                                    product['categoria'],
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily: 'Poppins Bold',
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                    textAlign: TextAlign.start,
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            Positioned(
+                                              top: 55,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: SizedBox(
+                                                  width: screenMax * 0.9,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Nombre: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
+                                                                  child: Text(
+                                                                    '${product['name']}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Stock: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
+                                                                  child: Text(
+                                                                    '${product['quantity'] is int ? product['quantity'] : 0}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  )),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Precio: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
+                                                                  child: Text(
+                                                                    '${product['price'] is double ? product['price'] : 0}\$',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _verMasProducto(
+                                                              '${product['id']}');
+                                                        },
+                                                        child: Row(
+                                                          children: [
+                                                            const Text('Ver',
+                                                                style: TextStyle(
+                                                                    color: Color(
+                                                                        0xFF7531FF))),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Image.asset(
+                                                                'lib/assets/Lupa-2@2x.png',
+                                                                width: 25),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  //esto para abajo es el navbar bottom
-                ],
+                    //esto para abajo es el navbar bottom
+                  ],
+                ),
               ),
-            ),
-            if (_showAddButton)
-              Positioned(
-                  top: screenHeight * 0.75,
-                  right: screenMax * 0.05,
-                  child: GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AddProductForm()),
-                    ),
-                    child: Image.asset(
-                      'lib/assets/Agregar@3x.png',
-                      width: 80,
-                    ),
-                  )),
-          ],
+              if (_showAddButton)
+                Positioned(
+                    top: screenHeight * 0.75,
+                    right: screenMax * 0.05,
+                    child: GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddProductForm()),
+                      ),
+                      child: Image.asset(
+                        'lib/assets/Agregar@3x.png',
+                        width: 80,
+                      ),
+                    )),
+            ],
+          ),
         ),
+        // bottomNavigationBar: CustomBottomNavigationBar(
+        //   onAddPressed: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => const AddProductForm()),
+        //     );
+        //   },
+        //   onRefreshPressed: () {
+        //     _loadProducts();
+        //   },
+        //   onBackPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
       ),
-      // bottomNavigationBar: CustomBottomNavigationBar(
-      //   onAddPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => const AddProductForm()),
-      //     );
-      //   },
-      //   onRefreshPressed: () {
-      //     _loadProducts();
-      //   },
-      //   onBackPressed: () {
-      //     Navigator.pop(context);
-      //   },
-      // ),
     );
   }
 

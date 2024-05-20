@@ -1,4 +1,5 @@
  import 'package:femovil/database/create_database.dart';
+import 'package:intl/intl.dart';
 
 Future<List<Map<String, dynamic>>> getProductsAndTaxes() async {
       final db = await DatabaseHelper.instance.database;
@@ -113,7 +114,23 @@ Future<List<Map<String, dynamic>>> getProducts() async {
         FROM orden_venta o
         INNER JOIN clients c ON o.cliente_id = c.id
       ''');
-      return orders;
+
+        // Formateador para el saldo total
+
+        final formatter = NumberFormat('#,##0.00', 'es_ES');
+
+         List<Map<String, dynamic>> ordersNew = orders.map((row) {
+    // Crear una copia modificable de cada fila
+            final Map<String, dynamic> newRow = Map<String, dynamic>.from(row);
+
+            // Formatear el saldo total
+            num saldoTotal = newRow['saldo_total'];
+            newRow['saldo_total_formatted'] = formatter.format(saldoTotal);
+
+            return newRow;
+          }).toList();
+
+      return ordersNew;
     } else {
       // Manejar el caso en el que db sea null
       print('Error: db is null');
@@ -126,7 +143,7 @@ Future<List<Map<String, dynamic>>> getProducts() async {
     if (db != null) {
       // Consultar todas las órdenes de venta con el nombre del cliente asociado
       List<Map<String, dynamic>> orders = await db.rawQuery('''
-        SELECT o.*, p.bpname AS nombre_proveedor, p.tax_id as ruc
+        SELECT o.*, p.bpname AS nombre_proveedor, p.tax_id as ruc, p.phone as phone, p.email as email
         FROM orden_compra o
         INNER JOIN providers p ON o.proveedor_id = p.id
       ''');
@@ -148,16 +165,34 @@ Future<List<Map<String, dynamic>>> getProducts() async {
        String sql = '''
           SELECT 
             o.*, 
-            (o.monto - COALESCE((SELECT SUM(pay_amt) FROM cobros WHERE sale_order_id = o.id), 0)) AS saldo_total
+          ROUND(
+          (CAST(REPLACE(o.monto, ',', '.') AS REAL) - COALESCE((SELECT SUM(pay_amt) FROM cobros WHERE sale_order_id = o.id), 0)),2) AS saldo_total
+
           FROM 
             orden_venta o
           WHERE 
             o.id = ?
         ''';
 
+
        List<Map<String, dynamic>> orderResult = await db.rawQuery(sql, [orderId]);
 
+         final formatter = NumberFormat('#,##0.00', 'es_ES');
+  
+      List<Map<String, dynamic>> ordersNew = orderResult.map((row) {
+          // Crear una copia modificable de cada fila
+          final Map<String, dynamic> newRow = Map<String, dynamic>.from(row);
 
+          // Asegurarse de que saldo_total sea de tipo double
+          double saldoTotal = (newRow['saldo_total'] is int)
+              ? (newRow['saldo_total'] as int).toDouble()
+              : newRow['saldo_total'];
+
+          // Formatear el saldo total
+          newRow['saldo_total_formatted'] = formatter.format(saldoTotal);
+
+          return newRow;
+        }).toList();
 
 
 
@@ -186,7 +221,7 @@ Future<List<Map<String, dynamic>>> getProducts() async {
         // Crear un mapa que contenga la orden de venta y sus productos
         Map<String, dynamic> orderWithProducts = {
           'client': clientsResult,
-          'order': orderResult.first, // La primera (y única) fila de la consulta de la orden de venta
+          'order': ordersNew.first, // La primera (y única) fila de la consulta de la orden de venta
           'products': productsResult, // Resultado de la consulta de productos asociados
         };
 

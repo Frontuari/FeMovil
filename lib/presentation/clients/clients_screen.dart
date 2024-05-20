@@ -141,85 +141,78 @@ class _ClientsState extends State<Clients> {
     final screenMax = MediaQuery.of(context).size.width * 0.8;
     final screenHight = MediaQuery.of(context).size.height * 0.8;
 
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(170),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            const AppBars(labelText: 'Clientes'),
-            Positioned(
-              left: 16,
-              right: 16,
-              top: 160,
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  width: 300,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                        9.0), // Ajusta el radio de las esquinas
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            Colors.grey.withOpacity(0.2), // Color de la sombra
-                        spreadRadius: 2, // Extensión de la sombra
-                        blurRadius: 3, // Difuminado de la sombra
-                        offset:
-                            const Offset(0, 2), // Desplazamiento de la sombra
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      if (searchController.text.isNotEmpty) {
+    return GestureDetector(
+      onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(170),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const AppBars(labelText: 'Clientes'),
+              Positioned(
+                left: 16,
+                right: 16,
+                top: 160,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    width: 300,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                          9.0), // Ajusta el radio de las esquinas
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Colors.grey.withOpacity(0.2), // Color de la sombra
+                          spreadRadius: 2, // Extensión de la sombra
+                          blurRadius: 3, // Difuminado de la sombra
+                          offset:
+                              const Offset(0, 2), // Desplazamiento de la sombra
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        if (searchController.text.isNotEmpty) {
+                          setState(() {
+                            _filter = "";
+                          });
+                        }
+      
                         setState(() {
-                          _filter = "";
+                          input = value;
+                          filteredClients = clients;
                         });
-                      }
-
-                      setState(() {
-                        input = value;
-                        filteredClients = clients;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 3.0, horizontal: 20.0),
-                      hintText: 'Nombre del Cliente o RUC',
-                      labelStyle: const TextStyle(
-                          color: Colors.black, fontFamily: 'Poppins Regular'),
-                      suffixIcon: Image.asset('lib/assets/Lupa.png'),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
+                      },
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 3.0, horizontal: 20.0),
+                        hintText: 'Nombre del Cliente o RUC',
+                        labelStyle: const TextStyle(
+                            color: Colors.black, fontFamily: 'Poppins Regular'),
+                        suffixIcon: Image.asset('lib/assets/Lupa.png'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Stack(
+        body: Stack(
           children: [
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () {
-                  // Cierra el teclado tocando en cualquier parte del Stack
-                  FocusScope.of(context).unfocus();
-                },
-              ),
-            ),
+         
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -260,7 +253,7 @@ class _ClientsState extends State<Clients> {
                       itemCount: searchClient.length,
                       itemBuilder: (context, index) {
                         final client = searchClient[index];
-
+        
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(

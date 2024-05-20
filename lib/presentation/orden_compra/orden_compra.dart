@@ -46,7 +46,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
   TextEditingController saldoNetoController = TextEditingController();
   TextEditingController fechaIdempiereController = TextEditingController();
   TextEditingController priceController = TextEditingController();
-
+  
   List<Map<String, dynamic>> selectedProducts = [];
   DateTime selectedDate = DateTime.now();
   double? saldoNeto;
@@ -72,33 +72,33 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
     return montoImpuesto;
   }
 
-  double calcularMontoTotal() {
-    double total = 0;
-    double totalNeto = 0;
-    double suma = 0;
+dynamic calcularMontoTotal() {
+  double total = 0;
+  double totalNeto = 0;
+  double suma = 0;
 
-    for (var product in selectedProducts) {
-      double price =
-          double.tryParse(product['price'].toString().replaceAll(',', '.')) ??
-              0;
-      double quantity = double.tryParse(
-              product['quantity'].toString().replaceAll(',', '.')) ??
-          0;
-      double impuesto = double.tryParse(
-              product['impuesto'].toString().replaceAll(',', '.')) ??
-          0;
+  // Formateador para el monto total y neto
+  final formatter = NumberFormat('#,##0.00', 'es_ES');
 
-      total += price * quantity * (impuesto / 100);
-      totalNeto += price * quantity;
-    }
+  for (var product in selectedProducts) {
+    double price = double.tryParse(product['price'].toString().replaceAll(',', '.')) ?? 0;
+    double quantity = double.tryParse(product['quantity'].toString()) ?? 0;
+    double impuesto = double.tryParse(product['impuesto'].toString()) ?? 0;
 
-    saldoNetoController.text = '\$${totalNeto.toStringAsFixed(2)}';
-    suma = total + totalNeto;
-    montoController.text = '\$${suma.toStringAsFixed(2)}';
-    print('productos totales $selectedProducts');
-
-    return suma;
+    total += price * quantity * (impuesto / 100);
+    totalNeto += price * quantity;
   }
+
+  saldoNetoController.text = '\$${formatter.format(totalNeto)}';
+  suma = total + totalNeto;
+  montoController.text = '\$${formatter.format(suma)}';
+  print('productos totales $selectedProducts');
+    print('Esto es la suma $suma');
+  
+  String parseFormatNumber = formatter.format(suma);
+
+  return parseFormatNumber;
+}
 
   initGetUser() async {
     final info = await getApplicationSupportDirectory();
@@ -204,15 +204,18 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
   void _handlePriceChange(String newValue, int index) {
     final String normalizedValue = newValue.replaceAll(',', '.');
     final double newPrice = double.tryParse(normalizedValue) ?? 0.0;
+
+    
+
     setState(() {
-      selectedProducts[index]['price'] = newPrice;
+      selectedProducts[index]['price'] = newPrice ;
     });
   }
 
   void _removeProduct(int index) {
     setState(() {
       selectedProducts.removeAt(index);
-      montoController.text = '\$${calcularMontoTotal().toStringAsFixed(2)}';
+      montoController.text = '\$${calcularMontoTotal()}';
     });
   }
 
@@ -702,8 +705,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
                                                       setState(() {
                                                         product['quantity'] -=
                                                             1;
-                                                        calcularMontoTotal()
-                                                            .toStringAsFixed(2);
+                                                        calcularMontoTotal();
 
                                                         print(
                                                             'Productos ${product['quantity_avaible']}');
@@ -735,7 +737,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
                                                         product['quantity'] +=
                                                             1;
                                                         calcularMontoTotal()
-                                                            .toStringAsFixed(2);
+                                                            ;
                                                       });
                                                     },
                                                     child: Image.asset(
@@ -784,7 +786,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
 
                                                   setState(() {
                                                     montoController.text =
-                                                        '\$${calcularMontoTotal().toStringAsFixed(2)}';
+                                                        '\$${calcularMontoTotal()}';
                                                   });
                                                 },
                                               ),
@@ -825,7 +827,7 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
                                     _addOrUpdateProduct(selectedProductsResult);
 
                                     montoController.text =
-                                        '\$${calcularMontoTotal().toStringAsFixed(2)}';
+                                        '\$${calcularMontoTotal()}';
                                   });
                                 }
                               },
@@ -920,10 +922,8 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
                         'id_factura': 0,
                         'fecha': fechaController.text,
                         'description': descripcionController.text,
-                        'monto':
-                            double.parse(montoController.text.substring(1)),
-                        'saldo_neto':
-                            double.parse(saldoNetoController.text.substring(1)),
+                        'monto': montoController.text.substring(1),
+                        'saldo_neto': saldoNetoController.text.substring(1),
                         'productos': selectedProducts,
                         'usuario_id': infoUserForOrder['userId'],
                         'status_sincronized': 'Borrador',

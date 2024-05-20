@@ -50,27 +50,34 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   Map<String, dynamic> infoUserForOrder = {};
   bool isDragging = false;
 
-  double calcularMontoTotal() {
-    double total = 0;
-    double totalNeto = 0;
-    double suma = 0;
+ dynamic calcularMontoTotal() {
+  double total = 0;
+  double totalNeto = 0;
+  double suma = 0;
 
-    for (var product in selectedProducts) {
-      total +=
-          product['price'] * product['quantity'] * (product['impuesto'] / 100);
-      totalNeto += product['price'] * product['quantity'];
-    }
-    saldoNetoController.text = '\$${totalNeto.toStringAsFixed(2)}';
-    
-    suma = total + totalNeto;
+  // Formateador para el monto total y neto
+  final formatter = NumberFormat('#,##0.00', 'es_ES');
 
-    montoController.text = '\$${suma.toStringAsFixed(2)}';
+  for (var product in selectedProducts) {
+    double price = double.tryParse(product['price'].toString().replaceAll(',', '.')) ?? 0;
+    double quantity = double.tryParse(product['quantity'].toString()) ?? 0;
+    double impuesto = double.tryParse(product['impuesto'].toString()) ?? 0;
 
-    print('productos totales $selectedProducts');
-
-    return suma;
-
+    total += price * quantity * (impuesto / 100);
+    totalNeto += price * quantity;
   }
+
+  saldoNetoController.text = '\$${formatter.format(totalNeto)}';
+  suma = total + totalNeto;
+  montoController.text = '\$${formatter.format(suma)}';
+  
+
+  String parseFormatNumber = formatter.format(suma);
+
+
+  return parseFormatNumber;
+
+}
 
   double calcularSaldoTotalProducts(dynamic price, dynamic quantity) {
     double prices;
@@ -188,7 +195,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   void _removeProduct(int index) {
     setState(() {
       selectedProducts.removeAt(index);
-      montoController.text = calcularMontoTotal().toString();
+      montoController.text = calcularMontoTotal();
     });
   }
 
@@ -711,8 +718,7 @@ Color getColorBg(Set<WidgetState> states){
 
                                                     setState(() {
                                                       product['quantity'] -= 1;
-                                                      calcularMontoTotal()
-                                                          .toStringAsFixed(2);
+                                                      calcularMontoTotal();
 
                                                       print(
                                                           'Productos ${product['quantity_avaible']}');
@@ -738,8 +744,7 @@ Color getColorBg(Set<WidgetState> states){
 
                                                     setState(() {
                                                       product['quantity'] += 1;
-                                                      calcularMontoTotal()
-                                                          .toStringAsFixed(2);
+                                                      calcularMontoTotal();
                                                     });
                                                   },
                                                   child: Container(
@@ -801,7 +806,7 @@ Color getColorBg(Set<WidgetState> states){
                                     _addOrUpdateProduct(selectedProductsResult);
 
                                     montoController.text =
-                                        '\$${calcularMontoTotal().toStringAsFixed(2)}';
+                                        '\$${calcularMontoTotal()}';
                                   });
                                 }
                               },
@@ -885,10 +890,8 @@ Color getColorBg(Set<WidgetState> states){
                             'documentno': numeroReferenciaController.text,
                             'fecha': fechaController.text,
                             'descripcion': descripcionController.text,
-                            'monto':
-                                double.parse(montoController.text.substring(1)),
-                            'saldo_neto': double.parse(
-                                saldoNetoController.text.substring(1)),
+                            'monto': montoController.text.substring(1),
+                            'saldo_neto': saldoNetoController.text.substring(1),
                             'productos': selectedProducts,
                             'c_bpartner_id': widget.cBPartnerId,
                             'c_bpartner_location_id': widget.cBPartnerLocationId,

@@ -1,8 +1,7 @@
-import 'package:femovil/database/create_database.dart';
+import 'package:femovil/config/app_bar_femovil.dart';
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/gets_database.dart';
-import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/compras/compras_details.dart';
-import 'package:femovil/presentation/screen/ventas/ventas_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -45,10 +44,24 @@ class _ComprasState extends State<Compras> {
     super.initState();
   }
 
+  double parseNumberToDouble(String number) {
+  number = number.replaceAll('.', '').replaceAll(',', '.');
+  return double.parse(number);
+}
+
+
 void _filterByMaxPrice(double maxPrice) {
   setState(() {
-    filteredCompras = compras.where((venta) => venta['monto'] <= maxPrice).toList();
-    filteredCompras.sort((a, b) => b['monto'].compareTo(a['monto'])); // Ordena las ventas de mayor a menor monto
+      filteredCompras = compras.where((venta) {
+    double monto = parseNumberToDouble(venta['monto']);
+    return monto <= maxPrice;
+  }).toList();
+
+  filteredCompras.sort((a, b) {
+    double montoA = parseNumberToDouble(a['monto']);
+    double montoB = parseNumberToDouble(b['monto']);
+    return montoB.compareTo(montoA);
+  });
   });
 }
 
@@ -116,23 +129,44 @@ void _sortByDateRange(DateTime start, DateTime end) {
       });
 }
 
-void _showMaxPriceDialog(BuildContext context) {
+void _showMaxPriceDialog(BuildContext context, mediaScreen) {
   showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
         title: const Text('Ingrese el monto máximo'),
-        content: TextField(
-          controller: inputValue, // Controlador para el campo de entrada
-          keyboardType: TextInputType.number, // Teclado numérico para ingresar el monto
-          decoration: const InputDecoration(hintText: 'Ingrese el monto máximo'),
+        content: Container(
+            width: mediaScreen,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 7,
+                      spreadRadius: 2)
+                ]),
+          child: TextField(
+            controller: inputValue, // Controlador para el campo de entrada
+            keyboardType: TextInputType.number, // Teclado numérico para ingresar el monto
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(10),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderSide: BorderSide(width: 1, color: Colors.white)),
+              hintText: 'Ingrese el monto máximo'),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () {
+              inputValue.clear();
               Navigator.of(context).pop();
             },
-            child: const Text('Cancelar'),
+            child: const Text('Cancelar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),),
           ),
           TextButton(
             onPressed: () {
@@ -142,41 +176,77 @@ void _showMaxPriceDialog(BuildContext context) {
               print("esto es el maxprice ${inputValue.text}");
               _filterByMaxPrice(maxPrice);
               Navigator.of(context).pop();
+              inputValue.clear();
             },
-            child: const Text('Aceptar'),
+            child: const Text('Aceptar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Color(0xFF7531ff)),),
           ),
         ],
       );
+      
     },
   );
 }
 
 
-void _showFilterOptions(BuildContext context) {
+void _showFilterOptions(BuildContext context, mediaScreen) {
   final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
 
   showMenu(
+    
     context: context,
+    shape: RoundedRectangleBorder(
+          // Redondear los bordes del menú emergente
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(
+            width: 5,
+            color: Colors.grey.withOpacity(
+                0.5), // Establece el color transparente como punto inicial del gradiente
+          )),
     position: RelativeRect.fromRect(
+      
       Rect.fromPoints(
-        const Offset(0, 0), // Punto de inicio en la esquina superior izquierda
-        const Offset(0, 0), // Punto de fin en la esquina superior izquierda
+        const Offset(25, 250), // Punto de inicio en la esquina superior izquierda
+        const Offset(160, 240), // Punto de fin en la esquina superior izquierda
       ),
       overlay.localToGlobal(Offset.zero) & overlay.size, // Tamaño del overlay
     ),
     items: <PopupMenuEntry>[
       PopupMenuItem(
         child: ListTile(
-          title: const Text('Filtrar Por el monto Mayor'),
+          title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/Check@3x.png',
+                  width: 25,
+                  color: const Color(0xFF7531ff),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.02,
+                ),
+              const Text('Filtrar Por el monto Mayor'),
+            ],
+          ),
           onTap: () {
             Navigator.pop(context);
-            _showMaxPriceDialog(context);
+            _showMaxPriceDialog(context, mediaScreen);
           },
         ),
       ),
       PopupMenuItem(
         child: ListTile(
-          title: const Text('Ordenar por un rango de fecha'),
+          title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/Check@3x.png',
+                  width: 25,
+                  color: const Color(0xFF7531ff),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.02,
+                ),
+              const Text('Ordenar por un rango de fecha'),
+            ],
+          ),
           onTap: () {
             Navigator.pop(context);
               _showDateRangePicker(context);
@@ -194,164 +264,357 @@ void _showFilterOptions(BuildContext context) {
         
         final screenMax = MediaQuery.of(context).size.width * 0.8;
 
-    return Scaffold(
-            backgroundColor: const Color.fromARGB(255, 236, 247, 255),
+    return GestureDetector(
+      onTap: () {
 
-      appBar: AppBar(title: const Text("Compras", style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            color: Color.fromARGB(255, 105, 102, 102),
-            
-          ),),
-            backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-       leading: IconButton(
-                    icon: Image.asset(
-                      'lib/assets/Ajustes.png',
-                      width: 25,
-                      height: 35,
-                    ),
-                    onPressed: () {
-                      _showFilterOptions(context);
-                    },
-                  ),
-       actions: [
-            IconButton(onPressed: () {
-                Navigator.pop(context);
-            }, icon:const Icon(Icons.arrow_back_sharp) )
-       ],
-       iconTheme: const IconThemeData(color: Color.fromARGB(255, 105, 102, 102)),
+          FocusScope.of(context).requestFocus(FocusNode());
 
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+      },
+      child: Scaffold(
+      
+        appBar:  PreferredSize(
+          preferredSize: const Size.fromHeight(170),
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    if (searchController.text.isNotEmpty) {
-                      setState(() {
-                        _filter = "";
-                      });
-                    }
-                    setState(() {
-                  filteredCompras = compras.where((compra) {
-                  final numeroReferencia = compra['id'].toString();
-                  final nombreProveedor = compra['nombre_proveedor'].toString().toLowerCase();
-                  final orderSale = compra['documentno'].toString();
-                  return numeroReferencia.contains(value) || nombreProveedor.contains(value.toLowerCase()) || orderSale.contains(value) ;
-                }).toList();
-                });
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Buscar por número de documento o nombre',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
+              const AppBars(labelText : 'Compras'),
+      
+               Positioned(
+                  left: 16,
+                  right: 16,
+                  top: 160,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      width: 300,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            9.0), // Ajusta el radio de las esquinas
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey
+                                .withOpacity(0.2), // Color de la sombra
+                            spreadRadius: 2, // Extensión de la sombra
+                            blurRadius: 3, // Difuminado de la sombra
+                            offset:
+                                const Offset(0, 2), // Desplazamiento de la sombra
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          if (searchController.text.isNotEmpty) {
+                            setState(() {
+                              _filter = "";
+                            });
+                          }
+      
+                          setState(() {
+                            input = value.toLowerCase();
+                              setState(() {
+                            filteredCompras = compras.where((compra) {
+                            final numeroReferencia = compra['ruc'].toString();
+                            final nombreProveedor = compra['nombre_proveedor'].toString().toLowerCase();
+                            final orderSale = compra['documentno'].toString();
+                            return numeroReferencia.contains(value) || nombreProveedor.contains(value.toLowerCase()) || orderSale.contains(value) ;
+                          }).toList();
+                          });
+                          });
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 3.0, horizontal: 20.0),
+                          hintText: 'Buscar por número de documento o nombre',
+                          labelStyle: const TextStyle(
+                              color: Colors.black, fontFamily: 'Poppins Regular'),
+                          suffixIcon: Image.asset('lib/assets/Lupa.png'),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: filteredCompras.length,
-                  itemBuilder: (context, index) {
-                    final compra = filteredCompras[index];
-                    
-                    print('esto es ventas $compra');
-
-                    return Column(
-                      children: [
-                        Container(  
-
-                          width: screenMax,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(10),
-                            
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("N° ${compra['documentno'] != '' ? compra['documentno'] : compra['id']}",
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          
+      
+            ],
+          )) ,
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                    const SizedBox(height: 25,),
+      
+                  
+                      IconButton(
+                        icon: Image.asset(
+                          'lib/assets/filtro@3x.png',
+                          width: 25,
+                          height: 35,
                         ),
-                        const SizedBox(height: 7),
-                         Container(
-                          width: screenMax,
-                           decoration: BoxDecoration(
-                           color: Colors.white,
-                           borderRadius: BorderRadius.circular(10.0), // Radio de borde de 10.0
-                        ),
-                          child: Padding(
+                        onPressed: () {
+                          _showFilterOptions(context, screenMax);
+                        },
+                      ),
+              
+                  const SizedBox(height: 10 ,),
+      
+                   Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredCompras.length,
+                        itemBuilder: (context, index) {
+                          final compra = filteredCompras[index];
+      
+                          print('Estas son las compras $compra');
+      
+                          return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text('Nombre: ${compra['nombre_proveedor']}'),
-                                Text('Fecha:  ${compra['fecha']}'),
-                                Text('Monto: ${compra['monto']}'),
-                                Text('Descripcion: ${compra['description']}'),
-                                // aqui quiero agregar los dos botones con space betwenn 
-                                         
+                                Container(
+                                  width: screenMax,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 160,
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 5,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                height: 50,
+                                                width: screenMax,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFF0EBFC),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.2),
+                                                      spreadRadius: 2,
+                                                      blurRadius: 5,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(15.0),
+                                                  child: Text(
+                                                    compra['documentno'] == ''
+                                                        ? 'N° ${compra['ruc'].toString()}'
+                                                        : 'N° ${compra['documentno'].toString()}',
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily: 'Poppins Bold',
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                    textAlign: TextAlign.start,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 55,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: SizedBox(
+                                                  width: screenMax * 1,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Nombre: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    '${compra['nombre_proveedor']}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Fecha: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    '${compra['fecha']}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  )),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Monto: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    '${compra['monto']}\$',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Descripción: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    compra['description']
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+      
+                                                       GestureDetector(
+                                                        onTap: () {
+                                             Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                      builder: (context) => ComprasDetails(compraId: compra['id'], nameProveedor: compra['nombre_proveedor'], emailProveedor: compra['email'],phoneProveedor: compra['phone'].toString(),rucProveedor:compra['ruc'].toString(),),
+                                                    ),
+                                                  );
+                                                },
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            const Text('Ver',
+                                                                style: TextStyle(
+                                                                    color: Color(
+                                                                        0xFF7531FF))),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Image.asset(
+                                                                'lib/assets/Lupa-2@2x.png',
+                                                                width: 25),
+                                                          ],
+                                                        ),
+                                                      )
+                                                  
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 5,),
-                        Container(
-                          width: screenMax,
-                          child:  Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ElevatedButton(
-                                      style: ButtonStyle(
-                                      backgroundColor: MaterialStateProperty.all<Color>(Colors.grey),
-                                      foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                    ),
-                                    onPressed: () {
-                                      // Acción al presionar el botón "Ver más"
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => ComprasDetails(compraId: compra['id'], nameProveedor: compra['nombre_proveedor']),
-                                          ),
-                                        );
-                                    },
-                                    child: const Text('Ver más'),
-                                  ),
-                                  // ElevatedButton(
-                                  //     style: ButtonStyle(
-                                  //     backgroundColor:compra['status_sincronized'] == 'Completado' ? MaterialStateProperty.all<Color>(Colors.green) : MaterialStateProperty.all<Color>(Colors.grey),
-                                  //     foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                  //   ),
-                                  //   onPressed: compra['status_sincronized'] == 'Completado' ? () {
-                                  //     // Acción al presionar el botón "Cobrar"
-                                  //       Navigator.of(context).push(
-                                  //         MaterialPageRoute(
-                                  //           builder: (context) => Cobro(orderId: compra['id'], loadCobranzas: _loadCompras ,saldoTotal: compra['saldo_total'], ),
-                                  //         ),
-                                  //       );
-                                  //   }: null,
-                                  //   child: const Text('Cobrar'),
-                                  // ),
-                                ],
-                              ),
-                            ),  
-                          const SizedBox(height: 5,),
-                      ],
-                    );
-                  },
-                ),
+                          );
+                        },
+                      ),
+                    ),
+                  
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

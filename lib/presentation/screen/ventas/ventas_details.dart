@@ -11,7 +11,7 @@ import 'package:flutter/widgets.dart';
 class VentasDetails extends StatefulWidget {
   final int ventaId;
   final String nameClient;
-  final double saldoTotal;
+  final dynamic saldoTotal;
   final String rucClient;
   final String emailClient;
   final String phoneClient;
@@ -22,7 +22,7 @@ class VentasDetails extends StatefulWidget {
       required this.saldoTotal,
       required this.rucClient,
       required this.emailClient,
-      required this.phoneClient
+      required this.phoneClient,
       });
 
   @override
@@ -96,6 +96,7 @@ class _VentasDetailsState extends State<VentasDetails> {
   @override
   Widget build(BuildContext context) {
     final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final heightScreen = MediaQuery.of(context).size.height * 0.9;
 
     return Scaffold(
       appBar: const PreferredSize(
@@ -123,6 +124,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                          SizedBox(height: heightScreen * 0.015,),
                       Container(
                         width: screenMax,
                         decoration: BoxDecoration(
@@ -136,9 +138,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                           textAlign: TextAlign.start,
                         ),
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: heightScreen * 0.05,),
 
                  
                    Container(
@@ -268,7 +268,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                     ),
                   ),
 
-                      SizedBox(height: screenMax * 0.1,),
+                                        SizedBox(height: heightScreen * 0.05,),
                     Container(
                             width: screenMax ,
                             decoration: BoxDecoration(
@@ -303,7 +303,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                             ),
                           ),
 
-                             SizedBox(height: screenMax * 0.1,),
+                          SizedBox(height: heightScreen * 0.025,),
                     Container(
                             width: screenMax ,
                             decoration: BoxDecoration(
@@ -335,7 +335,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                               ),
                             ),
                           ),
-                                    SizedBox(height: screenMax * 0.1,),
+                          SizedBox(height: heightScreen * 0.025,),
                     Container(
                             width: screenMax ,
                             height: screenMax * 0.25,
@@ -369,7 +369,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                             ),
                           ),
 
-                          SizedBox(height: screenMax * 0.1,),
+                               SizedBox(height: heightScreen * 0.025,),
                          SizedBox(
                             width: screenMax,
                             child: const Text(
@@ -381,9 +381,8 @@ class _VentasDetailsState extends State<VentasDetails> {
                                   fontSize: 18),
                             ),
                           ),
-                          SizedBox(
-                            height: screenMax * 0.05,
-                          ),
+                              SizedBox(height: heightScreen * 0.025,),
+
 
 
                            Container(
@@ -509,7 +508,6 @@ class _VentasDetailsState extends State<VentasDetails> {
                       Container(
                           width: screenMax,
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             borderRadius: BorderRadius.circular(
                                 8), // Establece el radio de los bordes
                           ),
@@ -525,7 +523,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                                     const Text('Total',
                                         style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 17)),
                                     Text(
-                                        ' \$ ${ventaData['saldo_total'].toString()}', style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                                        ' \$ ${ventaData['saldo_total_formatted'].toString()}', style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
                                   ],
                                 ),
                               ],
@@ -542,7 +540,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                                 color: ventaData['status_sincronized'] ==
                                             'Borrador' &&
                                         bottonEnable == true
-                                    ? Colors.green
+                                    ? const Color(0xFF7531FF)
                                     : Colors
                                         .grey, // Color verde para el fondo del botón
                               ),
@@ -585,9 +583,9 @@ class _VentasDetailsState extends State<VentasDetails> {
                                     : null,
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.all<Color>(Colors
+                                      WidgetStateProperty.all<Color>(Colors
                                           .transparent), // Hace que el color de fondo del botón sea transparente
-                                  shape: MaterialStateProperty.all<
+                                  shape: WidgetStateProperty.all<
                                       RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -601,7 +599,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                                     style: TextStyle(
                                       color: Colors
                                           .white, // Texto blanco para que se destaque sobre el fondo verde
-                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Poppins Bold' ,
                                     ),
                                   ),
                                 ),
@@ -619,7 +617,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                                 color: ventaData['status_sincronized'] ==
                                             'Por Enviar' &&
                                         bottonEnable == true
-                                    ? Colors.green
+                                    ? const Color(0xFF7531FF)
                                     : Colors
                                         .grey, // Color verde para el fondo del botón
                               ),
@@ -635,9 +633,6 @@ class _VentasDetailsState extends State<VentasDetails> {
                                       
                                         dynamic isTrue =
                                             await _updateAndCreateOrders();
-
-
-                                          
                                         
 
                                         if (isTrue != false) {
@@ -666,9 +661,9 @@ class _VentasDetailsState extends State<VentasDetails> {
                                     : null,
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.all<Color>(Colors
+                                      WidgetStateProperty.all<Color>(Colors
                                           .transparent), // Hace que el color de fondo del botón sea transparente
-                                  shape: MaterialStateProperty.all<
+                                  shape: WidgetStateProperty.all<
                                       RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -680,9 +675,8 @@ class _VentasDetailsState extends State<VentasDetails> {
                                   child: Text(
                                     'Enviar',
                                     style: TextStyle(
-                                      color: Colors
-                                          .white, // Texto blanco para que se destaque sobre el fondo verde
-                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Poppins Bold',
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -721,9 +715,9 @@ class _VentasDetailsState extends State<VentasDetails> {
                                 }
                               : null,
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(Colors
+                            backgroundColor: WidgetStateProperty.all<Color>(Colors
                                 .transparent), // Hace que el color de fondo del botón sea transparente
-                            shape: MaterialStateProperty.all<
+                            shape: WidgetStateProperty.all<
                                 RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -737,7 +731,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                               style: TextStyle(
                                 color: Colors
                                     .white, // Texto blanco para que se destaque sobre el fondo verde
-                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins Bold',
                               ),
                             ),
                           ),

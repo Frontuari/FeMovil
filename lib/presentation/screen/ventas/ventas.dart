@@ -34,8 +34,10 @@ class _VentasState extends State<Ventas> {
     print("Esto es la venta Data $ventasData");
 
     setState(() {
+
       ventas = ventasData;
       filteredVentas = ventasData;
+
     });
   }
 
@@ -45,12 +47,23 @@ class _VentasState extends State<Ventas> {
     super.initState();
   }
 
+  double parseNumberToDouble(String number) {
+  number = number.replaceAll('.', '').replaceAll(',', '.');
+  return double.parse(number);
+}
+
   void _filterByMaxPrice(double maxPrice) {
     setState(() {
-      filteredVentas =
-          ventas.where((venta) => venta['monto'] <= maxPrice).toList();
-      filteredVentas.sort((a, b) => b['monto']
-          .compareTo(a['monto'])); // Ordena las ventas de mayor a menor monto
+        filteredVentas = ventas.where((venta) {
+    double monto = parseNumberToDouble(venta['monto']);
+    return monto <= maxPrice;
+  }).toList();
+
+  filteredVentas.sort((a, b) {
+    double montoA = parseNumberToDouble(a['monto']);
+    double montoB = parseNumberToDouble(b['monto']);
+    return montoB.compareTo(montoA);
+  }); 
     });
   }
 
@@ -154,15 +167,17 @@ class _VentasState extends State<Ventas> {
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
-                      borderSide: BorderSide(width: 1, color: Colors.white))),
+                      borderSide: BorderSide(width: 1, color: Colors.white))
+                      ),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                inputValue.clear();
               },
-              child: const Text('Cancelar'),
+              child: const Text('Cancelar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),),
             ),
             TextButton(
               onPressed: () {
@@ -173,8 +188,9 @@ class _VentasState extends State<Ventas> {
                 print("esto es el maxprice ${inputValue.text}");
                 _filterByMaxPrice(maxPrice);
                 Navigator.of(context).pop();
+                inputValue.clear();
               },
-              child: const Text('Aceptar'),
+              child: const Text('Aceptar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Color(0xFF7531ff)),),
             ),
           ],
         );
@@ -195,14 +211,12 @@ class _VentasState extends State<Ventas> {
             color: Colors.grey.withOpacity(
                 0.5), // Establece el color transparente como punto inicial del gradiente
           )),
-      elevation: 0,
+      elevation: 2,
       context: context,
       position: RelativeRect.fromRect(
         Rect.fromPoints(
-          const Offset(
-              150, 240), // Punto de inicio en la esquina superior izquierda
-          const Offset(
-              250, 250), // Punto de fin en la esquina superior izquierda
+          const Offset(20, 250), // Punto de inicio en la esquina superior izquierda
+        const Offset(155, 240),  // Punto de fin en la esquina superior izquierda
         ),
         overlay.localToGlobal(Offset.zero) & overlay.size, // Tamaño del overlay
       ),
@@ -214,7 +228,7 @@ class _VentasState extends State<Ventas> {
                 Image.asset(
                   'lib/assets/Check@3x.png',
                   width: 25,
-                  color: colorPrimary,
+                  color: const Color(0xFF7531ff),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.02,
@@ -238,7 +252,7 @@ class _VentasState extends State<Ventas> {
                 Image.asset(
                   'lib/assets/Check@3x.png',
                   width: 25,
-                  color: colorPrimary,
+                  color: const Color(0xFF7531ff),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.02,
@@ -262,7 +276,7 @@ class _VentasState extends State<Ventas> {
                 Image.asset(
                   'lib/assets/Check@3x.png',
                   width: 25,
-                  color: colorPrimary,
+                  color: const Color(0xFF7531ff),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.02,
@@ -287,382 +301,388 @@ class _VentasState extends State<Ventas> {
   Widget build(BuildContext context) {
     final screenMax = MediaQuery.of(context).size.width * 0.8;
     final colorPrimary = Theme.of(context).colorScheme.primary;
-    return Scaffold(
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(170),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              AppBars(
-                labelText: 'Ventas',
-              ),
-              Positioned(
-                left: 16,
-                right: 16,
-                top: 160,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    width: 300,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                          9.0), // Ajusta el radio de las esquinas
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey
-                              .withOpacity(0.2), // Color de la sombra
-                          spreadRadius: 2, // Extensión de la sombra
-                          blurRadius: 3, // Difuminado de la sombra
-                          offset:
-                              const Offset(0, 2), // Desplazamiento de la sombra
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: searchController,
-                      onChanged: (value) {
-                        if (searchController.text.isNotEmpty) {
-                          setState(() {
-                            _filter = "";
-                          });
-                        }
+    return GestureDetector(
+      onTap: () {
 
-                        setState(() {
-                          input = value.toLowerCase();
+          FocusScope.of(context).requestFocus(FocusNode());
+
+      },
+      child: Scaffold(
+        appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(170),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const AppBars(
+                  labelText: 'Ventas',
+                ),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  top: 160,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      width: 300,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            9.0), // Ajusta el radio de las esquinas
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey
+                                .withOpacity(0.2), // Color de la sombra
+                            spreadRadius: 2, // Extensión de la sombra
+                            blurRadius: 3, // Difuminado de la sombra
+                            offset:
+                                const Offset(0, 2), // Desplazamiento de la sombra
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          if (searchController.text.isNotEmpty) {
+                            setState(() {
+                              _filter = "";
+                            });
+                          }
+      
                           setState(() {
-                            filteredVentas = ventas.where((venta) {
-                              final numeroReferencia = venta['id'].toString();
-                              final nombreCliente = venta['nombre_cliente']
-                                  .toString()
-                                  .toLowerCase();
-                              final orderSale = venta['documentno'].toString();
-                              return numeroReferencia.contains(input) ||
-                                  nombreCliente.contains(input) ||
-                                  orderSale.contains(input);
-                            }).toList();
+                            input = value.toLowerCase();
+                            setState(() {
+                              filteredVentas = ventas.where((venta) {
+                                final numeroReferencia = venta['id'].toString();
+                                final nombreCliente = venta['nombre_cliente']
+                                    .toString()
+                                    .toLowerCase();
+                                final orderSale = venta['documentno'].toString();
+                                return numeroReferencia.contains(input) ||
+                                    nombreCliente.contains(input) ||
+                                    orderSale.contains(input);
+                              }).toList();
+                            });
                           });
-                        });
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 3.0, horizontal: 20.0),
-                        hintText: 'Nombre del producto',
-                        labelStyle: const TextStyle(
-                            color: Colors.black, fontFamily: 'Poppins Regular'),
-                        suffixIcon: Image.asset('lib/assets/Lupa.png'),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide.none,
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 3.0, horizontal: 20.0),
+                          hintText: 'Nombre del producto',
+                          labelStyle: const TextStyle(
+                              color: Colors.black, fontFamily: 'Poppins Regular'),
+                          suffixIcon: Image.asset('lib/assets/Lupa.png'),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
+              ],
+            )),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  // Cierra el teclado tocando en cualquier parte del Stack
+                  FocusScope.of(context).unfocus();
+                },
               ),
-            ],
-          )),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () {
-                // Cierra el teclado tocando en cualquier parte del Stack
-                FocusScope.of(context).unfocus();
-              },
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus();
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  IconButton(
-                    icon: Image.asset(
-                      'lib/assets/filtro@3x.png',
-                      width: 25,
-                      height: 35,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 25,
                     ),
-                    onPressed: () {
-                      _showFilterOptions(context, colorPrimary, screenMax);
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredVentas.length,
-                      itemBuilder: (context, index) {
-                        final venta = filteredVentas[index];
-
-                        print('Estas son las venta $venta');
-
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: screenMax,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: 160,
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            255, 255, 255, 255),
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: Container(
-                                              height: 50,
-                                              width: screenMax,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFF0EBFC),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.grey
-                                                        .withOpacity(0.2),
-                                                    spreadRadius: 2,
-                                                    blurRadius: 5,
-                                                    offset: const Offset(0, 3),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(15.0),
-                                                child: Text(
-                                                  venta['documentno'] == ''
-                                                      ? 'N° ${venta['ruc'].toString()}'
-                                                      : 'N° ${venta['documentno'].toString()}',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: 'Poppins Bold',
-                                                    fontSize: 18,
-                                                    color: Colors.black,
-                                                  ),
-                                                  textAlign: TextAlign.start,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 55,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: SizedBox(
-                                                width: screenMax * 1,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Nombre: ',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Poppins SemiBold'),
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenMax *
-                                                                        0.40,
-                                                                child: Text(
-                                                                  '${venta['nombre_cliente']}',
-                                                                  style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins Regular'),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Fecha: ',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Poppins SemiBold'),
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenMax *
-                                                                        0.40,
-                                                                child: Text(
-                                                                  '${venta['fecha']}',
-                                                                  style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins Regular'),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                )),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Monto: ',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Poppins SemiBold'),
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenMax *
-                                                                        0.40,
-                                                                child: Text(
-                                                                  '${venta['monto'] is double ? venta['monto'] : 0}\$',
-                                                                  style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins Regular'),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Descripción: ',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Poppins SemiBold'),
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenMax *
-                                                                        0.40,
-                                                                child: Text(
-                                                                  venta['descripcion']
-                                                                      .toString(),
-                                                                  style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins Regular'),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        Navigator.of(context)
-                                                            .push(
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                VentasDetails(
-                                                                    ventaId:
-                                                                        venta[
-                                                                            'id'],
-                                                                    nameClient:
-                                                                        venta[
-                                                                            'nombre_cliente'],
-                                                                    saldoTotal:
-                                                                        venta[
-                                                                            'saldo_total'],
-                                                                    rucClient:
-                                                                        venta['ruc'],
-                                                                    emailClient:
-                                                                        venta['email'],
-                                                                    phoneClient:
-                                                                        venta['phone'].toString()
-
-                                                                            
-                                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          const Text('Ver',
-                                                              style: TextStyle(
-                                                                  color: Color(
-                                                                      0xFF7531FF))),
-                                                          const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          Image.asset(
-                                                              'lib/assets/Lupa-2@2x.png',
-                                                              width: 25),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                    IconButton(
+                      icon: Image.asset(
+                        'lib/assets/filtro@3x.png',
+                        width: 25,
+                        height: 35,
+                      ),
+                      onPressed: () {
+                        _showFilterOptions(context, colorPrimary, screenMax);
                       },
                     ),
-                  ),
-                ],
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredVentas.length,
+                        itemBuilder: (context, index) {
+                          final venta = filteredVentas[index];
+      
+                          print('Estas son las venta $venta');
+      
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: screenMax,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 160,
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 5,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                height: 50,
+                                                width: screenMax,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFF0EBFC),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.2),
+                                                      spreadRadius: 2,
+                                                      blurRadius: 5,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(15.0),
+                                                  child: Text(
+                                                    venta['documentno'] == ''
+                                                        ? 'N° ${venta['ruc'].toString()}'
+                                                        : 'N° ${venta['documentno'].toString()}',
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily: 'Poppins Bold',
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                    textAlign: TextAlign.start,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 55,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: SizedBox(
+                                                  width: screenMax * 1,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Nombre: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    '${venta['nombre_cliente']}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Fecha: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    '${venta['fecha']}',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  )),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Monto: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    '${venta['monto']}\$',
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Descripción: ',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold'),
+                                                              ),
+                                                              SizedBox(
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
+                                                                  child: Text(
+                                                                    venta['descripcion']
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Poppins Regular'),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.of(context)
+                                                              .push(
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  VentasDetails(
+                                                                      ventaId:
+                                                                          venta[
+                                                                              'id'],
+                                                                      nameClient:
+                                                                          venta[
+                                                                              'nombre_cliente'],
+                                                                      saldoTotal:
+                                                                          venta[
+                                                                              'saldo_total'],
+                                                                      rucClient:
+                                                                          venta['ruc'],
+                                                                      emailClient:
+                                                                          venta['email'],
+                                                                      phoneClient:
+                                                                          venta['phone'].toString()
+      
+                                                                      ),
+                                                            ),
+                                                          );
+                                                        },
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            const Text('Ver',
+                                                                style: TextStyle(
+                                                                    color: Color(
+                                                                        0xFF7531FF))),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Image.asset(
+                                                                'lib/assets/Lupa-2@2x.png',
+                                                                width: 25),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
