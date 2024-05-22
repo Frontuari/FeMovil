@@ -298,73 +298,120 @@ class CustomDropdownButtonFormField extends StatelessWidget {
         );
 
       case 'selectTypeAccountBank':
-        return DropdownButtonFormField<int>(
-          value: selectedIndex,
-          items: dataList
-              .where((bankAccount) =>
-                  bankAccount['c_bank_id'] is int &&
-                  bankAccount['bank_name'] != '')
-              .map<DropdownMenuItem<int>>((bankAcc) {
-            print('bankAccount $bankAcc');
-            return DropdownMenuItem<int>(
-              value: bankAcc['c_bank_id'] as int,
-              child: Text(bankAcc['bank_name'] as String),
-            );
-          }).toList(),
-          onChanged: (newValue) {
-            print('esto es el bank Account List ${dataList}');
-            String nameBankAccount =
-                invoke('obtenerNombreBankAccount', newValue, dataList);
-            print(
-                "esto es el nombre de la cuenta bancaria $nameBankAccount y este el id $newValue");
-
-            onSelected(newValue, nameBankAccount);
-          },
-          decoration: const InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
+        return Container(
+            height: mediaScreen * 0.22,
+            width: mediaScreen * 0.95,
+            decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 7,
+                  spreadRadius: 2,
+                  color: Colors.grey.withOpacity(0.5))
+            ],
           ),
-          validator: (value) {
-            if (value == null || value == 0) {
-              return 'Por favor selecciona un Pais';
-            }
-            return null;
-          },
+          child: DropdownButtonFormField<int>(
+            value: selectedIndex,
+            items: dataList
+                .where((bankAccount) =>
+                    bankAccount['c_bank_id'] is int &&
+                    bankAccount['bank_name'] != '')
+                .map<DropdownMenuItem<int>>((bankAcc) {
+              print('bankAccount $bankAcc');
+              return DropdownMenuItem<int>(
+                value: bankAcc['c_bank_id'] as int,
+                child: SizedBox(
+                  width: mediaScreen * 0.7,
+                  child: Text(bankAcc['bank_name'] as String, style: const TextStyle(fontFamily: 'Poppins Regular'),)),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              print('esto es el bank Account List ${dataList}');
+              String nameBankAccount =
+                  invoke('obtenerNombreBankAccount', newValue, dataList);
+              print(
+                  "esto es el nombre de la cuenta bancaria $nameBankAccount y este el id $newValue");
+          
+              onSelected(newValue, nameBankAccount);
+            },
+            decoration:  InputDecoration(
+               errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (value == null || value == 0) {
+                return 'Por favor selecciona una cuenta bancaria';
+              }
+              return null;
+            },
+          ),
         );
 
       case 'selectTypeCoins':
-        return DropdownButtonFormField<int>(
-          value: selectedIndex,
-          items: dataList
-              .where((typeCoins) =>
-                  typeCoins['c_currency_id'] is int &&
-                  typeCoins['iso_code'] != '')
-              .map<DropdownMenuItem<int>>((typeCoins) {
-            return DropdownMenuItem<int>(
-              value: typeCoins['c_currency_id'] as int,
-              child: Text(typeCoins['iso_code'] as String),
-            );
-          }).toList(),
-          onChanged: (newValue) {
-            print('esto es el bank Account List ${dataList}');
-            String nameBankAccount =
-                invoke('obtenerNombreBankAccount', newValue, dataList);
-            print(
-                "esto es el nombre de la cuenta bancaria $nameBankAccount y este el id $newValue");
-
-            onSelected(newValue, nameBankAccount);
-          },
-          decoration: const InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
+        return Container(
+           height: mediaScreen * 0.22,
+            width: mediaScreen * 0.95,
+            decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 7,
+                  spreadRadius: 2,
+                  color: Colors.grey.withOpacity(0.5))
+            ],
           ),
-          validator: (value) {
-            if (value == null || value == 0) {
-              return 'Por favor selecciona un Pais';
-            }
-            return null;
-          },
+          child: DropdownButtonFormField<int>(
+            value: selectedIndex,
+            items: dataList
+                .where((typeCoins) =>
+                    typeCoins['c_currency_id'] is int &&
+                    typeCoins['iso_code'] != '')
+                .map<DropdownMenuItem<int>>((typeCoins) {
+              return DropdownMenuItem<int>(
+                value: typeCoins['c_currency_id'] as int,
+                child: SizedBox(
+                   width: mediaScreen * 0.7,
+                  child: Text(typeCoins['iso_code'] as String, style: const TextStyle(fontFamily: 'Poppins Regular'),)),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              print('esto es el currency List ${dataList}');
+              String nameCurrency =
+                  invoke('obtenerNombreCurrencyType', newValue, dataList);
+              print(
+                  "esto es el nombre que tiene el tipo de moneda $nameCurrency y este el id $newValue");
+          
+              onSelected(newValue, nameCurrency);
+            },
+            decoration:  InputDecoration(
+              errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (value == null || value == 0) {
+                return 'Por favor selecciona un tipo de moneda';
+              }
+              return null;
+            },
+          ),
         );
+        
 
       default:
         return DropdownButtonFormField<int>(

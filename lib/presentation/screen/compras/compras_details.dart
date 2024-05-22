@@ -568,11 +568,6 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                         bottonEnable = false;
                       });
 
-                        Timer(const Duration(seconds: 3), () {
-                            setState(() {
-                              bottonEnable = true;
-                            });
-                          });
 
                      dynamic isTrue =  await _updateAndCreateOrders();
 
@@ -580,12 +575,13 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                             if(isTrue != false){
                               String newValue = 'Enviado';
                               updateOrderePurchaseForStatusSincronzed(compraData['id'], newValue );
+                               bottonEnable = true;
 
                             }else{
                               String newValue = 'Por Enviar';
 
                               updateOrderePurchaseForStatusSincronzed(compraData['id'], newValue );
-
+                              bottonEnable = true;
 
                             }
 

@@ -259,7 +259,7 @@ Future updateMProductIdOrderCompra(int orderId, int mProductId) async {
 
   Future<void> updateDocumentNoCobro(
   int cobrorId, 
-  int documentNo,
+  dynamic documentNo,
    ) async {
     final db = await DatabaseHelper.instance.database;
     

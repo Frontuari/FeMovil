@@ -637,11 +637,11 @@ class _VentasDetailsState extends State<VentasDetails> {
 
                                         if (isTrue != false) {
                                           String newValue = 'Enviado';
+                                          updateOrdereSalesForStatusSincronzed(
+                                              ventaData['id'], newValue);
                                           setState(() {
                                             bottonEnable = true;
                                           });
-                                          updateOrdereSalesForStatusSincronzed(
-                                              ventaData['id'], newValue);
                                         } else {
                                           String newValue = 'Por Enviar';
                                           updateOrdereSalesForStatusSincronzed(
@@ -704,8 +704,6 @@ class _VentasDetailsState extends State<VentasDetails> {
                                     MaterialPageRoute(
                                       builder: (context) => Cobro(
                                         orderId: ventaData['id'],
-                                        saldoTotal: widget.saldoTotal,
-                                        loadCobranzas: _loadVentasForId,
                                         cOrderId: ventaData['c_order_id'],
                                         documentNo: ventaData['documentno'],
                                         idFactura: ventaData['id_factura'],

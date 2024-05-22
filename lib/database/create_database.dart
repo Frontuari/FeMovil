@@ -244,6 +244,7 @@ class DatabaseHelper {
           CREATE TABLE cobros(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             c_bankaccount_id INTEGER,
+            c_bankaccount_name STRING,
             c_doctype_id INTEGER,
             date_trx TEXT,
             description TEXT,
@@ -251,10 +252,12 @@ class DatabaseHelper {
             pay_amt REAL,
             date TEXT,
             c_currency_id INTEGER,
+            c_currency_iso STRING,
             c_order_id INTEGER,
             c_invoice_id INTEGER,
             documentno INTEGER,
             tender_type STRING,
+            tender_type_name STRING,
             sale_order_id INTEGER,
             FOREIGN KEY (sale_order_id) REFERENCES orden_venta(id)
             

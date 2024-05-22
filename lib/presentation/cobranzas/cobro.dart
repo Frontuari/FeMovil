@@ -1,5 +1,5 @@
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/config/getPosProperties.dart';
-import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/database/update_database.dart';
@@ -7,7 +7,6 @@ import 'package:femovil/presentation/clients/select_customer.dart';
 import 'package:femovil/presentation/cobranzas/idempiere/create_cobro.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 
@@ -18,13 +17,11 @@ import 'package:intl/intl.dart';
 
 class Cobro extends StatefulWidget {
   final int orderId;
-  final dynamic saldoTotal;
-  final Function loadCobranzas;
   final dynamic cOrderId; 
   final dynamic documentNo;
   final dynamic idFactura;
   
-  const Cobro({super.key, required this.orderId, required this.saldoTotal, required this.loadCobranzas, required this.cOrderId, required this.documentNo, required this.idFactura});
+  const Cobro({super.key, required this.orderId, required this.cOrderId, required this.documentNo, required this.idFactura});
 
   @override
   State<Cobro> createState() => _CobroState();
@@ -38,6 +35,8 @@ class _CobroState extends State<Cobro> {
   TextEditingController montoController = TextEditingController();
   TextEditingController observacionController = TextEditingController();
   final TextEditingController _fechaIdempiereController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  Map<String, dynamic> orderData = {}; 
   String? paymentTypeValue = 'Efectivo';
   String? coinValue = "\$";
   String? typeDocumentValue = "Cobro";
@@ -46,15 +45,18 @@ class _CobroState extends State<Cobro> {
   List<Map<String, dynamic>> bankAccountsList = [];
     List<Map<String, dynamic>> typeCoinsList = [];
   List<Map<String, dynamic>> cobrosList = [];
+  late Future<void> _bankAccFuture;
 
   // Selecteds 
 
   int _selectsBankAccountId =  0; 
   String _selectTypePayment = "X";
   dynamic _selectTypeCoins = 0;
+   int _selectCurrencyId = 0;
   //Texts
 
   String _bankAccountText = "";
+   String _currencyText = "";
 
 List<Map<String, dynamic>> uniqueISOsAndCurrencyId = [];
 
@@ -80,11 +82,12 @@ void _loadCurrentDate() {
 }
 
 
-void _getBankAcc() async {
+ Future<void> _getBankAcc() async {
 
 
+    print('Entre aqui... ${widget.orderId}');
     List<Map<String, dynamic>> bankAccounts = await getBankAccounts();
-     List<Map<String, dynamic>> cobros = await getCobrosByOrderId(widget.cOrderId);
+     List<Map<String, dynamic>> cobros = await getCobrosByOrderId(widget.orderId);
 
       cobrosList.addAll(cobros);
 
@@ -93,6 +96,7 @@ void _getBankAcc() async {
       bankAccountsList
         .add({'c_bank_id': 0, 'bank_name': 'Selecciona una Cuenta Bancaria'});
 
+        uniqueISOsAndCurrencyId.add({'c_currency_id': 0, 'iso_code': 'Selecciona un tipo de moneda'});
 
           for (var account in bankAccounts) {
 
@@ -118,8 +122,8 @@ void _getBankAcc() async {
 
 
     print("estos son las cuentas agregadas desde la base de datos $bankAccounts");
-
 }
+
 
     initV() async {
 
@@ -143,10 +147,9 @@ void initState() {
     setState(() {
       
        montoController.text = "0";
-       numRefController.text = "Sin registro";
     });
       _loadCurrentDate();
-      _getBankAcc();
+_bankAccFuture = _getBankAcc();
 
     _fechaIdempiereController.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate);
 
@@ -163,283 +166,596 @@ void initState() {
 
   @override
   Widget build(BuildContext context) {
-           final screenMax = MediaQuery.of(context).size.width * 0.8;
-
+           final screenMax = MediaQuery.of(context).size.width * 0.9;
+           final heightScreen = MediaQuery.of(context).size.height * 1;
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-                  backgroundColor: const Color.fromARGB(255, 236, 247, 255),
       
-            appBar: AppBar(title: const Text("Cobro"),
-                  backgroundColor: const Color.fromARGB(255, 236, 247, 255),
+            appBar: const PreferredSize(
+              preferredSize: Size.fromHeight(50),
+              child:  AppBarSample(label: 'Cobro')),
       
-            ),
-      
-            body: FutureBuilder(
-                    future: _ordenVenta,
-                    builder: (context,  AsyncSnapshot<Map<String, dynamic>> snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return const CircularProgressIndicator();
-      
-                          } else if (snapshot.hasError) {
-                            
-                            return Text('Error: ${snapshot.error}');
-      
-                          }else{
-                              final clientData = snapshot.data!['client'][0];
-                              final orderData = snapshot.data!['order'];
-                              print("Esto es snapshot data ${snapshot.data}");
-
-                               cBPartnerIds = orderData['c_bpartner_id']; 
-
-                           return  Padding(
-                             padding: const EdgeInsets.all(16.0),
-                             child: Align(
-                                alignment: Alignment.topCenter,
-                               child: SingleChildScrollView(  
-                                 child: Column(
-                                    crossAxisAlignment:  CrossAxisAlignment.center,
-                                  children: [
-                                  Container(
-                                      width: screenMax ,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                                      ),
-                                      child: const Text('Datos De la Orden', style:  TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                                    ),
-                                  const SizedBox(height: 10,),
-                                    Column(
+            body: Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: FutureBuilder(
+                      future: _ordenVenta,
+                      builder: (context,  AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const Center(child:  CircularProgressIndicator());
+                    
+                            } else if (snapshot.hasError) {
+                              
+                              return Text('Error: ${snapshot.error}');
+                    
+                            }else{
+              
+                                 final clientData = snapshot.data!['client'][0];
+                                 orderData = snapshot.data!['order'];
+                                 print("Esto es snapshot data ${snapshot.data}");
+              
+                                 cBPartnerIds = orderData['c_bpartner_id']; 
+              
+                             return  Padding(
+                               padding: const EdgeInsets.all(16.0),
+                               child: Align(
+                                  alignment: Alignment.topCenter,
+                                 child: SingleChildScrollView(  
+                                   child: SizedBox(
+                                    width: screenMax,
+                                     child: Column(
+                                        crossAxisAlignment:  CrossAxisAlignment.center,
                                       children: [
-                                        Container(
-                                          width: screenMax,
+                                      Container(
+                                          width: screenMax * 0.85 ,
                                           decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(8),
                                           
+                                            borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
                                           ),
-                                          child:  Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                          child:  Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                               CustomTextInfo(
-                                                 label: "N° Document",
-                                                 value: orderData['documentno'].toString() != "" ? orderData['documentno'].toString() : "Sin registro",
-                                               ),
-                                               CustomTextInfo(
-                                                 label: "Cliente",
-                                                 value: clientData['bp_name'],
-                                               ),
-                                               CustomTextInfo(
-                                                 label: "Ruc",
-                                                 value: clientData['ruc'].toString(),
-                                               ),
-                                                CustomTextInfo(
-                                                 label: "Saldo Total",
-                                                 value: orderData['saldo_total'].toStringAsFixed(2),
-                                               ),
-                                               ],
-                                              ),
-                                            ),
-                                          ),
+                                          child: const Text('Datos Del Cliente', style:  TextStyle(fontFamily: 'Poppins Bold', fontSize: 18 ), textAlign: TextAlign.start,),
                                         ),
                                       const SizedBox(height: 10,),
+                                     
                                        Container(
-                                        width: screenMax ,
+                                        width: screenMax * 0.85,
+                                        height: heightScreen * 0.35,
                                         decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(15),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              blurRadius: 7,
+                                              spreadRadius: 2
+                                            )
+                                          ]
                                         ),
-                                        child: const Text('Cobranza', style:  TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                                       ),
-                                      const SizedBox(height: 10,),
-                                        Container(
-                                          width: screenMax,
-                                          decoration: BoxDecoration(
-                                              color:  Colors.white,
-                                              borderRadius:  BorderRadius.circular(8),
-                                          ),
-                                            child:  Column(
-                                 
-                                                children: [
-                                           
-                                                   CustomDropdownButtonFormField(identifier: 'selectTypeAccountBank', selectedIndex: _selectsBankAccountId , dataList: bankAccountsList, text: _bankAccountText, onSelected: (newValue, bankAccText) {
-                                                      setState(() {
-                                                          _selectsBankAccountId = newValue ?? 0;
-                                                          _bankAccountText = bankAccText;
-                                                      });
-                                                  },),
-
-                                                  DropdownButtonFormField(
-                                              items: uniqueISOsAndCurrencyId.map((Map<String, dynamic> item) {
-                                                return DropdownMenuItem<String>(
-                                                  value: item['c_currency_id'].toString(),
-                                                  child: Text(item['iso_code']),
-                                                );
-                                              }).toList(),
-                                              onChanged: (selectedValue) {
-
-
-                                                  setState(() {
-                                                    _selectTypeCoins = selectedValue ;
-                                                  });
-
-                                                print('Este es el valor seleccionado: $selectedValue y selecteTypeCoins $_selectTypeCoins');
-                                                // Aquí puedes realizar acciones adicionales con el valor seleccionado
-                                              },
-                                              decoration: const InputDecoration(
-                                                labelText: 'Tipo de Moneda',
-                                                labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5),
-                                                contentPadding: EdgeInsets.all(15),
-                                              ),
-                                            ),
-
-                                              DropdownButtonFormField<String>(
-                                              value: paymentTypeValue,
-                                              onChanged: (String? newValue) {
-                                                setState(() {
-                                                  paymentTypeValue = newValue;
-
-
-                                                });
-
-                                                if(newValue == 'Depósito Directo'){
-
-                                                    setState(() {
-                                                      _selectTypePayment = 'A';
-                                                    });
-
-                                                }else if(newValue == 'Tarjeta de Crédito'){
-
-                                                    setState(() {
-                                                      _selectTypePayment = 'C';
-                                                    });
-
-                                                }else if(newValue == "Cheque"){
-
-                                                    setState(() {
-                                                      _selectTypePayment = 'K';
-                                                    });
-
-                                                }else if(newValue == "Cuenta"){
-
-                                                    setState(() {
-                                                      _selectTypePayment = 'T';
-                                                    });
-
-                                                }else if(newValue == 'Efectivo' ){
-
-                                                    setState(() {
-                                                      _selectTypePayment = 'X';
-                                                    });
-
-                                                }else if(newValue == 'Débito Directo'){
-
-                                                    setState(() {
-                                                      _selectTypePayment = 'D';
-                                                    });
-
-                                                }
-
-                                                print('Este es el valor de paymentTypeValue $paymentTypeValue && este es el valor de $_selectTypePayment');
-                                              },
-                                             items: <String>['Depósito Directo', 'Tarjeta de Crédito', 'Cheque', 'Cuenta', 'Efectivo', 'Débito Directo' ].map((String value) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(value),
-                                              );
-                                            }).toList(),
-                                            decoration: const InputDecoration(
-                                              labelText: 'Tipo de Pago',
-                                              labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 0.5),
-                                              contentPadding: EdgeInsets.all(15),
-                                            ),
-                                          ),
-
-
-                                              TextFormField(
-                                                readOnly: true,
-                                                controller: dateController,
-                                                decoration: const InputDecoration(
-                                                  labelText: "Fecha",
-                                                  contentPadding: EdgeInsets.all(15),
-                                                ),
-                                              ),
-
-                                              
-
-                                              TextFormField(
-                                                controller: montoController,
-                                                decoration: const InputDecoration(
-                                                  labelText: "Monto",
-                                                  contentPadding: EdgeInsets.all(15),
-                                                ),
-                                                keyboardType: TextInputType.number,
-
-                                              ),
-
-                                           
-                                                    TextFormField(
-                                                controller: observacionController,
-                                                decoration: const InputDecoration(
-                                                  labelText: "Observacion",
-                                                  contentPadding: EdgeInsets.all(15),
-                                                ),
-                                              ),
-
-            
-                                                ],
-                                 
-                                            ),
-                                 
-                                        ),  
-                                          const SizedBox(height: 10,),
-                                        // Aqui va el boton
-                                           ElevatedButton(
-                                                onPressed: orderData['status_sincronized'] == 'Enviado' ?  () async {
-                                                  // Aquí puedes agregar la lógica para crear el cobro
+                                        child:  Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal:10, vertical: 15),
+                                          child:  Column(
+                                            
+                                            children: [
+                                          
+                                                Row(
+                                                  children:  [
+                                                    SizedBox(
+                                                      width: screenMax * 0.40,
+                                                      height: heightScreen * 0.15,
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
                                                            
-
-                                                               await _createCobro(widget.loadCobranzas);
-
-                                                              setState(() {
-                                                              _ordenVenta = _loadOrdenVentasForId();
-                                                              });
-                                                           
-  
-                                                } : null,
-                                                style: ElevatedButton.styleFrom(
-                                                  foregroundColor: Colors.green, // Color de fondo verde
-                                                  minimumSize: Size(screenMax, 50), // Ancho máximo y altura de 50
+                                                             const Text('Nombre', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18), textAlign: TextAlign.start,),
+                                                              SizedBox(height: heightScreen * 0.02,),
+              
+                                                              Flexible(child: Text('${clientData['bp_name']}', style: const TextStyle(fontFamily: 'Poppins Regular'),))
+                                                      
+                                                        ],
+                                                      ),
+                                                    ),
+                                          
+                                                    
+                                                    SizedBox(
+                                                      width: screenMax * 0.35,
+                                                      height: heightScreen * 0.15,
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          const Text('Ruc/DNI', style:  TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                                                          SizedBox(height: heightScreen * 0.02,),
+              
+                                                           Flexible(child: Text(clientData['ruc'], style: const TextStyle(fontFamily: 'Poppins Regular'),))
+                                                       
+                                                        ],
+                                                      ))
+              
+                                                  ],
                                                 ),
-                                                child: const Text(
-                                                  'Crear Cobro',
-                                                  style: TextStyle(fontSize: 16), // Tamaño de fuente 16
-                                                ),
-                                              ),
-                                              
-                                                                              
-                                      ],
+              
+              
+                                                SizedBox(
+                                                  width: screenMax,
+                                                  child: const Text('Detalles', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),textAlign: TextAlign.left,)),
+              
+                                                  SizedBox(height: heightScreen * 0.02,),
+                                              Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: const TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.black),
+                                          children: [
+                                            const TextSpan(text: 'Correo: '),
+                                            TextSpan(
+                                              text: clientData['email'] != '{@nil: true}' ? clientData['email']: "",
+                                              style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                                            
-                                 ],                        
+                                  ],
                                 ),
+                                     Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: const TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.black),
+                                          children: [
+                                            const TextSpan(text: 'Telefono: '),
+                                            TextSpan(
+                                              text: clientData['phone'] != '{@nil: true}'? clientData['phone']: '',
+                                              style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),  
+                                  Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: const TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.black),
+                                          children: [
+                                            const TextSpan(text: 'Saldo: '),
+                                            TextSpan(
+                                              text: orderData['saldo_total'] != '{@nil: true}'? '\$${orderData['saldo_total'].toString()}': '',
+                                              style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )         
+                              ],
+                            ),
+                          ),
+                        ),
+              
+                                      SizedBox(height: heightScreen * 0.02,),
+              
+                            SizedBox(
+                              width: screenMax * 0.85,
+                              child: const Text('Detalles de Orden', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),textAlign: TextAlign.start,)),
+                                    
+                                     SizedBox(height: heightScreen * 0.02,),
+  
+                                   CustomTextInfo(
+                                      label: "Orden N°",
+                                      value: orderData['documentno'].toString() != "" ? orderData['documentno'].toString() : "",
+                                      mediaScreen: screenMax,
+                                      heightScreen: heightScreen,
+                                    ),
+                                     SizedBox(height: heightScreen * 0.015,),
+              
+                                      CustomTextInfo(
+                                                     label: "Fecha",
+                                                     value: orderData['fecha'].toString(),
+                                                     mediaScreen: screenMax,
+                                                     heightScreen: heightScreen,
+                                                   ),
+              
+                                     SizedBox(height: heightScreen * 0.015,),
+              
+                                        Column(
+                                          children: [
+                                          
+                                           Container(
+                                            width: screenMax * 0.85,
+                                            decoration: BoxDecoration(
+                                             
+                                              borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
+                                            ),
+                                            child: const Text('Cobranza', style:  TextStyle(fontFamily: 'Poppins Bold', fontSize: 18), textAlign: TextAlign.start,),
+                                           ),
+              
+                                          SizedBox(height: heightScreen * 0.015,),
+              
+                                            Container(
+                                              width: screenMax,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:  BorderRadius.circular(8),
+                                              ),
+                                                child:  Column(
+                                                    children: [
+
+                                                Container(
+                                                     height: heightScreen * 0.1,
+                                                     width: screenMax * 0.85,
+                                                     decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.5),
+                                                          blurRadius: 7,
+                                                          spreadRadius: 2
+                                                        )
+                                                      ]
+                                                     ),
+                                                    child: TextFormField(
+                                                      controller: numRefController,
+                                                      decoration: const InputDecoration(
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white )
+                                                        ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide.none
+                                                        ),
+                                                        enabledBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white)
+                                                        ),
+                                                        errorBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 1, color: Colors.red)
+                                                        ),
+                                                        focusedErrorBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 1, color: Colors.red)
+                                                        ),
+                                                        labelText: "Numero de Referencia",
+                                                        labelStyle: TextStyle(fontFamily: 'Poppins Regular'),
+                                                        contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 25),
+                                                      ),
+                                                      keyboardType: TextInputType.number,                            
+                                                    ),
+                                                  ),
+                                    
+                                                      
+                                               SizedBox(height: heightScreen * 0.013,),
+
+                                                  FutureBuilder<void>(future: _bankAccFuture, builder: (context, snapshot) {
+                                                         
+                                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                                        return const Center(child: CircularProgressIndicator());
+                                                      } else if (snapshot.hasError) {
+                                                        return Text('Error: ${snapshot.error}');
+                                                      } else {
+                
+                                                      return Column(children: [
+                                                             CustomDropdownButtonFormField(identifier: 'selectTypeAccountBank', selectedIndex: _selectsBankAccountId , dataList: bankAccountsList, text: _bankAccountText, onSelected: (newValue, bankAccText) {
+                                                          setState(() {
+                                                              _selectsBankAccountId = newValue ?? 0;
+                                                              _bankAccountText = bankAccText;
+                                                          });
+                                                      },),
+                                                  SizedBox(height: heightScreen * 0.013,),
+              
+              
+                                                  CustomDropdownButtonFormField(identifier: 'selectTypeCoins', selectedIndex: _selectCurrencyId , dataList: uniqueISOsAndCurrencyId, text: _currencyText, onSelected: (newValue, currectText) {
+                                                          setState(() {
+                                                              _selectCurrencyId = newValue ?? 0;
+                                                              _currencyText = currectText;
+                                                          });
+                                                      },)
+                                                      
+              
+                                                      ],);
+                                                    }
+                                                  }
+                                                  ),
+              
+              
+              
+              
+                                               
+                                                SizedBox(height: heightScreen * 0.013,),
+              
+              
+                                     
+                                                  Container(
+                                                     height: heightScreen * 0.1,
+                                                      width: screenMax * 0.85,
+                                                      decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                            blurRadius: 7,
+                                                            spreadRadius: 2,
+                                                            color: Colors.grey.withOpacity(0.5))
+                                                      ],
+                                                    ),
+                                                    child: DropdownButtonFormField<String>(
+                                                    value: paymentTypeValue,
+                                                    onChanged: (String? newValue) {
+                                                      setState(() {
+                                                        paymentTypeValue = newValue;
+                                                                                       
+                                                                                       
+                                                      });
+                                                                                       
+                                                      if(newValue == 'Depósito Directo'){
+                                                                                       
+                                                          setState(() {
+                                                            _selectTypePayment = 'A';
+                                                          });
+                                                                                       
+                                                      }else if(newValue == 'Tarjeta de Crédito'){
+                                                                                       
+                                                          setState(() {
+                                                            _selectTypePayment = 'C';
+                                                          });
+                                                                                       
+                                                      }else if(newValue == "Cheque"){
+                                                                                       
+                                                          setState(() {
+                                                            _selectTypePayment = 'K';
+                                                          });
+                                                                                       
+                                                      }else if(newValue == "Cuenta"){
+                                                                                       
+                                                          setState(() {
+                                                            _selectTypePayment = 'T';
+                                                          });
+                                                                                       
+                                                      }else if(newValue == 'Efectivo' ){
+                                                                                       
+                                                          setState(() {
+                                                            _selectTypePayment = 'X';
+                                                          });
+                                                                                       
+                                                      }else if(newValue == 'Débito Directo'){
+                                                                                       
+                                                          setState(() {
+                                                            _selectTypePayment = 'D';
+                                                          });
+                                                                                       
+                                                      }
+                                                                                       
+                                                      print('Este es el valor de paymentTypeValue $paymentTypeValue && este es el valor de $_selectTypePayment');
+                                                    },
+                                                    items: <String>['Depósito Directo', 'Tarjeta de Crédito', 'Cheque', 'Cuenta', 'Efectivo', 'Débito Directo' ].map((String value) {
+                                                    return DropdownMenuItem<String>(
+                                                      value: value,
+                                                      child: Text(value, style: const TextStyle(fontFamily: 'Poppins Regular'),),
+                                                    );
+                                                    }).toList(),
+                                                    decoration:  InputDecoration(
+                                                        errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                                                    contentPadding:
+                                                        const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                                                      border: OutlineInputBorder(
+                                                      borderSide: BorderSide.none,
+                                                      borderRadius: BorderRadius.circular(15),
+                                                    ),
+                                                    focusedBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      borderSide: const BorderSide(width: 25, color: Colors.white)
+                                                    ),
+                                                    enabledBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      borderSide:  const BorderSide(width: 25, color: Colors.white)
+                                                    ),
+                                                      labelText: 'Tipo de Pago',
+                                                    labelStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                                                    ),
+                                                  ),
+                                                  ),
+                                     
+                                                  SizedBox(height: heightScreen * 0.013,),
+              
+                                                  Container(
+                                                     height: heightScreen * 0.1,
+                                                     width: screenMax * 0.85,
+                                                     decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      boxShadow: [
+              
+                                                          BoxShadow(
+                                                            color: Colors.grey.withOpacity(0.5),
+                                                            blurRadius: 7,
+                                                            spreadRadius: 2
+                                                          )
+              
+                                                      ]
+                                                     ),
+                                                    child: TextFormField(
+                                                      readOnly: true,
+                                                      controller: dateController,
+                                                    
+                                                      decoration: const InputDecoration(
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white )
+                                                        ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide.none
+                                                        ),
+                                                        enabledBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white)
+                                                        ),
+                                                        labelText: "Fecha",
+                                                        contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 25),
+                                                      ),
+                                                    ),
+                                                  ),
+                                     
+                                                  SizedBox(height: heightScreen * 0.013,),
+                                
+                                     
+                                                  Container(
+                                                     height: heightScreen * 0.1,
+                                                     width: screenMax * 0.85,
+                                                     decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.5),
+                                                          blurRadius: 7,
+                                                          spreadRadius: 2
+                                                        )
+                                                      ]
+                                                     ),
+                                                    child: TextFormField(
+                                                      controller: montoController,
+                                                      decoration: const InputDecoration(
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white )
+                                                        ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide.none
+                                                        ),
+                                                        enabledBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white)
+                                                        ),
+                                                        errorBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 1, color: Colors.red)
+                                                        ),
+                                                        focusedErrorBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 1, color: Colors.red)
+                                                        ),
+                                                        labelText: "Monto",
+                                                        contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 25),
+                                                      ),
+                                                      keyboardType: TextInputType.number,
+                                                      validator: (value) {
+
+                                                          if(value!.isEmpty || value == '0' ||  value.contains('-') || value.contains(',') ){
+
+                                                              return "El monto tiene caracteres invalidos, esta vacio";
+                                                          }
+
+                                                          return null;
+
+                                                      },                             
+                                                    ),
+                                                  ),
+                                     
+                                                    SizedBox(height: heightScreen * 0.013,),
+              
+                                                        Container(
+                                                          height: heightScreen * 0.1,
+                                                          width: screenMax * 0.85,
+                                                          decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.5),
+                                                          blurRadius: 7,
+                                                          spreadRadius: 2
+                                                        )
+                                                      ]
+                                                     ),
+                                                          child: TextFormField(
+                                                            controller: observacionController,
+                                                            decoration: const InputDecoration(
+                                                               focusedBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white )
+                                                        ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide.none
+                                                        ),
+                                                        enabledBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          borderSide: BorderSide(width: 25, color: Colors.white)
+                                                        ),
+                                                              labelText: "Observacion",
+                                                        contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 25),
+                                                            ),
+                                                          ),
+                                                        ),
+                                     
+                                                 
+                                                    ],
+                                     
+                                                ),
+                                     
+                                            ),  
+                                              SizedBox(height: heightScreen * 0.025,),
+              
+                                               ElevatedButton(
+                                                    onPressed: orderData['status_sincronized'] == 'Enviado' && orderData['saldo_total'] > 0 ?   () async {                                                             
+                                     
+                                                            if (_formKey.currentState!.validate()) {
+
+                                                                
+                                                                   await _createCobro();
+              
+                                                                  setState(() {
+                                                                  _ordenVenta = _loadOrdenVentasForId();
+                                                                  });
+                                                               
+                                                            }
+                                                    } : null,
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: (const Color(0xFF7531FF)),
+                                                      foregroundColor: Colors.white, // Color de fondo verde
+                                                      minimumSize: Size(screenMax * 0.85, 50),
+                                                       // Ancho máximo y altura de 50
+                                                    ),
+                                                    child: const Text(
+                                                      'Crear Cobro',
+                                                      style: TextStyle(fontSize: 16, fontFamily: 'Poppins Bold'), // Tamaño de fuente 16
+                                                    ),
+                                                  ),
+                                             SizedBox(height: heightScreen * 0.025,),
+              
+                                                                                  
+                                          ],
+                                        ),
+                                                                
+                                     ],                        
+                                                                     ),
+                                   ),
+                                 ),
                                ),
-                             ),
-                           );
-                        }
-                 }, 
+                             );
+                          }
+                   }, 
+              ),
             ),
       ),
     );
   }
 
- Future<void> _createCobro(loadCobranzas) async {
+ Future<void> _createCobro() async {
   final dynamic bankAccountId = _selectsBankAccountId;
   //Tipo del documento de cobro
   final dynamic cDocTypeId = variablesG[0]['c_doctypereceipt_id'];
@@ -451,6 +767,9 @@ void initState() {
   final dynamic cOrderId = widget.cOrderId;
   final dynamic cInvoiceId = widget.idFactura;
   final dynamic tenderType = _selectTypePayment;
+  final String typeMoney = _currencyText;
+  final String bankAccount = _bankAccountText;
+  final String tenderTypeT = paymentTypeValue!;
 
   print('Esto es numRef ${numRefController.text}  es currencyId $currencyId y este es el orderId $cOrderId y este es el id de la factura $cInvoiceId');
 
@@ -462,11 +781,18 @@ void initState() {
 
   // Obtener el saldo total de la orden
 
-  double numberFormmated = parseFormattedNumber(widget.saldoTotal);
+  final double saldoTotal;
 
-  final double saldoTotal = numberFormmated.toDouble();
+  if (orderData['saldo_total'] is double) {
+  saldoTotal = orderData['saldo_total'];
+} else if (orderData['saldo_total'] is String) {
+  saldoTotal = double.parse(orderData['saldo_total']);
+} else {
+  // Manejar el caso en el que `saldo_total` no sea ni `double` ni `String`
+  throw Exception('El tipo de saldo_total no es ni double ni String');
+}
 
-  print('esto es el saldototal $saldoTotal');
+
 
   if (payAmt > saldoTotal) {
     // Si el monto del cobro es mayor al saldo total, mostrar mensaje de diálogo
@@ -487,7 +813,7 @@ void initState() {
         );
       },
     );
-  } else if (payAmt <= 0) {
+  } else if (payAmt <= 0 || saldoTotal <= 0 ) {
 
        showDialog(
       context: context,
@@ -519,10 +845,11 @@ void initState() {
       "description" : description,
       "c_bpartner_id": cBPartnerId, 
       "pay_amt": payAmt.toStringAsFixed(2), 
-      "c_currency_id": currencyId,
+      "c_currency_id": _selectCurrencyId,
       "c_order_id":  cOrderId, 
       "c_invoice_id": cInvoiceId,
-      "tender_type": tenderType,      
+      "tender_type": tenderType,
+      "c_number_ref": numRefController.text      
 
     };
 
@@ -535,12 +862,15 @@ void initState() {
       description: description,
       cBPartnerId: cBPartnerId,
       payAmt: payAmt.toStringAsFixed(2),
-      cCurrencyId: currencyId,
+      cCurrencyId: _selectCurrencyId,
       cOrderId: cOrderId,
       cInvoiceId: cInvoiceId,
       documentNo: 0,
       tenderType: tenderType ,
       saleOrderId: saleOrderId,
+      bankAccountT: bankAccount,
+      cCurrencyIso: typeMoney,
+      tenderTypeName: tenderTypeT ,
     );
 
     // setState(() {
@@ -548,15 +878,15 @@ void initState() {
     // _loadOrdenVentasForId();
     // });
 
-    //  loadCobranzas();
-
+   
 
    dynamic response = await createCobroIdempiere(cobro);
 
     dynamic numDoc = response['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
+    print('Esto es cobroId $cobroId, y numdoc $numDoc');
     
     await updateDocumentNoCobro(cobroId, numDoc);
-  
+      
     print('NumDoc $numDoc');
     print("esto es el cobro $cobro y la respuesta $response" );
 
@@ -567,6 +897,7 @@ void initState() {
     observacionController.clear();
     
     setState(() {
+      _selectCurrencyId = 0;
       _selectsBankAccountId = 0;
     });
 
@@ -584,23 +915,42 @@ void initState() {
 class CustomTextInfo extends StatelessWidget {
   final String label;
   final String value;
+  final double mediaScreen;
+  final double heightScreen;
 
   const CustomTextInfo({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
-  }) : super(key: key);
+    required this.mediaScreen,
+    required this.heightScreen
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label),
-        const SizedBox(height: 5,),
-        Text(value),
-        const Divider(),
-      ],
+    return Container(
+        width: mediaScreen * 0.85,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              blurRadius: 7,
+              spreadRadius: 2 
+            )
+          ],
+          borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5 ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label),
+            const SizedBox(height: 5,),
+            Text(value, style: const TextStyle(fontFamily: 'Poppins Regular'),),
+          ],
+        ),
+      ),
     );
   }
 }

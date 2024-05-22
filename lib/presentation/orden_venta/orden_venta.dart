@@ -337,7 +337,7 @@ Color getColorBg(Set<WidgetState> states){
                               spreadRadius: 2,
                               color: Colors.grey.withOpacity(0.5))
                         ]),
-                    child: Column(
+                   child: Column(
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(

@@ -17,6 +17,16 @@ invoke(option, newValue, data){
 
         // Si se encuentra la categoría, devolver su nombre, de lo contrario devolver una cadena vacía
         return categoria != null ? categoria['categoria'] : '';
+         case 'obtenerNombreCurrencyType':
+
+      
+        // Buscar la categoría en _categoriesList que coincide con el ID dado
+        Map<String, dynamic>? currency = data.firstWhere(
+          (currency) => currency['c_currency_id'] == newValue,
+        );
+
+        // Si se encuentra la categoría, devolver su nombre, de lo contrario devolver una cadena vacía
+        return currency != null ? currency['iso_code'] : '';
         
         case 'obtenerNombreProductGroup':
 

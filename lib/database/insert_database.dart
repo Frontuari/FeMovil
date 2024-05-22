@@ -27,6 +27,7 @@ Future<void> insertTaxData() async {
 
  Future insertCobro({
     required int cBankAccountId,
+    required String bankAccountT,
     required int? cDocTypeId,
     required String? dateTrx,
     required String description,
@@ -34,11 +35,14 @@ Future<void> insertTaxData() async {
     required dynamic payAmt,
     required String? date,
     required dynamic cCurrencyId,
+    required String cCurrencyIso,
     required dynamic cOrderId,
     required dynamic cInvoiceId,
     required dynamic documentNo,
     required dynamic tenderType,
+    required String tenderTypeName,
     required int saleOrderId,
+  
   }) async {
     final db = await DatabaseHelper.instance.database;
 
@@ -60,6 +64,9 @@ Future<void> insertTaxData() async {
         'documentno': documentNo,
         'tender_type': tenderType,
         'sale_order_id': saleOrderId,
+        'c_bankaccount_name': bankAccountT,
+        'c_currency_iso': cCurrencyIso,
+        'tender_type_name': tenderTypeName
       },
     // Esto significa que si hay un conflicto, es decir si ya existe un registro con la misma clave primaria o restriccion unica, el registro existente se remplazara por el nuevo
       conflictAlgorithm: ConflictAlgorithm.replace, 

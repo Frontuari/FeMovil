@@ -2,6 +2,8 @@ import 'package:femovil/config/app_bar_femovil.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/presentation/cobranzas/cobro.dart';
+import 'package:femovil/presentation/cobranzas/cobros_list.dart';
+import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:flutter/material.dart';
 
 
@@ -54,6 +56,7 @@ class _CobranzasState extends State<Cobranzas> {
 
 void _showFilterOptions(BuildContext context) {
   final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+          final screenMax = MediaQuery.of(context).size.width * 0.8;
 
   showMenu(
     context: context,
@@ -72,7 +75,10 @@ void _showFilterOptions(BuildContext context) {
                Image.asset('lib/assets/Check@3x.png', width: 25,
                   color: const Color(0xFF7531FF),
                 ),
-              const Text('Filtrar Por Ordenes con saldo abierto', style: TextStyle(overflow: TextOverflow.ellipsis),),
+                const SizedBox(width: 10,),
+              SizedBox(
+                width: screenMax * 0.6 ,
+                child: const Text('Ordenes con saldo abierto', style: TextStyle(overflow: TextOverflow.ellipsis),)),
             ],
           ),
           onTap: () {
@@ -94,7 +100,11 @@ void _showFilterOptions(BuildContext context) {
               Image.asset('lib/assets/Check@3x.png', width: 25,
                   color: const Color(0xFF7531FF),
                 ),
-              const Text('Filtrar Por Ordenes con saldo pagado'),
+              const SizedBox(width: 10,),
+
+              SizedBox(
+                width: screenMax * 0.6 ,
+                child: const Text('Ordenes con saldo pagado',style: TextStyle(overflow: TextOverflow.ellipsis),)),
             ],
           ),
           onTap: () {
@@ -116,7 +126,6 @@ void _showFilterOptions(BuildContext context) {
   Widget build(BuildContext context) {
         
         final screenMax = MediaQuery.of(context).size.width * 0.8;
-        final heightScreen = MediaQuery.of(context).size.height * 1;
 
 
     return GestureDetector(
@@ -219,6 +228,8 @@ void _showFilterOptions(BuildContext context) {
                       ),
                       IconButton(
                           onPressed: () {
+
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const CobrosList()) );
                             
                           },
                           icon: const Icon(
@@ -426,7 +437,7 @@ void _showFilterOptions(BuildContext context) {
                                                       onTap: () {
                                                             Navigator.of(context).push(
                                                             MaterialPageRoute(
-                                                            builder: (context) =>  Cobro(orderId: venta['id'],saldoTotal: venta['saldo_total'], loadCobranzas: _loadCobranzas,cOrderId: venta['c_order_id'], documentNo: venta['documentno'], idFactura: venta['id_factura'], ),
+                                                            builder: (context) =>  Cobro(orderId: venta['id'],cOrderId: venta['c_order_id'], documentNo: venta['documentno'], idFactura: venta['id_factura'], ),
                                                           ),
                                                         );
                                                       },

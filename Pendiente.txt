@@ -75,3 +75,10 @@ y en caso de que si existe se le creara al numero de factura
 27) Acceso por modulos(Compras/Ventas/Ambos)
 28) Agregar configuracion para documentos de prueba(Agregar un limite para documentos de prueba que no pueda agregar mas 
 documentos del limite)
+
+29) Enviar en idempiere en el campo documentno si existe un numero de referencia en el cobro 
+
+validar los distintos casos 
+1) si hay un numero de referencia se envia como numero de documento y no se actualiza en documentno
+2) se mostrara solamente el numero de documento del cobro como referencia al cobro realizado
+

@@ -19,6 +19,23 @@ Future<List<Map<String, dynamic>>> getProductsAndTaxes() async {
 }
 
 
+Future<List<Map<String, dynamic>>> getProductsScreen({required int page, required int pageSize}) async {
+  final db = await DatabaseHelper.instance.database;
+  print('Esto es page $page y esto es pagesize $pageSize');
+  if (db != null) {
+    // Calcula el índice de inicio
+    final int offset = (page - 1) * pageSize;
+
+    // Realiza la consulta con paginación
+    return await db.query('products', limit: pageSize, offset: offset);
+    
+  } else {
+    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+    print('Error: db is null');
+    return [];
+  }
+}
+
 
 Future<List<Map<String, dynamic>>> getProducts() async {
       final db = await DatabaseHelper.instance.database;
@@ -110,7 +127,7 @@ Future<List<Map<String, dynamic>>> getProducts() async {
       // Consultar todas las órdenes de venta con el nombre del cliente asociado
       List<Map<String, dynamic>> orders = await db.rawQuery('''
         SELECT o.*, c.bp_name AS nombre_cliente, c.ruc AS ruc, c.email AS email, c.phone AS phone,
-        (o.monto - COALESCE((SELECT SUM(pay_amt) FROM cobros WHERE sale_order_id = o.id), 0)) AS saldo_total
+        ROUND((CAST(REPLACE(o.monto, ',', '.') AS REAL) - COALESCE((SELECT SUM(pay_amt) FROM cobros WHERE sale_order_id = o.id), 0)),2) AS saldo_total
         FROM orden_venta o
         INNER JOIN clients c ON o.cliente_id = c.id
       ''');
@@ -212,7 +229,7 @@ Future<List<Map<String, dynamic>>> getProducts() async {
 
 
         List<Map<String, dynamic>> clientsResult = await db.rawQuery('''
-          SELECT c.bp_name, c.ruc, c.email, c.id
+          SELECT c.bp_name, c.ruc, c.email, c.id, c.phone
           FROM clients c
           WHERE  c.id = ?
         ''', [clienteId]); 
@@ -741,11 +758,21 @@ Future<Map<String, dynamic>?> getVendorsById(int vendorId) async {
 }
 
 
-Future<List<Map<String, dynamic>>> getCobros() async {
+Future<List<Map<String, dynamic>>> getCobros({required int page,required int pageSize}) async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {
-    // Consultar todos los registros de la tabla 'cobros'
-    List<Map<String, dynamic>> result = await db.query('cobros');
+
+          final int offset = (page - 1) * pageSize;
+
+    
+    // Consulta que une las tablas `cobros`, `orden_venta` y `clients` para obtener el nombre del cliente
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT cobros.*, c.bp_name AS client_name, o.documentno as orden_venta_nro
+      FROM cobros
+      INNER JOIN orden_venta o ON cobros.sale_order_id = o.id
+      INNER JOIN clients c ON o.cliente_id = c.id
+      LIMIT ? OFFSET ?
+    ''',[pageSize, offset]);
     return result;
   } else {
     // Manejar el caso en el que db sea null
