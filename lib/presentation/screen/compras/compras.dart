@@ -1,5 +1,4 @@
 import 'package:femovil/config/app_bar_femovil.dart';
-import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/presentation/screen/compras/compras_details.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +68,7 @@ void _showDateRangePicker(BuildContext context) async {
     // Enhanced user experience with custom date range and better initial selection
     final picked = await showDateRangePicker(
       context: context,
+      locale: const Locale("es", "ES"), 
       initialDateRange: DateTimeRange(
         start: DateTime.now().subtract(const Duration(days: 7)), // Default to past week
         end: DateTime.now(),

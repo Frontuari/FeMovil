@@ -1,7 +1,9 @@
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/gets_database.dart';
+import 'package:femovil/presentation/cobranzas/cobro_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 
 class CobrosList extends StatefulWidget {
   const CobrosList({super.key});
@@ -15,10 +17,10 @@ class _CobrosListState extends State<CobrosList> {
   List<Map<String, dynamic>> cobros = [];
   List<Map<String, dynamic>> filteredCobros = [];
   List<Map<String, dynamic>> filteredCobroCopy = [];
-  final int _pageSize = 20; // Tamaño de cada página
+  final int _pageSize = 5; // Tamaño de cada página
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
-
+  bool _hasMoreCobros = true;
   final TextEditingController _searchController = TextEditingController();
   TextEditingController inputValue = TextEditingController();
   DateTimeRange? _selectedDateRange; 
@@ -28,6 +30,7 @@ class _CobrosListState extends State<CobrosList> {
   void initState() {
     super.initState();
    _scrollController.addListener(_onScroll);
+   
 
     _cobrosFuture = getCobros(page: cobros.length ~/ _pageSize + 1, pageSize: _pageSize);
     _cobrosFuture.then((data) {
@@ -39,18 +42,36 @@ class _CobrosListState extends State<CobrosList> {
   }
 
   Future<void> _loadMoreCobros() async {
-    if (_isLoading) return;
-    setState(() {
-      _isLoading = true;
-    });
+    if (_isLoading || !_hasMoreCobros) return;
+
+      setState(() {
+        _isLoading = true;
+      });
 
     try {
-      final newData = await getCobros(page: cobros.length ~/ _pageSize + 1, pageSize: _pageSize);
-      setState(() {
-        cobros.addAll(newData);
-        filteredCobros = cobros;
-        filteredCobroCopy = cobros;
-      });
+      final List<Map<String, dynamic>> newData = await getCobros(
+          page: (cobros.length ~/ _pageSize) + 1, pageSize: _pageSize);
+
+      print('New data $newData');
+
+      if (newData.isNotEmpty) {
+        setState(() {
+          for (var cob in newData) {
+            bool exists = cobros
+                .any((existingCobros) => existingCobros['id'] == cob['id']);
+            if (!exists) {
+              filteredCobros = [...filteredCobros, cob];
+            }
+          }
+          _hasMoreCobros = newData.length == _pageSize;
+        });
+      } else {
+        setState(() {
+          _hasMoreCobros = false; // No hay más productos para cargar
+        });
+      }
+      print(
+          "esto es el valor de productos despues de agrgarle el siguiente $cobros");
     } finally {
       setState(() {
         _isLoading = false;
@@ -210,8 +231,12 @@ class _CobrosListState extends State<CobrosList> {
 
    void _showDateRangePicker(BuildContext context) async {
     // Enhanced user experience with custom date range and better initial selection
+
+
+
     final picked = await showDateRangePicker(
       context: context,
+      locale: const Locale("es", "ES"), 
       initialDateRange: DateTimeRange(
         start: DateTime.now()
             .subtract(const Duration(days: 7)), // Default to past week
@@ -252,8 +277,8 @@ class _CobrosListState extends State<CobrosList> {
       context: context,
       position: RelativeRect.fromRect(
         Rect.fromPoints(
-          const Offset(20, 250), // Punto de inicio en la esquina superior izquierda
-        const Offset(155, 240),  // Punto de fin en la esquina superior izquierda
+          const Offset(20, 180), // Punto de inicio en la esquina superior izquierda
+        const Offset(175, 240),  // Punto de fin en la esquina superior izquierda
         ),
         overlay.localToGlobal(Offset.zero) & overlay.size, // Tamaño del overlay
       ),
@@ -342,7 +367,11 @@ class _CobrosListState extends State<CobrosList> {
     return GestureDetector(
       onTap: () {
 
-        FocusScope.of(context).unfocus();
+          if(MediaQuery.of(context).viewInsets.bottom > 0){
+
+            FocusScope.of(context).unfocus();
+
+          }
 
       },
       child: Scaffold(
@@ -350,330 +379,343 @@ class _CobrosListState extends State<CobrosList> {
           preferredSize: Size.fromHeight(50),
           child: AppBarSample(label: 'Lista de Cobros'),
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: screenHeight * 0.035,),
-            Container(
-              width: screenMax,
-              height: screenMax * 0.18,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 7,
-                    spreadRadius: 2,
-                    color: Colors.grey.withOpacity(0.5),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _filterCobros,
-                decoration: InputDecoration(
-                  labelStyle: const TextStyle(
-                    fontFamily: 'Poppins Regular',
-                    color: Colors.black,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 25,
-                    horizontal: 20,
-                  ),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                    borderSide: BorderSide.none, // Color del borde
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                    borderSide: BorderSide(
-                      color: Colors.white,
-                      width: 25,
-                    ), // Color del borde cuando está enfocado
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                    borderSide: BorderSide(
-                      color: Colors.white,
-                      width: 25,
-                    ), // Color del borde cuando no está enfocado
-                  ),
-                  labelText: 'Buscar por nombre o numero de orden',
-                  suffixIcon: Image.asset('lib/assets/Lupa.png'),
-                ),
-                style: const TextStyle(fontFamily: 'Poppins Regular'),
-              ),
-            ),
-             SizedBox(height: screenHeight * 0.035,),
-      
-              const SizedBox(
-                      height: 25,
-                    ),
-                    IconButton(
-                      icon: Image.asset(
-                        'lib/assets/filtro@3x.png',
-                        width: 25,
-                        height: 35,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: screenHeight * 0.035,),
+                Container(
+                  width: screenMax,
+                  height: screenMax * 0.18,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 7,
+                        spreadRadius: 2,
+                        color: Colors.grey.withOpacity(0.5),
                       ),
-                      onPressed: () {
-                        _showFilterOptions(context, screenMax);
-                      },
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _filterCobros,
+                    decoration: InputDecoration(
+                      labelStyle: const TextStyle(
+                        fontFamily: 'Poppins Regular',
+                        color: Colors.black,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 25,
+                        horizontal: 20,
+                      ),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                        borderSide: BorderSide.none, // Color del borde
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                          width: 25,
+                        ), // Color del borde cuando está enfocado
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                          width: 25,
+                        ), // Color del borde cuando no está enfocado
+                      ),
+                      labelText: 'Buscar por nombre o numero de orden',
+                      suffixIcon: Image.asset('lib/assets/Lupa.png'),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    style: const TextStyle(fontFamily: 'Poppins Regular'),
+                  ),
+                ),
+                 SizedBox(height: screenHeight * 0.025,),
+                  
+                   
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: Image.asset(
+                                'lib/assets/filtro@3x.png',
+                                width: 25,
+                                height: 35,
+                              ),
+                              onPressed: () {
+                                _showFilterOptions(context, screenMax);
+                              },
+                            alignment: Alignment.bottomLeft,),
+                          ],
+                        ),
+                 SizedBox(height: screenHeight * 0.025,),
             
-
-            Expanded(
-              child: FutureBuilder(
-                future: _cobrosFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return ListView.builder(
-                      controller: _scrollController,
-                      itemCount: filteredCobros.length + 1,
-                      itemBuilder: (context, index) {
-                         if (index == filteredCobros.length) {
-                          return _isLoading ? const Center(child: CircularProgressIndicator()) : const SizedBox();
-                        }
-                        
-                        
-                        final cobro = filteredCobros[index];
-                        
-                        print('esto es el snapshotData ${snapshot.data}');
-
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: screenMax,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
+            
+                Expanded(
+                  child: FutureBuilder(
+                    future: _cobrosFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return ListView.builder(
+                          controller: _scrollController,
+                          itemCount: filteredCobros.length + 1,
+                          itemBuilder: (context, index) {
+                             if (index == filteredCobros.length) {
+                              return _isLoading ? const Center(child: CircularProgressIndicator()) : const SizedBox();
+                            }
+                            
+                            
+                            final cobro = filteredCobros[index];
+                            
+                            print('esto es el snapshotData ${snapshot.data}');
+            
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: screenMax,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: 170,
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(255, 255, 255, 255),
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: Container(
-                                              height: 50,
-                                              width: screenMax,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFF0EBFC),
-                                                borderRadius: BorderRadius.circular(10),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.grey.withOpacity(0.2),
-                                                    spreadRadius: 2,
-                                                    blurRadius: 5,
-                                                    offset: const Offset(0, 3),
-                                                  ),
-                                                ],
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          height: 170,
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(255, 255, 255, 255),
+                                            borderRadius: BorderRadius.circular(10),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey.withOpacity(0.5),
+                                                spreadRadius: 2,
+                                                blurRadius: 5,
+                                                offset: const Offset(0, 3),
                                               ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(10.0),
-                                                child: Text(
-                                                  "N° ${cobro['orden_venta_nro'] != "" ? cobro['orden_venta_nro'] : ''}",
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: 'Poppins Bold',
-                                                    fontSize: 18,
-                                                    color: Colors.black,
+                                            ],
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Positioned(
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                child: Container(
+                                                  height: 50,
+                                                  width: screenMax,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFF0EBFC),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.grey.withOpacity(0.2),
+                                                        spreadRadius: 2,
+                                                        blurRadius: 5,
+                                                        offset: const Offset(0, 3),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  textAlign: TextAlign.start,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(10.0),
+                                                    child: Text(
+                                                      "N° ${cobro['orden_venta_nro'] != "" ? cobro['orden_venta_nro'] : ''}",
+                                                      style: const TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontFamily: 'Poppins Bold',
+                                                        fontSize: 18,
+                                                        color: Colors.black,
+                                                      ),
+                                                      textAlign: TextAlign.start,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 55,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: SizedBox(
-                                                width: screenMax * 0.9,
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                              Positioned(
+                                                top: 55,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: SizedBox(
+                                                    width: screenMax * 0.9,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
-                                                        Row(
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
-                                                            const Text(
-                                                              'Nombre: ',
-                                                              style: TextStyle(
-                                                                fontFamily: 'Poppins SemiBold',
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenMax * 0.45,
-                                                              child: Text(
-                                                                cobro['client_name'].toString(),
-                                                                style: const TextStyle(
-                                                                  fontFamily: 'Poppins Regular',
+                                                            Row(
+                                                              children: [
+                                                                const Text(
+                                                                  'Nombre: ',
+                                                                  style: TextStyle(
+                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  ),
                                                                 ),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
+                                                                SizedBox(
+                                                                  width: screenMax * 0.45,
+                                                                  child: Text(
+                                                                    cobro['client_name'].toString(),
+                                                                    style: const TextStyle(
+                                                                      fontFamily: 'Poppins Regular',
+                                                                    ),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
+                                                            Row(
+                                                              children: [
+                                                                const Text(
+                                                                  'Fecha: ',
+                                                                  style: TextStyle(
+                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: screenMax * 0.45,
+                                                                  child: Text(
+                                                                    cobro['date'],
+                                                                    style: const TextStyle(
+                                                                      fontFamily: 'Poppins Regular',
+                                                                    ),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                const Text(
+                                                                  'Monto: ',
+                                                                  style: TextStyle(
+                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: screenMax * 0.45,
+                                                                  child: Text(
+                                                                    '${cobro['pay_amt'].toString()}\$',
+                                                                    style: const TextStyle(
+                                                                      fontFamily: 'Poppins Regular',
+                                                                    ),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                               Row(
+                                                              children: [
+                                                                const Text(
+                                                                  'N° Documento: ',
+                                                                  style: TextStyle(
+                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: screenMax * 0.30,
+                                                                  child: Text(
+                                                                    cobro['documentno'].toString(),
+                                                                    style: const TextStyle(
+                                                                      fontFamily: 'Poppins Regular',
+                                                                    ),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                const Text(
+                                                                  'Descripción: ',
+                                                                  style: TextStyle(
+                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: screenMax * 0.40,
+                                                                  child: Text(
+                                                                    cobro['description'].toString(),
+                                                                    style: const TextStyle(
+                                                                      fontFamily: 'Poppins Regular',
+                                                                    ),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+            
                                                           ],
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Fecha: ',
-                                                              style: TextStyle(
-                                                                fontFamily: 'Poppins SemiBold',
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenMax * 0.45,
-                                                              child: Text(
-                                                                cobro['date'],
-                                                                style: const TextStyle(
-                                                                  fontFamily: 'Poppins Regular',
+                                                        GestureDetector(
+                                                          onTap: () {
+            
+                                                              Navigator.push(context, MaterialPageRoute(builder: (context) => CobroDetails(cobro: cobro) , ));
+            
+                                                          },
+                                                          child: Row(
+                                                            children: [
+                                                              const Text(
+                                                                'Ver',
+                                                                style: TextStyle(
+                                                                  color: Color(0xFF7531FF),
                                                                 ),
-                                                                overflow: TextOverflow.ellipsis,
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Monto: ',
-                                                              style: TextStyle(
-                                                                fontFamily: 'Poppins SemiBold',
+                                                              const SizedBox(
+                                                                width: 10,
                                                               ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenMax * 0.45,
-                                                              child: Text(
-                                                                '${cobro['pay_amt'].toString()}\$',
-                                                                style: const TextStyle(
-                                                                  fontFamily: 'Poppins Regular',
-                                                                ),
-                                                                overflow: TextOverflow.ellipsis,
+                                                              Image.asset(
+                                                                'lib/assets/Lupa-2@2x.png',
+                                                                width: 25,
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                           Row(
-                                                          children: [
-                                                            const Text(
-                                                              'N° Documento: ',
-                                                              style: TextStyle(
-                                                                fontFamily: 'Poppins SemiBold',
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenMax * 0.30,
-                                                              child: Text(
-                                                                cobro['documentno'].toString(),
-                                                                style: const TextStyle(
-                                                                  fontFamily: 'Poppins Regular',
-                                                                ),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            const Text(
-                                                              'Descripción: ',
-                                                              style: TextStyle(
-                                                                fontFamily: 'Poppins SemiBold',
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenMax * 0.40,
-                                                              child: Text(
-                                                                cobro['description'].toString(),
-                                                                style: const TextStyle(
-                                                                  fontFamily: 'Poppins Regular',
-                                                                ),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
-                                                    GestureDetector(
-                                                      onTap: () {},
-                                                      child: Row(
-                                                        children: [
-                                                          const Text(
-                                                            'Ver',
-                                                            style: TextStyle(
-                                                              color: Color(0xFF7531FF),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          Image.asset(
-                                                            'lib/assets/Lupa-2@2x.png',
-                                                            width: 25,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  
+                                ],
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         );
-                      },
-                    );
-                  }
-                },
-              ),
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

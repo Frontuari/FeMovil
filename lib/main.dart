@@ -7,8 +7,8 @@ import 'package:femovil/presentation/screen/informacion/informacion.dart';
 import 'package:femovil/presentation/screen/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 
 class AppInitializer {
@@ -55,6 +55,16 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: widget.initialRoute,
+      localizationsDelegates: const [
+        
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ] ,
+      supportedLocales: const [
+        Locale('en', ''), 
+        Locale('es', ''), 
+      ],
       debugShowCheckedModeBanner: false,
       title: 'Fe Movil',
       theme: AppTheme(selectedColor: 0).theme(),

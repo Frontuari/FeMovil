@@ -71,6 +71,7 @@ class _VentasState extends State<Ventas> {
     // Enhanced user experience with custom date range and better initial selection
     final picked = await showDateRangePicker(
       context: context,
+      locale: const Locale("es", "ES"), 
       initialDateRange: DateTimeRange(
         start: DateTime.now()
             .subtract(const Duration(days: 7)), // Default to past week

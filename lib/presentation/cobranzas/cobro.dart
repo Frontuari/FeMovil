@@ -46,7 +46,7 @@ class _CobroState extends State<Cobro> {
     List<Map<String, dynamic>> typeCoinsList = [];
   List<Map<String, dynamic>> cobrosList = [];
   late Future<void> _bankAccFuture;
-
+  bool disabledButton = true;
   // Selecteds 
 
   int _selectsBankAccountId =  0; 
@@ -711,11 +711,13 @@ _bankAccFuture = _getBankAcc();
                                               SizedBox(height: heightScreen * 0.025,),
               
                                                ElevatedButton(
-                                                    onPressed: orderData['status_sincronized'] == 'Enviado' && orderData['saldo_total'] > 0 ?   () async {                                                             
+                                                    onPressed: orderData['status_sincronized'] == 'Enviado' && orderData['saldo_total'] > 0 && disabledButton ?   () async {                                                             
                                      
                                                             if (_formKey.currentState!.validate()) {
 
-                                                                
+                                                                  setState(() {
+                                                                    disabledButton = false;
+                                                                  });
                                                                    await _createCobro();
               
                                                                   setState(() {
@@ -899,6 +901,8 @@ _bankAccFuture = _getBankAcc();
     setState(() {
       _selectCurrencyId = 0;
       _selectsBankAccountId = 0;
+      disabledButton = true;
+
     });
 
     // Mostrar un mensaje de éxito

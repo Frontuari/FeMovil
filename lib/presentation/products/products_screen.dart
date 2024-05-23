@@ -21,11 +21,9 @@ class _ProductsState extends State<Products> {
   String input = "";
   late ScrollController _scrollController;
   bool _showAddButton = true;
-  final int _pageSize = 5; // Tamaño de cada página
+  final int _pageSize = 25; // Tamaño de cada página
   bool _isLoading = false;
   bool _hasMoreProducts = true;
-  double _scrollPosition =
-      0.0; // Variable para almacenar la posición del scroll
 
   late List<Map<String, dynamic>> taxes =
       []; // Lista para almacenar los impuestos
@@ -72,9 +70,9 @@ class _ProductsState extends State<Products> {
   Future<void> _loadMoreProducts() async {
     if (_isLoading || !_hasMoreProducts) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+      setState(() {
+        _isLoading = true;
+      });
 
     try {
       final List<Map<String, dynamic>> newData = await getProductsScreen(

@@ -241,7 +241,7 @@ void _showFilterOptions(BuildContext context) {
 
                 const SizedBox(height: 10,),
 
-          Expanded(
+             Expanded(
                     child: ListView.builder(
 
                       itemCount: filteredCobranzas.length,

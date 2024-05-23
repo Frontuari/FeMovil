@@ -84,6 +84,40 @@ Future<List<Map<String, dynamic>>> getClients() async {
   }
 }
 
+
+Future<List<Map<String, dynamic>>> getClientsScreen({required int page, required int pageSize}) async {
+  final db = await DatabaseHelper.instance.database;
+
+      print('Esto es el numero de pagina $page y el tamano de items pr pagina $pageSize');
+
+      final int offset = (page - 1) * pageSize;
+
+  if (db != null) {
+    // Realiza la consulta para recuperar todos los registros de la tabla "products"
+    return await db.query('clients', limit: pageSize, offset: offset);
+  } else {
+    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+    print('Error: db is null');
+    return [];
+  }
+}
+
+Future<List<Map<String, dynamic>>> getClientsByNameOrRUC(String query) async {
+  final db = await DatabaseHelper.instance.database;
+  if (db != null) {
+    List<Map<String, dynamic>> result = await db.query(
+      'clients',
+      where: 'bp_name LIKE ? OR ruc LIKE ?',
+      whereArgs: ['%$query%', '%$query%'],
+    );
+    return result;
+  } else {
+    print('Error: db is null');
+    return [];
+  }
+}
+
+
 Future<List<Map<String, dynamic>>> getProviders() async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {
@@ -744,11 +778,12 @@ Future<List<Map<String, dynamic>>> getCobros(
     {required int page, required int pageSize}) async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {
+
     final int offset = (page - 1) * pageSize;
 
     // Consulta que une las tablas `cobros`, `orden_venta` y `clients` para obtener el nombre del cliente
     List<Map<String, dynamic>> result = await db.rawQuery('''
-      SELECT cobros.*, c.bp_name AS client_name, o.documentno as orden_venta_nro
+      SELECT cobros.*, c.bp_name AS client_name, o.documentno as orden_venta_nro, c.ruc as ruc, o.fecha as date_order, o.monto as total
       FROM cobros
       INNER JOIN orden_venta o ON cobros.sale_order_id = o.id
       INNER JOIN clients c ON o.cliente_id = c.id

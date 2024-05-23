@@ -16,7 +16,7 @@ class _FilterGroupsState extends State<FilterGroups> {
   // Ahora scategory es un miembro de la clase State
   @override
   Widget build(BuildContext context) {
-    print("Products ${widget.clients}");
+    print("clients ${widget.clients}");
     List<String> clients = widget.clients
         .map<String>((clients) => clients['group_bp_name'] as String)
         .toSet() // Elimina duplicados

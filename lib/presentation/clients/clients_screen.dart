@@ -1,4 +1,3 @@
-import 'package:femovil/assets/nav_bottom_menu.dart';
 import 'package:femovil/config/app_bar_femovil.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
@@ -22,12 +21,13 @@ class _ClientsState extends State<Clients> {
   List<Map<String, dynamic>> searchClient = [];
   TextEditingController searchController = TextEditingController();
   List<Map<String, dynamic>> filteredClients = [];
-  bool _isMounted = false;
-
+  final int _pageSize = 25;
   String input = "";
+  bool _isLoading = false;
+  bool _hasMoreProducts = true;
 
   Future<void> _loadClients() async {
-    final clientes = await getClients(); // Obtener todos los productos
+    final clientes = await getClientsScreen(page: 1, pageSize: _pageSize);
 
     print("Estoy obteniendo Clientes $clientes");
     setState(() {
@@ -36,7 +36,54 @@ class _ClientsState extends State<Clients> {
     });
   }
 
-  void _scrollListener() {
+
+
+  Future<void> _loadMoreClients() async {
+    if (_isLoading || !_hasMoreProducts) return;
+
+      setState(() {
+        _isLoading = true;
+      });
+
+    try {
+      final List<Map<String, dynamic>> newData = await getClientsScreen(
+          page: (clients.length ~/ _pageSize) + 1, pageSize: _pageSize);
+
+      print('New data $newData');
+
+      if (newData.isNotEmpty) {
+        setState(() {
+          for (var client in newData) {
+            bool exists = clients
+                .any((existingClient) => existingClient['id'] == client['id']);
+                print('esto es exist $exists');
+            if (!exists) {
+              clients = [...clients, client];
+              
+            }
+          }
+          _hasMoreProducts = newData.length == _pageSize;
+        });
+      } else {
+        setState(() {
+          _hasMoreProducts = false;
+        });
+      }
+      print(
+          "esto es el valor de clientes despues de agrgarle el siguiente $clients");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+     void _scrollListener() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
+      _loadMoreClients();
+    }
+
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent) {
       if (_showAddButton) {
@@ -53,11 +100,12 @@ class _ClientsState extends State<Clients> {
     }
   }
 
-  void _showFilterOptions(BuildContext context) async {
+
+ void _showFilterOptions(BuildContext context) async {
     final selectedFilter = await showDialog<String>(
       context: context,
       builder: (context) => FilterGroups(
-        clients: clients,
+        clients: searchClient,
       ),
     );
 
@@ -66,84 +114,66 @@ class _ClientsState extends State<Clients> {
     if (selectedFilter != null) {
       setState(() {
         _filter = selectedFilter;
+        _applyFilter();
         print("Esto es el filter $_filter");
       });
+    }
+  }
+
+  Future<void> _searchAndFilterClients(String input) async {
+    print("Estoy entrando en el input cuando no está vacío");
+    List<Map<String, dynamic>> dbResults = await getClientsByNameOrRUC(input);
+
+    setState(() {
+      searchClient = dbResults;
+      print("Estos son los clientes por grupo $clients $input");
+      _applyFilter();
+    });
+  }
+
+void _applyFilter() {
+    
+
+    if (_filter.isNotEmpty && _filter != "Todos") {
+      searchClient = searchClient
+          .where((client) => client['group_bp_name'] == _filter)
+          .toList();
+      print("Este es el searchClient $_filter $searchClient");
+    }else if(_filter  == 'Todos'){
+        searchController.text = '';
+        searchClient = clients;
+
     }
   }
 
   @override
   void initState() {
     // print("Esto es la variable global ${variablesG[0]['m_pricelist_id']}");
-    _isMounted = true;
     _loadClients();
-    _scrollController = ScrollController();
+     _scrollController = ScrollController();
 
     _scrollController.addListener(_scrollListener);
 
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_isMounted) {
-      _loadClients();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    if (input == "") {
-      searchClient = clients.toList();
-    }
 
-    if (_filter != "" && input == "") {
-      setState(() {
-        if (_filter == "Todos") {
-          searchController.clear();
-          input = "";
-
-          searchClient = clients.toList();
-        } else {
-          searchClient = clients
-              .where((client) => client['group_bp_name'] == _filter)
-              .toList();
-          print("Este es el searchClient $searchClient");
-        }
-        input = ""; // Limpiar el campo de búsqueda al filtrar por categoría
-      });
-    } else if (input != "") {
-      print("Estoy entrando en el input cuando no esta vacio ");
-      setState(() {
-        searchClient = clients.where((client) {
-          final name = client['bp_name'].toString().toLowerCase();
-          final ruc = client['ruc'].toString().toLowerCase();
-          final inputLower = input.toLowerCase();
-          return name.contains(inputLower) || ruc.contains(inputLower);
-        }).toList();
-        print("Estos son los clientes por grupo $searchClient $input");
-      });
-    }
-
-    if (_filter != "" && _filter != "Todos") {
-      searchClient = clients
-          .where((client) => client['group_bp_name'] == _filter)
-          .toList();
-      searchController.clear();
-      input = "";
-    } else if (_filter == "Todos") {
-      searchController.clear();
-      input = "";
-
-      searchClient = clients.toList();
-    }
+        if (input == "") {
+        searchClient = clients.toList();
+      }
 
     final screenMax = MediaQuery.of(context).size.width * 0.8;
     final screenHight = MediaQuery.of(context).size.height * 0.8;
 
     return GestureDetector(
       onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
+        if (MediaQuery.of(context).viewInsets.bottom > 0) {
+          // Verificar si hay un teclado visible
+          FocusScope.of(context).unfocus();
+        }
       },
       child: Scaffold(
         appBar: PreferredSize(
@@ -178,15 +208,13 @@ class _ClientsState extends State<Clients> {
                     child: TextField(
                       controller: searchController,
                       onChanged: (value) {
-                        if (searchController.text.isNotEmpty) {
-                          setState(() {
-                            _filter = "";
-                          });
-                        }
-      
-                        setState(() {
+                          if(value.isNotEmpty){
+                            _filter = '';
+                          }
+
+                         setState(() {
                           input = value;
-                          filteredClients = clients;
+                          _searchAndFilterClients(value);
                         });
                       },
                       decoration: InputDecoration(
