@@ -82,3 +82,4 @@ validar los distintos casos
 1) si hay un numero de referencia se envia como numero de documento y no se actualiza en documentno
 2) se mostrara solamente el numero de documento del cobro como referencia al cobro realizado
 
+30) Facturas con retencion mostrar el tipo de retencion

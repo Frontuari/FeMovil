@@ -1,25 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/config/getPosProperties.dart';
-import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_compra/product_selection.dart';
-import 'package:femovil/presentation/orden_venta/product_selection.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/retenciones/idempiere/create_factura_retencion.dart';
-import 'package:femovil/presentation/retenciones/idempiere/payment_terms_sincronization.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CrearRetenciones extends StatefulWidget {
-  const CrearRetenciones({Key? key}) : super(key: key);
+  const CrearRetenciones({super.key});
 
   @override
   State<CrearRetenciones> createState() => _CrearRetencionesState();
@@ -54,7 +50,6 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
   final _formKey = GlobalKey<FormState>();
   final FocusNode _focusNode = FocusNode();
   List<Map<String, dynamic>> ordenesSinRetencion = [];
-  int? _selectedTercero;
   List<Map<String, dynamic>> selectedProducts = [];
 
   Future? _terceros;
@@ -68,6 +63,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
   double? saldoNeto;
   double? totalImpuesto;
   BuildContext? currentContext;
+  bool _hasError = false;
 
   double calcularMontoTotal() {
     double total = 0;
@@ -86,6 +82,8 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
 
     return suma;
   }
+
+
 
   initV() async {
     if (variablesG.isEmpty) {
@@ -157,6 +155,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
 
   @override
   void initState() {
+
     if (mounted) {
       setState(() {
         _paymentTermsFuture = getPaymentTerms();
@@ -183,71 +182,269 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
     super.dispose();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final screenMedia = MediaQuery.of(context).size.width * 0.8;
+    final screenHeight = MediaQuery.of(context).size.height * 1;
     setState(() {
       currentContext = context;
     });
+
+    
 
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
       },
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-        appBar: AppBar(
-          title: const Text('Factura con Retencion'),
-          backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-        ),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(50) ,
+          child: AppBarSample(label: 'Factura con Retencion')),
         body: Center(
           child: SizedBox(
             width: screenMedia,
             child: SingleChildScrollView(
               child: Form(
                 key: _formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
-                  children: [
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: numeroDocumentoController,
-                      decoration: const InputDecoration(
-                          labelText: 'Numero de documento',
-                          filled: true,
-                          fillColor: Colors.white),
-                      onChanged: (value) => print('Este es el valor $value'),
-                    ),
-                    // const SizedBox(height: 10,),
-                    // TextField(
-                    //   controller: numeroFacturaController,
-                    //   decoration:  const InputDecoration(labelText: 'Numero de Factura', fillColor: Colors.white, filled: true),
-                    // ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextField(
-                      controller: descripcionController,
-                      decoration: const InputDecoration(
-                          labelText: 'Descripcion',
-                          fillColor: Colors.white,
-                          filled: true),
-                      maxLines: 2,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: fechaFacturacionController,
-                      decoration: const InputDecoration(
-                          labelText: 'Fecha de Facturacion',
-                          fillColor: Colors.white,
-                          filled: true),
-                    ),
 
-                    const SizedBox(
-                      height: 10,
+                  
+                  
+                  children: [
+
+                      SizedBox(height: screenHeight * 0.03,),
+                    
+                    Container(
+                     height: screenMedia * 0.20,
+                      width: screenMedia * 0.95,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+
+                          borderRadius: BorderRadius.circular(15), 
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2
+                            )
+                          ]
+
+                      ),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: numeroDocumentoController,
+                        decoration:    InputDecoration(
+                            labelText: 'Numero de documento',
+                            filled: true,
+                            fillColor: Colors.white,
+                             contentPadding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 20),
+                            labelStyle: const TextStyle(
+                              fontFamily:
+                                  'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
+                              fontSize: 15.0, // Tamaño de la fuente
+                              // Peso de la fuente (por ejemplo, bold)
+                              color: Color.fromARGB(
+                                  255, 0, 0, 0), // Color del texto
+                            ),
+                            border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide.none, // Color del borde
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando está enfocado
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando no está enfocado
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.red))
+                            ),
+                            
+                        onChanged: (value) {
+                          if(_hasError == false){
+
+                          setState(() {
+                            
+                          });
+                          }
+
+                          print('Este es el valor $value');
+                        },
+                        validator: (value) {
+                      
+                            if(value!.isEmpty){
+
+                                
+                      
+                                return "Por favor, proporciona un numero de documento.";
+                            }
+                            return null;
+                      
+                        },
+                        
+                      ),
                     ),
+                  SizedBox(height: screenHeight * 0.02,),
+                          Container(
+                            height: screenMedia * 0.20,
+                      width: screenMedia * 0.95,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+
+                          borderRadius: BorderRadius.circular(15), 
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2
+                            )
+                          ]
+
+                      ),
+                            child: TextFormField(
+                            readOnly: true,
+                            controller: fechaFacturacionController,
+                            decoration:  InputDecoration(
+                            labelText: 'Fecha de Facturacion',
+                            fillColor: Colors.white,
+                            filled: true,
+                             contentPadding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 20),
+                            labelStyle: const TextStyle(
+                              fontFamily:
+                                  'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
+                              fontSize: 15.0, // Tamaño de la fuente
+                              // Peso de la fuente (por ejemplo, bold)
+                              color: Color.fromARGB(
+                                  255, 0, 0, 0), // Color del texto
+                            ),
+                            border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide.none, // Color del borde
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando está enfocado
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando no está enfocado
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.red))
+                            ),
+                                                    
+                            ),
+                          ),
+                  SizedBox(height: screenHeight * 0.02,),
+
+                    Container(
+                         height: screenMedia * 0.30,
+                      width: screenMedia * 0.95,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+
+                          borderRadius: BorderRadius.circular(15), 
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2
+                            )
+                          ]
+
+                      ),
+                      child: TextFormField(
+                        controller: descripcionController,
+                        decoration:  InputDecoration(
+                            labelText: 'Descripcion',
+                            fillColor: Colors.white,
+                            filled: true,
+                             contentPadding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 20),
+                            labelStyle: const TextStyle(
+                              fontFamily:
+                                  'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
+                              fontSize: 15.0, // Tamaño de la fuente
+                              // Peso de la fuente (por ejemplo, bold)
+                              color: Color.fromARGB(
+                                  255, 0, 0, 0), // Color del texto
+                            ),
+                            border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide.none, // Color del borde
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando está enfocado
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando no está enfocado
+                            ),
+                        
+                            ),
+                            onChanged: (value) {
+
+                                if(_hasError == false){
+                                  print('Entre aqui');
+                                  setState(() {
+                                    
+                                  });
+                                }
+
+                            } ,
+                        maxLines: 2,
+                      ),
+                    ),
+                
+
+                    SizedBox(height: screenHeight * 0.02,),
 
                     FutureBuilder<dynamic>(
                       future:
@@ -263,168 +460,324 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                               .data; // Accedemos a los datos del snapshot
 
                           filteredTerceros ??= tercerosData;
+                     
 
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.search),
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return StatefulBuilder(
-                                            builder: (context, setState) {
-                                              return AlertDialog(
-                                                title: const Text(
-                                                    'Buscar Proveedor'),
-                                                content: SingleChildScrollView(
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      TextField(
-                                                        controller:
-                                                            _searchDialogController,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          labelText: 'Buscar',
-                                                          prefixIcon: Icon(
-                                                              Icons.search),
+                          return Container(
+                            width: screenMedia * 0.97,
+                               
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                            
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(0.5),
+                                              blurRadius: 7,
+                                              spreadRadius: 2
+                                            )
+                                        ]
+                                      ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: _hasError == true ? screenHeight * 0.18 : screenHeight * 0.11,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(2)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            blurRadius: 7,
+                                            spreadRadius: 2,
+                                            offset: Offset(-2, 0)
+
+                                          )
+                                        ]
+                                      ),
+                                      child: IconButton(
+                                       
+                                        icon:  Icon(Icons.search, color: _hasError  ? Color(0XFFA5F52B): Color(0XFF7531FF),),
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                                  
+                                                    if(MediaQuery.of(context).viewInsets.bottom > 0){
+                                                                  
+                                                      FocusScope.of(context).requestFocus(FocusNode());
+                                                    }
+                                                
+                                                },
+                                                child: StatefulBuilder(
+
+                                                  builder: (context, setStateDialog) {
+                                                    return AlertDialog(
+                                                      title: const Text(
+                                                          'Buscar Proveedor', style: TextStyle(fontFamily: 'Poppins Semibold',),),
+                                                      content: SingleChildScrollView(
+                                                        child: Column(
+                                                          
+                                                          children: [
+                                                            SizedBox(height: screenHeight * 0.03,),
+                                                            Container(
+                                                              width: screenMedia* 0.80,
+                                                              height: screenHeight * 0.09,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.white,
+                                                                borderRadius: BorderRadius.circular(8),
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    color: Colors.grey.withOpacity(0.3),
+                                                                    blurRadius: 7,
+                                                                    spreadRadius: 2
+                                                                  )
+                                                
+                                                                ]
+                                                              ),
+                                                              child: TextField(
+                                                                controller:
+                                                                    _searchDialogController,
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                    
+                                                                      border: OutlineInputBorder(
+                                                                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                                        borderSide: BorderSide.none
+                                                                      ),
+                                                                      focusedBorder: OutlineInputBorder(
+                                                                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                                        borderSide: BorderSide(width: 25, color: Colors.white)
+                                                                      ),
+                                                                  contentPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+                                                                  labelText: 'Buscar',
+                                                                  prefixIcon: Icon(
+                                                                      Icons.search),
+                                                                ),
+                                                                onChanged: (value) {
+                                                                  if (mounted) {
+                                                                    setState(() {
+                                                                      filteredTerceros = tercerosData
+                                                                          .where((tercero) =>
+                                                                              tercero['bpname']
+                                                                                  .toLowerCase()
+                                                                                  .contains(value
+                                                                                      .toLowerCase()) ||
+                                                                              tercero['tax_id']
+                                                                                  .contains(
+                                                                                      value))
+                                                                          .toList();
+                                                                    });
+                                                                  }
+                                                                },
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 16),
+                                                            SizedBox(
+                                                              width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width *
+                                                                  0.9,
+                                                              height: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height *
+                                                                  0.5,
+                                                              child: ListView.builder(
+                                                                shrinkWrap: true,
+                                                                itemCount:
+                                                                    filteredTerceros!
+                                                                        .length,
+                                                                itemBuilder:
+                                                                    (context, index) {
+                                                                  print(
+                                                                      'Estos son los filteredTerceros $filteredTerceros');
+                                                
+                                                                  String bpName =
+                                                                      filteredTerceros![
+                                                                              index]
+                                                                          ['bpname'];
+                                                                  int providerId =
+                                                                      filteredTerceros![
+                                                                              index]
+                                                                          ['id'];
+                                                                  int cBPartnerID =
+                                                                      filteredTerceros![
+                                                                              index][
+                                                                          'c_bpartner_id'];
+                                                                  dynamic
+                                                                      cBPartnerLocationID =
+                                                                      filteredTerceros![
+                                                                              index][
+                                                                          'c_bpartner_location_id'];
+                                                                  String ruc =
+                                                                      filteredTerceros![
+                                                                              index]
+                                                                          ['tax_id'];
+                                                
+                                                                          
+                                                                  String displayBpName =
+                                                                      "${bpName} ";
+                                                                  String displayRuc = ruc;
+                                                                  return ListTile(
+                                                                    title: Container(
+                                                                        decoration: BoxDecoration(
+                                                                          color: Colors.white,
+                                                                                borderRadius: BorderRadius.circular(8),
+                                                                                boxShadow: [
+                                                                                  BoxShadow(
+                                                                                    color: Colors.grey.withOpacity(0.3),
+                                                                                    blurRadius: 7,
+                                                                                    spreadRadius: 2
+                                                                                  )
+                                                                                ]
+                                                
+                                                                              ),
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.all(8.0),
+                                                                        child: Column(
+                                                                          children: [
+                                                                             
+                                                                                SizedBox(
+                                                                                
+                                                                                  width: screenMedia ,
+                                                                                  child: Padding(
+                                                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                                                                                    child: Text(
+                                                                                        displayBpName, textAlign: TextAlign.start, style: TextStyle(fontFamily: 'Poppins Bold'),),
+                                                                                  ),
+                                                                                                                                                  
+                                                                                ),
+                                                                                        SizedBox(
+                                                                                         
+                                                                                  width: screenMedia ,
+                                                                                  child: Padding(
+                                                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                                                                    child: Text(
+                                                                                        displayRuc, textAlign: TextAlign.start, style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                                                                  ),
+                                                                                                                                                  
+                                                                                ),
+                                                                                    ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    
+                                                                    onTap: () {
+                                                                      setState(() {
+                                                                        _hasError = false;
+                                                                      },);
+                                                                    
+                                                                      _textTerceroController
+                                                                              .text =
+                                                                          bpName
+                                                                              .toString();
+                                                                      _cbPartnerIdController
+                                                                              .text =
+                                                                          cBPartnerID
+                                                                              .toString();
+                                                                      _cbPartnerLocationIdController
+                                                                              .text =
+                                                                          cBPartnerLocationID
+                                                                              .toString();
+                                                                      _providerIdController
+                                                                              .text =
+                                                                          providerId
+                                                                              .toString();
+                                                                      print(
+                                                                          'este es el tercero que se elijio  $bpName este es el cbpartnerId ${_cbPartnerIdController.text} y este es el cbpartnerLocationId $cBPartnerLocationID');
+                                                                      // Aquí puedes manejar la selección del tercero
+                                                                      // Por ejemplo, cerrar el diálogo y usar el tercero seleccionado.
+                                                                      Navigator.of(
+                                                                              context,)
+                                                                          .pop();
+                                                                      // Puedes acceder al tercero seleccionado con filteredTerceros[index]
+                                                                    },
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        onChanged: (value) {
-                                                          if (mounted) {
-                                                            setState(() {
-                                                              filteredTerceros = tercerosData
-                                                                  .where((tercero) =>
-                                                                      tercero['bpname']
-                                                                          .toLowerCase()
-                                                                          .contains(value
-                                                                              .toLowerCase()) ||
-                                                                      tercero['tax_id']
-                                                                          .contains(
-                                                                              value))
-                                                                  .toList();
-                                                            });
-                                                          }
-                                                        },
                                                       ),
-                                                      const SizedBox(
-                                                          height: 16),
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.9,
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.5,
-                                                        child: ListView.builder(
-                                                          shrinkWrap: true,
-                                                          itemCount:
-                                                              filteredTerceros!
-                                                                  .length,
-                                                          itemBuilder:
-                                                              (context, index) {
-                                                            print(
-                                                                'Estos son los filteredTerceros $filteredTerceros');
-
-                                                            String bpName =
-                                                                filteredTerceros![
-                                                                        index]
-                                                                    ['bpname'];
-                                                            int providerId =
-                                                                filteredTerceros![
-                                                                        index]
-                                                                    ['id'];
-                                                            int cBPartnerID =
-                                                                filteredTerceros![
-                                                                        index][
-                                                                    'c_bpartner_id'];
-                                                            dynamic
-                                                                cBPartnerLocationID =
-                                                                filteredTerceros![
-                                                                        index][
-                                                                    'c_bpartner_location_id'];
-                                                            String ruc =
-                                                                filteredTerceros![
-                                                                        index]
-                                                                    ['tax_id'];
-                                                            String displayText =
-                                                                "${bpName.length > 15 ? '${bpName.substring(0, 15)}...' : bpName} - $ruc";
-                                                            return ListTile(
-                                                              title: Text(
-                                                                  displayText),
-                                                              onTap: () {
-                                                                _textTerceroController
-                                                                        .text =
-                                                                    bpName
-                                                                        .toString();
-                                                                _cbPartnerIdController
-                                                                        .text =
-                                                                    cBPartnerID
-                                                                        .toString();
-                                                                _cbPartnerLocationIdController
-                                                                        .text =
-                                                                    cBPartnerLocationID
-                                                                        .toString();
-                                                                _providerIdController
-                                                                        .text =
-                                                                    providerId
-                                                                        .toString();
-                                                                print(
-                                                                    'este es el tercero que se elijio  $bpName este es el cbpartnerId ${_cbPartnerIdController.text} y este es el cbpartnerLocationId $cBPartnerLocationID');
-                                                                // Aquí puedes manejar la selección del tercero
-                                                                // Por ejemplo, cerrar el diálogo y usar el tercero seleccionado.
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
-                                                                // Puedes acceder al tercero seleccionado con filteredTerceros[index]
-                                                              },
-                                                            );
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(context)
+                                                                .pop();
                                                           },
+                                                          child:
+                                                              const Text('Cancelar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                      ],
+                                                    );
+                                                  },
                                                 ),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child:
-                                                        const Text('Cancelar'),
-                                                  ),
-                                                ],
                                               );
                                             },
                                           );
                                         },
-                                      );
-                                    },
-                                  ),
-                                  Container(
-                                    width: screenMedia * 0.84,
-                                    child: TextField(
-                                      readOnly: true,
-                                      decoration: const InputDecoration(
-                                          label: Text('Tercero')),
-                                      controller: _textTerceroController,
+                                      ),
                                     ),
-                                  )
-                                ],
-                              ),
-                            ],
+                                    SizedBox(width: MediaQuery.of(context).size.width * 0.02,),
+                                    SizedBox(
+                                      width: screenMedia * 0.75,
+                                      child: TextFormField(
+                                       
+                                        readOnly: true,
+                                        decoration: const InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical:25),
+                                          disabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                                            borderSide: BorderSide(width: 25, color: Colors.white)
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                            borderSide: BorderSide(width: 25, color: Colors.white)
+                                          ) ,
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                                            borderSide: BorderSide(width: 25, color: Colors.white) 
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                                            borderSide: BorderSide.none
+                                          ),
+                                          focusedErrorBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                                            borderSide: BorderSide(width: 1, color: Colors.red )
+                                          ),
+                                            label: Text('Proveedor')),
+                                        controller: _textTerceroController,
+                                      validator: (value) {
+                                        
+
+                                        if(value!.isEmpty){  
+
+                                            _hasError = true;                                          
+
+                                            return "Debe seleccionar un proveedor";
+                                        }
+                          
+                                        return null;
+                                      },
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                
+                              ],
+                            ),
                           );
                         }
                       },
                     ),
+                    SizedBox(height: screenHeight * 0.02,),
 
                     FutureBuilder<List<Map<String, dynamic>>>(
                       future: _paymentTermsFuture,
@@ -444,20 +797,78 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                   (Map<String, dynamic> value) {
                             return DropdownMenuItem<int>(
                               value: value['c_paymentterm_id'],
-                              child: Text(value['name']),
+                              child: Text(value['name'].toString(), style: TextStyle(fontFamily: 'Poppins Regular') ,),
                             );
                           }).toList();
 
-                          return DropdownButtonFormField<int>(
-                            decoration: const InputDecoration(
-                              labelText: 'Selecciona un término de pago',
-                              contentPadding: EdgeInsets.all(15),
+                          return Container(
+                            width: screenMedia *0.97,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 7,
+                                  spreadRadius: 2,
+                                  color: Colors.grey.withOpacity(0.5)
+                                )
+                              ]
+
                             ),
-                            items: dropdownItems,
-                            onChanged: (int? newValue) {
-                              // Aquí puedes manejar el valor seleccionado
-                              print("Selected value: $newValue");
-                            },
+                            child: DropdownButtonFormField<int>(
+                              icon: Image.asset('lib/assets/Abajo.png'),
+                              validator: (value) {
+
+                                    if (value == null) {
+                                        return 'Por favor, selecciona un término de pago';
+                                      }
+                                return null;
+
+                              },
+                              decoration: const InputDecoration(
+                                focusedErrorBorder: OutlineInputBorder(
+                                 borderRadius: BorderRadius.all(Radius.circular(15)),
+                                 borderSide: BorderSide(width: 1, color: Colors.red) 
+                                ),
+                                errorBorder: OutlineInputBorder(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(width: 1, color: Colors.red) 
+
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(width: 25, color: Colors.white) 
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(width: 25, color: Colors.white) 
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide.none
+                                ),
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'Poppins Regular' ,
+                                  overflow: TextOverflow.ellipsis
+                                ),
+                                labelText: 'Selecciona un término de pago',
+                                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+                              ),
+                              items: dropdownItems,
+                              onChanged: (int? newValue) {
+                                // Aquí puedes manejar el valor seleccionado
+                                print("Selected value: $newValue");
+                                if(_hasError == false){
+                                
+                                    setState(() {
+                                      
+                                    });
+                                      
+                                }
+                              },
+                            ),
                           );
                         } else {
                           return const Center(
@@ -466,9 +877,8 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                       },
                     ),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
+                   SizedBox(height: screenHeight * 0.02,),
+
 
                     DropdownButtonFormField<String>(
                       value: paymentTypeValue,
@@ -689,7 +1099,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    Container(
+                    SizedBox(
                       height: 300,
                       child: ListView.builder(
                         itemCount: selectedProducts.length,
@@ -869,6 +1279,8 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                   .infinity, // Asegura que el botón ocupe todo el ancho disponible
                               child: ElevatedButton(
                                 onPressed: () async {
+
+                                  if(_formKey.currentState!.validate()){
                                   final info =
                                       await getApplicationSupportDirectory();
                                   print("esta es la ruta ${info.path}");
@@ -951,6 +1363,16 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                     ),
                                   );
                                   // Navigator.pop(context);
+                                  }else{  
+
+                                   
+
+                                       setState(() {
+                                        _hasError = true;
+                                         });
+
+                                        
+                                  }
                                 },
                                 child: const Text('Crear retención'),
                               ),

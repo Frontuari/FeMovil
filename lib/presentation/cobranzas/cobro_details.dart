@@ -29,7 +29,7 @@ class CobroDetails extends StatelessWidget {
                 SizedBox(height: heightScreen * 0.02,),
               Container( 
                 width: mediaScreen,
-                height: heightScreen *0.45 ,
+                height: heightScreen *0.50 ,
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
@@ -97,6 +97,33 @@ class CobroDetails extends StatelessWidget {
                           width: mediaScreen,
                           child: Text('Detalles', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18), textAlign: TextAlign.start,)),
                       ),
+
+                          Padding(
+                       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                       child: SizedBox(
+                        width: double.infinity,
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'N° Documento: ',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins SemiBold',
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${cobro['documentno']}',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins Regular',
+                                  overflow: TextOverflow.ellipsis,
+                              
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                       ),
+                     ),
             
                      Padding(
                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
@@ -124,6 +151,7 @@ class CobroDetails extends StatelessWidget {
                         ),
                        ),
                      ),
+                     
             
                        Padding(
                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),

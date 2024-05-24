@@ -109,13 +109,13 @@ class _CobrosListState extends State<CobrosList> {
   void _filterByMaxPrice(double maxPrice) {
   setState(() {
       filteredCobros = cobros.where((cobro) {
-  double monto = parseNumberToDouble(cobro['pay_amt']);
+  double monto = cobro['pay_amt'];
   return monto <= maxPrice;
   }).toList();
 
   filteredCobros.sort((a, b) {
-    double montoA = parseNumberToDouble(a['pay_amt']);
-    double montoB = parseNumberToDouble(b['pay_amt']);
+    double montoA = a['pay_amt'];
+    double montoB = b['pay_amt'];
     return montoB.compareTo(montoA);
   }); 
     });

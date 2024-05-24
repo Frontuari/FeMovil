@@ -282,7 +282,7 @@ class DatabaseHelper {
             date_invoiced TEXT,
             date_acct TEXT, 
             sales_rep_id INTEGER,
-            sri_authorization_code INTEGER,
+            sri_authorization_code TEXT,
             ing_establishment INTEGER, 
             ing_emission INTEGER, 
             ing_sequence INTEGER,

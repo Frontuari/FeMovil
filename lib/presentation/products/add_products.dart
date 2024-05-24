@@ -91,7 +91,6 @@ class _AddProductFormState extends State<AddProductForm> {
   @override
   Widget build(BuildContext context) {
     _context = context;
-    ColorScheme colorTheme = Theme.of(context).colorScheme;
     final mediaScreen = MediaQuery.of(context).size.width * 0.8;
 
     return GestureDetector(
