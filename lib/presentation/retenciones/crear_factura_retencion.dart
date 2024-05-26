@@ -47,6 +47,8 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
   String? reglaRetencionSeleccionada = '';
   String? valorSeleccionado = '';
   String? impuestoValue = '';
+  bool _isFocused = false;
+
   final _formKey = GlobalKey<FormState>();
   final FocusNode _focusNode = FocusNode();
   List<Map<String, dynamic>> ordenesSinRetencion = [];
@@ -77,13 +79,12 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
     }
     saldoNetoController.text = '\$${totalNeto.toStringAsFixed(2)}';
     suma = total + totalNeto;
+    montoController.text = '\$${suma.toStringAsFixed(2)}';
 
     print('productos totales $selectedProducts');
 
     return suma;
   }
-
-
 
   initV() async {
     if (variablesG.isEmpty) {
@@ -155,7 +156,11 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
 
   @override
   void initState() {
-
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
     if (mounted) {
       setState(() {
         _paymentTermsFuture = getPaymentTerms();
@@ -182,17 +187,14 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final screenMedia = MediaQuery.of(context).size.width * 0.8;
     final screenHeight = MediaQuery.of(context).size.height * 1;
+    final scrennSelect = MediaQuery.of(context).size.width * 1;
     setState(() {
       currentContext = context;
     });
-
-    
 
     return GestureDetector(
       onTap: () {
@@ -200,8 +202,8 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
       },
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(50) ,
-          child: AppBarSample(label: 'Factura con Retencion')),
+            preferredSize: Size.fromHeight(50),
+            child: AppBarSample(label: 'Factura con Retencion')),
         body: Center(
           child: SizedBox(
             width: screenMedia,
@@ -210,37 +212,30 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
-
-                  
-                  
                   children: [
-
-                      SizedBox(height: screenHeight * 0.03,),
-                    
+                    SizedBox(
+                      height: screenHeight * 0.03,
+                    ),
                     Container(
-                     height: screenMedia * 0.20,
+                      height: screenMedia * 0.20,
                       width: screenMedia * 0.95,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-
-                          borderRadius: BorderRadius.circular(15), 
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              blurRadius: 7,
-                              spreadRadius: 2
-                            )
-                          ]
-
-                      ),
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
                       child: TextFormField(
                         keyboardType: TextInputType.number,
                         controller: numeroDocumentoController,
-                        decoration:    InputDecoration(
+                        decoration: InputDecoration(
                             labelText: 'Numero de documento',
                             filled: true,
                             fillColor: Colors.white,
-                             contentPadding: const EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 vertical: 25, horizontal: 20),
                             labelStyle: const TextStyle(
                               fontFamily:
@@ -278,58 +273,47 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                             focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                                 borderSide: const BorderSide(
-                                    width: 1, color: Colors.red))
-                            ),
-                            
+                                    width: 1, color: Colors.red)),
+                            errorStyle:
+                                TextStyle(fontFamily: 'Poppins Regular')),
                         onChanged: (value) {
-                          if(_hasError == false){
-
-                          setState(() {
-                            
-                          });
+                          if (_hasError == false) {
+                            setState(() {});
                           }
 
                           print('Este es el valor $value');
                         },
                         validator: (value) {
-                      
-                            if(value!.isEmpty){
-
-                                
-                      
-                                return "Por favor, proporciona un numero de documento.";
-                            }
-                            return null;
-                      
+                          if (value!.isEmpty) {
+                            return "Por favor, proporciona un numero de documento.";
+                          }
+                          return null;
                         },
-                        
                       ),
                     ),
-                  SizedBox(height: screenHeight * 0.02,),
-                          Container(
-                            height: screenMedia * 0.20,
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
+                    Container(
+                      height: screenMedia * 0.20,
                       width: screenMedia * 0.95,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-
-                          borderRadius: BorderRadius.circular(15), 
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              blurRadius: 7,
-                              spreadRadius: 2
-                            )
-                          ]
-
-                      ),
-                            child: TextFormField(
-                            readOnly: true,
-                            controller: fechaFacturacionController,
-                            decoration:  InputDecoration(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
+                      child: TextFormField(
+                        readOnly: true,
+                        controller: fechaFacturacionController,
+                        decoration: InputDecoration(
                             labelText: 'Fecha de Facturacion',
                             fillColor: Colors.white,
                             filled: true,
-                             contentPadding: const EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 vertical: 25, horizontal: 20),
                             labelStyle: const TextStyle(
                               fontFamily:
@@ -367,85 +351,74 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                             focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                                 borderSide: const BorderSide(
-                                    width: 1, color: Colors.red))
-                            ),
-                                                    
-                            ),
-                          ),
-                  SizedBox(height: screenHeight * 0.02,),
-
+                                    width: 1, color: Colors.red))),
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
                     Container(
-                         height: screenMedia * 0.30,
+                      height: screenMedia * 0.30,
                       width: screenMedia * 0.95,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-
-                          borderRadius: BorderRadius.circular(15), 
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              blurRadius: 7,
-                              spreadRadius: 2
-                            )
-                          ]
-
-                      ),
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
                       child: TextFormField(
                         controller: descripcionController,
-                        decoration:  InputDecoration(
-                            labelText: 'Descripcion',
-                            fillColor: Colors.white,
-                            filled: true,
-                             contentPadding: const EdgeInsets.symmetric(
-                                vertical: 25, horizontal: 20),
-                            labelStyle: const TextStyle(
-                              fontFamily:
-                                  'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
-                              fontSize: 15.0, // Tamaño de la fuente
-                              // Peso de la fuente (por ejemplo, bold)
-                              color: Color.fromARGB(
-                                  255, 0, 0, 0), // Color del texto
-                            ),
-                            border: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0)),
-                              borderSide: BorderSide.none, // Color del borde
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0)),
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                                width: 25,
-                              ), // Color del borde cuando está enfocado
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0)),
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                                width: 25,
-                              ), // Color del borde cuando no está enfocado
-                            ),
-                        
-                            ),
-                            onChanged: (value) {
-
-                                if(_hasError == false){
-                                  print('Entre aqui');
-                                  setState(() {
-                                    
-                                  });
-                                }
-
-                            } ,
+                        decoration: InputDecoration(
+                          labelText: 'Descripcion',
+                          fillColor: Colors.white,
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 25, horizontal: 20),
+                          labelStyle: const TextStyle(
+                            fontFamily:
+                                'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
+                            fontSize: 15.0, // Tamaño de la fuente
+                            // Peso de la fuente (por ejemplo, bold)
+                            color:
+                                Color.fromARGB(255, 0, 0, 0), // Color del texto
+                          ),
+                          border: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                            borderSide: BorderSide.none, // Color del borde
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                              width: 25,
+                            ), // Color del borde cuando está enfocado
+                          ),
+                          enabledBorder: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                              width: 25,
+                            ), // Color del borde cuando no está enfocado
+                          ),
+                        ),
+                        onChanged: (value) {
+                          if (_hasError == false) {
+                            print('Entre aqui');
+                            setState(() {});
+                          }
+                        },
                         maxLines: 2,
                       ),
                     ),
-                
-
-                    SizedBox(height: screenHeight * 0.02,),
-
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
                     FutureBuilder<dynamic>(
                       future:
                           _terceros, // Tu Future que devuelve un AsyncSnapshot<dynamic>
@@ -460,115 +433,147 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                               .data; // Accedemos a los datos del snapshot
 
                           filteredTerceros ??= tercerosData;
-                     
 
                           return Container(
                             width: screenMedia * 0.97,
-                               
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                            
-                                            BoxShadow(
-                                              color: Colors.grey.withOpacity(0.5),
-                                              blurRadius: 7,
-                                              spreadRadius: 2
-                                            )
-                                        ]
-                                      ),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      blurRadius: 7,
+                                      spreadRadius: 2)
+                                ]),
                             child: Column(
                               children: [
                                 Row(
                                   children: [
                                     Container(
-                                      height: _hasError == true ? screenHeight * 0.18 : screenHeight * 0.11,
+                                      height: _hasError == true
+                                          ? screenHeight * 0.18
+                                          : screenHeight * 0.11,
                                       decoration: BoxDecoration(
-                                        color: Colors.black,
-                                        borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(2)),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            blurRadius: 7,
-                                            spreadRadius: 2,
-                                            offset: Offset(-2, 0)
-
-                                          )
-                                        ]
-                                      ),
+                                          color: Colors.black,
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(15),
+                                              bottomLeft: Radius.circular(2)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                blurRadius: 7,
+                                                spreadRadius: 2,
+                                                offset: Offset(-2, 0))
+                                          ]),
                                       child: IconButton(
-                                       
-                                        icon:  Icon(Icons.search, color: _hasError  ? Color(0XFFA5F52B): Color(0XFF7531FF),),
+                                        icon: Icon(
+                                          Icons.search,
+                                          color: _hasError
+                                              ? Color(0XFFA5F52B)
+                                              : Color(0XFF7531FF),
+                                        ),
                                         onPressed: () {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
                                               return GestureDetector(
                                                 onTap: () {
-                                                                  
-                                                    if(MediaQuery.of(context).viewInsets.bottom > 0){
-                                                                  
-                                                      FocusScope.of(context).requestFocus(FocusNode());
-                                                    }
-                                                
+                                                  if (MediaQuery.of(context)
+                                                          .viewInsets
+                                                          .bottom >
+                                                      0) {
+                                                    FocusScope.of(context)
+                                                        .requestFocus(
+                                                            FocusNode());
+                                                  }
                                                 },
                                                 child: StatefulBuilder(
-
-                                                  builder: (context, setStateDialog) {
+                                                  builder: (context,
+                                                      setStateDialog) {
                                                     return AlertDialog(
                                                       title: const Text(
-                                                          'Buscar Proveedor', style: TextStyle(fontFamily: 'Poppins Semibold',),),
-                                                      content: SingleChildScrollView(
+                                                        'Buscar Proveedor',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Poppins Semibold',
+                                                        ),
+                                                      ),
+                                                      content:
+                                                          SingleChildScrollView(
                                                         child: Column(
-                                                          
                                                           children: [
-                                                            SizedBox(height: screenHeight * 0.03,),
+                                                            SizedBox(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.03,
+                                                            ),
                                                             Container(
-                                                              width: screenMedia* 0.80,
-                                                              height: screenHeight * 0.09,
+                                                              width:
+                                                                  screenMedia *
+                                                                      0.80,
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.09,
                                                               decoration: BoxDecoration(
-                                                                color: Colors.white,
-                                                                borderRadius: BorderRadius.circular(8),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors.grey.withOpacity(0.3),
-                                                                    blurRadius: 7,
-                                                                    spreadRadius: 2
-                                                                  )
-                                                
-                                                                ]
-                                                              ),
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(8),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .withOpacity(
+                                                                                0.3),
+                                                                        blurRadius:
+                                                                            7,
+                                                                        spreadRadius:
+                                                                            2)
+                                                                  ]),
                                                               child: TextField(
                                                                 controller:
                                                                     _searchDialogController,
                                                                 decoration:
                                                                     const InputDecoration(
-                                                                    
-                                                                      border: OutlineInputBorder(
-                                                                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                                                                        borderSide: BorderSide.none
-                                                                      ),
-                                                                      focusedBorder: OutlineInputBorder(
-                                                                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                                                                        borderSide: BorderSide(width: 25, color: Colors.white)
-                                                                      ),
-                                                                  contentPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-                                                                  labelText: 'Buscar',
-                                                                  prefixIcon: Icon(
-                                                                      Icons.search),
+                                                                  border: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(Radius.circular(
+                                                                              15)),
+                                                                      borderSide:
+                                                                          BorderSide
+                                                                              .none),
+                                                                  focusedBorder: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(Radius.circular(
+                                                                              15)),
+                                                                      borderSide: BorderSide(
+                                                                          width:
+                                                                              25,
+                                                                          color:
+                                                                              Colors.white)),
+                                                                  contentPadding:
+                                                                      EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              25,
+                                                                          vertical:
+                                                                              20),
+                                                                  labelText:
+                                                                      'Buscar',
+                                                                  prefixIcon:
+                                                                      Icon(Icons
+                                                                          .search),
                                                                 ),
-                                                                onChanged: (value) {
+                                                                onChanged:
+                                                                    (value) {
                                                                   if (mounted) {
-                                                                    setState(() {
+                                                                    setState(
+                                                                        () {
                                                                       filteredTerceros = tercerosData
                                                                           .where((tercero) =>
-                                                                              tercero['bpname']
-                                                                                  .toLowerCase()
-                                                                                  .contains(value
-                                                                                      .toLowerCase()) ||
-                                                                              tercero['tax_id']
-                                                                                  .contains(
-                                                                                      value))
+                                                                              tercero['bpname'].toLowerCase().contains(value.toLowerCase()) ||
+                                                                              tercero['tax_id'].contains(value))
                                                                           .toList();
                                                                     });
                                                                   }
@@ -588,91 +593,108 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                                                       .size
                                                                       .height *
                                                                   0.5,
-                                                              child: ListView.builder(
-                                                                shrinkWrap: true,
+                                                              child: ListView
+                                                                  .builder(
+                                                                shrinkWrap:
+                                                                    true,
                                                                 itemCount:
                                                                     filteredTerceros!
                                                                         .length,
                                                                 itemBuilder:
-                                                                    (context, index) {
+                                                                    (context,
+                                                                        index) {
                                                                   print(
                                                                       'Estos son los filteredTerceros $filteredTerceros');
-                                                
-                                                                  String bpName =
+
+                                                                  String
+                                                                      bpName =
                                                                       filteredTerceros![
                                                                               index]
-                                                                          ['bpname'];
+                                                                          [
+                                                                          'bpname'];
                                                                   int providerId =
                                                                       filteredTerceros![
                                                                               index]
-                                                                          ['id'];
+                                                                          [
+                                                                          'id'];
                                                                   int cBPartnerID =
                                                                       filteredTerceros![
-                                                                              index][
+                                                                              index]
+                                                                          [
                                                                           'c_bpartner_id'];
                                                                   dynamic
                                                                       cBPartnerLocationID =
                                                                       filteredTerceros![
-                                                                              index][
+                                                                              index]
+                                                                          [
                                                                           'c_bpartner_location_id'];
                                                                   String ruc =
                                                                       filteredTerceros![
                                                                               index]
-                                                                          ['tax_id'];
-                                                
-                                                                          
-                                                                  String displayBpName =
+                                                                          [
+                                                                          'tax_id'];
+
+                                                                  String
+                                                                      displayBpName =
                                                                       "${bpName} ";
-                                                                  String displayRuc = ruc;
+                                                                  String
+                                                                      displayRuc =
+                                                                      ruc;
                                                                   return ListTile(
-                                                                    title: Container(
-                                                                        decoration: BoxDecoration(
-                                                                          color: Colors.white,
-                                                                                borderRadius: BorderRadius.circular(8),
-                                                                                boxShadow: [
-                                                                                  BoxShadow(
-                                                                                    color: Colors.grey.withOpacity(0.3),
-                                                                                    blurRadius: 7,
-                                                                                    spreadRadius: 2
-                                                                                  )
-                                                                                ]
-                                                
-                                                                              ),
-                                                                      child: Padding(
-                                                                        padding: const EdgeInsets.all(8.0),
-                                                                        child: Column(
+                                                                    title:
+                                                                        Container(
+                                                                      decoration: BoxDecoration(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          borderRadius: BorderRadius.circular(8),
+                                                                          boxShadow: [
+                                                                            BoxShadow(
+                                                                                color: Colors.grey.withOpacity(0.3),
+                                                                                blurRadius: 7,
+                                                                                spreadRadius: 2)
+                                                                          ]),
+                                                                      child:
+                                                                          Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .all(
+                                                                            8.0),
+                                                                        child:
+                                                                            Column(
                                                                           children: [
-                                                                             
-                                                                                SizedBox(
-                                                                                
-                                                                                  width: screenMedia ,
-                                                                                  child: Padding(
-                                                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                                                                                    child: Text(
-                                                                                        displayBpName, textAlign: TextAlign.start, style: TextStyle(fontFamily: 'Poppins Bold'),),
-                                                                                  ),
-                                                                                                                                                  
+                                                                            SizedBox(
+                                                                              width: screenMedia,
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                                                                                child: Text(
+                                                                                  displayBpName,
+                                                                                  textAlign: TextAlign.start,
+                                                                                  style: TextStyle(fontFamily: 'Poppins Bold'),
                                                                                 ),
-                                                                                        SizedBox(
-                                                                                         
-                                                                                  width: screenMedia ,
-                                                                                  child: Padding(
-                                                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                                                                    child: Text(
-                                                                                        displayRuc, textAlign: TextAlign.start, style: TextStyle(fontFamily: 'Poppins Regular'),),
-                                                                                  ),
-                                                                                                                                                  
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width: screenMedia,
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                                                                child: Text(
+                                                                                  displayRuc,
+                                                                                  textAlign: TextAlign.start,
+                                                                                  style: TextStyle(fontFamily: 'Poppins Regular'),
                                                                                 ),
-                                                                                    ],
+                                                                              ),
+                                                                            ),
+                                                                          ],
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                    
                                                                     onTap: () {
-                                                                      setState(() {
-                                                                        _hasError = false;
-                                                                      },);
-                                                                    
+                                                                      setState(
+                                                                        () {
+                                                                          _hasError =
+                                                                              false;
+                                                                        },
+                                                                      );
+
                                                                       _textTerceroController
                                                                               .text =
                                                                           bpName
@@ -693,9 +715,10 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                                                           'este es el tercero que se elijio  $bpName este es el cbpartnerId ${_cbPartnerIdController.text} y este es el cbpartnerLocationId $cBPartnerLocationID');
                                                                       // Aquí puedes manejar la selección del tercero
                                                                       // Por ejemplo, cerrar el diálogo y usar el tercero seleccionado.
-                                                                      Navigator.of(
-                                                                              context,)
-                                                                          .pop();
+                                                                      Navigator
+                                                                          .of(
+                                                                        context,
+                                                                      ).pop();
                                                                       // Puedes acceder al tercero seleccionado con filteredTerceros[index]
                                                                     },
                                                                   );
@@ -708,11 +731,18 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                                       actions: <Widget>[
                                                         TextButton(
                                                           onPressed: () {
-                                                            Navigator.of(context)
+                                                            Navigator.of(
+                                                                    context)
                                                                 .pop();
                                                           },
-                                                          child:
-                                                              const Text('Cancelar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),),
+                                                          child: const Text(
+                                                            'Cancelar',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins SemiBold',
+                                                                color:
+                                                                    Colors.red),
+                                                          ),
                                                         ),
                                                       ],
                                                     );
@@ -724,61 +754,63 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                         },
                                       ),
                                     ),
-                                    SizedBox(width: MediaQuery.of(context).size.width * 0.02,),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.02,
+                                    ),
                                     SizedBox(
                                       width: screenMedia * 0.75,
                                       child: TextFormField(
-                                       
                                         readOnly: true,
                                         decoration: const InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical:25),
-                                          disabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                                            borderSide: BorderSide(width: 25, color: Colors.white)
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                                            borderSide: BorderSide(width: 25, color: Colors.white)
-                                          ) ,
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                                            borderSide: BorderSide(width: 25, color: Colors.white) 
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                                            borderSide: BorderSide.none
-                                          ),
-                                          focusedErrorBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                                            borderSide: BorderSide(width: 1, color: Colors.red )
-                                          ),
-                                            label: Text('Proveedor')),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    horizontal: 5,
+                                                    vertical: 25),
+                                            disabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(15)),
+                                                borderSide: BorderSide(
+                                                    width: 25,
+                                                    color: Colors.white)),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(15)),
+                                                borderSide: BorderSide(
+                                                    width: 25,
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(15)),
+                                                borderSide:
+                                                    BorderSide(width: 25, color: Colors.white)),
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15)), borderSide: BorderSide.none),
+                                            focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide(width: 1, color: Colors.red)),
+                                            label: Text('Proveedor'),
+                                            errorStyle: TextStyle(fontFamily: 'Poppins Regular')),
                                         controller: _textTerceroController,
-                                      validator: (value) {
-                                        
-
-                                        if(value!.isEmpty){  
-
-                                            _hasError = true;                                          
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            _hasError = true;
 
                                             return "Debe seleccionar un proveedor";
-                                        }
-                          
-                                        return null;
-                                      },
+                                          }
+
+                                          return null;
+                                        },
                                       ),
                                     )
                                   ],
                                 ),
-                                
                               ],
                             ),
                           );
                         }
                       },
                     ),
-                    SizedBox(height: screenHeight * 0.02,),
-
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
                     FutureBuilder<List<Map<String, dynamic>>>(
                       future: _paymentTermsFuture,
                       builder: (BuildContext context,
@@ -797,75 +829,77 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                   (Map<String, dynamic> value) {
                             return DropdownMenuItem<int>(
                               value: value['c_paymentterm_id'],
-                              child: Text(value['name'].toString(), style: TextStyle(fontFamily: 'Poppins Regular') ,),
+                              child: Text(
+                                value['name'].toString(),
+                                style: TextStyle(fontFamily: 'Poppins Regular'),
+                              ),
                             );
                           }).toList();
 
                           return Container(
-                            width: screenMedia *0.97,
+                            width: screenMedia * 0.97,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 7,
-                                  spreadRadius: 2,
-                                  color: Colors.grey.withOpacity(0.5)
-                                )
-                              ]
-
-                            ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: [
+                                  BoxShadow(
+                                      blurRadius: 7,
+                                      spreadRadius: 2,
+                                      color: Colors.grey.withOpacity(0.5))
+                                ]),
                             child: DropdownButtonFormField<int>(
                               icon: Image.asset('lib/assets/Abajo.png'),
                               validator: (value) {
-
-                                    if (value == null) {
-                                        return 'Por favor, selecciona un término de pago';
-                                      }
+                                if (value == null) {
+                                  return 'Por Favor, selecciona un término de pago';
+                                }
                                 return null;
-
                               },
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 focusedErrorBorder: OutlineInputBorder(
-                                 borderRadius: BorderRadius.all(Radius.circular(15)),
-                                 borderSide: BorderSide(width: 1, color: Colors.red) 
-                                ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.red)),
                                 errorBorder: OutlineInputBorder(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide(width: 1, color: Colors.red) 
-
-                                ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.red)),
                                 focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide(width: 25, color: Colors.white) 
-                                ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                    borderSide: BorderSide(
+                                        width: 25, color: Colors.white)),
                                 enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide(width: 25, color: Colors.white) 
-                                ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                    borderSide: BorderSide(
+                                        width: 25, color: Colors.white)),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide.none
-                                ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                    borderSide: BorderSide.none),
                                 labelStyle: TextStyle(
                                   color: Colors.black,
-                                  fontFamily: 'Poppins Regular' ,
-                                  overflow: TextOverflow.ellipsis
+                                  fontFamily: 'Poppins Regular',
                                 ),
-                                labelText: 'Selecciona un término de pago',
-                                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+                                errorStyle:
+                                    TextStyle(fontFamily: 'Poppins Regular'),
+                                label: SizedBox(
+                                    width: scrennSelect,
+                                    child: Text(
+                                      'Selecciona un término de pago',
+                                    )),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 20),
                               ),
                               items: dropdownItems,
                               onChanged: (int? newValue) {
                                 // Aquí puedes manejar el valor seleccionado
                                 print("Selected value: $newValue");
-                                if(_hasError == false){
-                                
-                                    setState(() {
-                                      
-                                    });
-                                      
+                                if (_hasError == false) {
+                                  setState(() {});
                                 }
                               },
                             ),
@@ -876,519 +910,981 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                         }
                       },
                     ),
-
-                   SizedBox(height: screenHeight * 0.02,),
-
-
-                    DropdownButtonFormField<String>(
-                      value: paymentTypeValue,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          paymentTypeValue = newValue;
-                        });
-
-                        if (newValue == 'Caja de Punto de Venta') {
-                          setState(() {
-                            _selectTypePaymentRule = 'B';
-                          });
-                        } else if (newValue == 'Cheque') {
-                          setState(() {
-                            _selectTypePaymentRule = 'S';
-                          });
-                        } else if (newValue == "Con Término de Pago") {
-                          setState(() {
-                            _selectTypePaymentRule = 'P';
-                          });
-                        } else if (newValue == "Depósito Directo") {
-                          setState(() {
-                            _selectTypePaymentRule = 'T';
-                          });
-                        } else if (newValue == 'Multiples Medios de Pago') {
-                          setState(() {
-                            _selectTypePaymentRule = 'M';
-                          });
-                        } else if (newValue == 'Tarjeta De Crédito') {
-                          setState(() {
-                            _selectTypePaymentRule = 'K';
-                          });
-                        }
-
-                        print(
-                            'Este es el valor de paymentTypeValue $paymentTypeValue && este es el valor de $_selectTypePaymentRule');
-                      },
-                      items: <String>[
-                        'Caja de Punto de Venta',
-                        'Cheque',
-                        'Con Término de Pago',
-                        'Depósito Directo',
-                        'Multiples Medios de Pago',
-                        'Tarjeta De Crédito'
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      decoration: const InputDecoration(
-                        labelText: 'Regla de Pago',
-                        labelStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            height: 0.5),
-                        contentPadding: EdgeInsets.all(15),
-                      ),
-                    ),
-
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: _sriAuthorizationCodeController,
-                      decoration: const InputDecoration(
-                          labelText: 'Codigo Autorizado por el SRI',
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: _establishmentController,
-                      decoration: const InputDecoration(
-                          labelText: 'Establecimiento',
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: _emisionController,
-                      onChanged: (value) {},
-                      decoration: const InputDecoration(
-                        labelText: 'Emisión',
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: _sequenceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Secuencia',
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                    ),
-
-                    DropdownButtonFormField<String>(
-                      value: taxSustance,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          taxSustance = newValue;
-                        });
-
-                        if (newValue ==
-                            'Crédito Tributario para declaración de IVA') {
-                          setState(() {
-                            _selectTaxSutance = '01';
-                          });
-                        } else if (newValue ==
-                            'Costo o Gasto para declaración de Imp. a la Renta') {
-                          setState(() {
-                            _selectTaxSutance = '02';
-                          });
-                        } else if (newValue == "Activo Fijo") {
-                          setState(() {
-                            _selectTaxSutance = '03';
-                          });
-                        } else if (newValue == "Activo Fijo - Costo o Gasto") {
-                          setState(() {
-                            _selectTaxSutance = '04';
-                          });
-                        } else if (newValue ==
-                            'Liquidación de Gastos de Viaje, hospedaje y Alimentación') {
-                          setState(() {
-                            _selectTaxSutance = '05';
-                          });
-                        } else if (newValue ==
-                            'Inventario - Crédito Tributario para la declaración de IVA') {
-                          setState(() {
-                            _selectTaxSutance = '06';
-                          });
-                        } else if (newValue ==
-                            'Inventario - Costo o Gasto para declaración de Imp.') {
-                          setState(() {
-                            _selectTaxSutance = '07';
-                          });
-                        } else if (newValue ==
-                            'Valor pagado para solicitar Reembolso de Gastos') {
-                          setState(() {
-                            _selectTaxSutance = '08';
-                          });
-                        } else if (newValue == 'Reembolso por Siniestros') {
-                          setState(() {
-                            _selectTaxSutance = '09';
-                          });
-                        } else if (newValue ==
-                            'Distribución de Dividendos, Beneficios o Utilidades') {
-                          setState(() {
-                            _selectTaxSutance = '10';
-                          });
-                        } else if (newValue ==
-                            'Impuestos y retenciones presuntivos') {
-                          setState(() {
-                            _selectTaxSutance = '11';
-                          });
-                        } else if (newValue ==
-                            'Valores reconocidos por entidades del sector público') {
-                          setState(() {
-                            _selectTaxSutance = '12';
-                          });
-                        }
-
-                        print(
-                            'Este es el valor de Sustento Tributario $taxSustance && este es el valor de $_selectTaxSutance');
-                      },
-                      items: <String>[
-                        'Crédito Tributario para declaración de IVA',
-                        'Costo o Gasto para declaración de Imp. a la Renta',
-                        'Activo Fijo',
-                        'Activo Fijo - Costo o Gasto',
-                        'Liquidación de Gastos de Viaje, hospedaje y Alimentación',
-                        'Inventario - Crédito Tributario para la declaración de IVA',
-                        'Inventario - Costo o Gasto para declaración de Imp.',
-                        'Valor pagado para solicitar Reembolso de Gastos',
-                        'Reembolso por Siniestros',
-                        'Distribución de Dividendos, Beneficios o Utilidades',
-                        'Impuestos y retenciones presuntivos',
-                        'Valores reconocidos por entidades del sector público'
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: SizedBox(
-                              width: screenMedia,
-                              child: Text(
-                                value,
-                                overflow: TextOverflow
-                                    .ellipsis, // Para manejar texto largo
-                              )),
-                        );
-                      }).toList(),
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Sustento Tributario',
-                        labelStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            height: 0.5),
-                        contentPadding: EdgeInsets.all(15),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    const Text(
-                      'Productos:',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
                     SizedBox(
-                      height: 300,
-                      child: ListView.builder(
-                        itemCount: selectedProducts.length,
-                        itemBuilder: (context, index) {
-                          final product = selectedProducts[index];
-                          return Container(
-                            padding: const EdgeInsets.all(10),
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product['name'].toString(),
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text('Cantidad: ${product["quantity"]}'),
-                                    Row(
-                                      children: [
-                                        const Text('Price: '),
-                                        SizedBox(
-                                          width: 80,
-                                          child: TextFormField(
-                                            initialValue:
-                                                '${product['price']}', // Valor inicial del precio
-                                            decoration: const InputDecoration(
-                                              border: OutlineInputBorder(),
-                                            ),
+                      height: screenHeight * 0.02,
+                    ),
+                    Container(
+                      width: screenMedia * 0.97,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 7,
+                                spreadRadius: 2,
+                                color: Colors.grey.withOpacity(0.5))
+                          ]),
+                      child: DropdownButtonFormField<String>(
+                        icon: Image.asset('lib/assets/Abajo.png'),
+                        value: paymentTypeValue,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            paymentTypeValue = newValue;
+                          });
 
-                                            onChanged: (newValue) {
-                                              _handlePriceChange(
-                                                  newValue, index);
+                          if (newValue == 'Caja de Punto de Venta') {
+                            setState(() {
+                              _selectTypePaymentRule = 'B';
+                            });
+                          } else if (newValue == 'Cheque') {
+                            setState(() {
+                              _selectTypePaymentRule = 'S';
+                            });
+                          } else if (newValue == "Con Término de Pago") {
+                            setState(() {
+                              _selectTypePaymentRule = 'P';
+                            });
+                          } else if (newValue == "Depósito Directo") {
+                            setState(() {
+                              _selectTypePaymentRule = 'T';
+                            });
+                          } else if (newValue == 'Multiples Medios de Pago') {
+                            setState(() {
+                              _selectTypePaymentRule = 'M';
+                            });
+                          } else if (newValue == 'Tarjeta De Crédito') {
+                            setState(() {
+                              _selectTypePaymentRule = 'K';
+                            });
+                          }
 
-                                              setState(() {
-                                                montoController.text =
-                                                    '\$${calcularMontoTotal().toStringAsFixed(2)}';
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Flexible(
-                                        child: Text(
-                                            'Impuesto: ${product['impuesto']}%')),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Text(
-                                        'Monto Impuesto: ${calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])}',
-                                        style: const TextStyle(
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        'Saldo Neto: ${calcularSaldoNetoProducto(product['quantity'], product['price']).toStringAsFixed(2)}',
-                                        style: const TextStyle(
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Text(
-                                        'Monto Total: ${(calcularSaldoNetoProducto(product['quantity'], product['price']) + calcularMontoImpuesto(product['impuesto'], product['quantity'] * product['price'])).toStringAsFixed(2)}',
-                                        style: const TextStyle(
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      setState(() {
-                                        _removeProduct(index);
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
+                          print(
+                              'Este es el valor de paymentTypeValue $paymentTypeValue && este es el valor de $_selectTypePaymentRule');
+                        },
+                        items: <String>[
+                          'Caja de Punto de Venta',
+                          'Cheque',
+                          'Con Término de Pago',
+                          'Depósito Directo',
+                          'Multiples Medios de Pago',
+                          'Tarjeta De Crédito'
+                        ].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(fontFamily: 'Poppins Regular'),
                             ),
                           );
+                        }).toList(),
+                        decoration: InputDecoration(
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                borderSide:
+                                    BorderSide(width: 1, color: Colors.red)),
+                            errorBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                borderSide:
+                                    BorderSide(width: 1, color: Colors.red)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                borderSide:
+                                    BorderSide(width: 25, color: Colors.white)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                borderSide:
+                                    BorderSide(width: 25, color: Colors.white)),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                borderSide: BorderSide.none),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 20),
+                            label: SizedBox(
+                                width: scrennSelect,
+                                child: Text('Regla de Pago')),
+                            labelStyle: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontFamily: 'Poppins Regular',
+                                height: 0.5),
+                            errorStyle:
+                                TextStyle(fontFamily: 'Poppins Regular')),
+                        onTap: () {
+                          if (_hasError == false) {
+                            setState(() {});
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return "Por Favor, selecciona una regla de pago";
+                          }
+                          return null;
                         },
                       ),
                     ),
-
-                    ElevatedButton(
-                      onPressed: () async {
-                        // Aquí puedes mostrar un diálogo o pantalla para seleccionar productos y agregarlos a la orden de venta
-                        // Puedes usar Navigator.push para navegar a una pantalla de selección de productos
-                        // y agregar los productos seleccionados a la lista selectedProducts
-                        // Por ejemplo:
-
-                        final selectedProductsResult = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  ProductSelectionComprasScreen()),
-                        );
-                        print("Cantidad de productos $selectedProductsResult");
-                        if (selectedProductsResult != null) {
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
+                    Container(
+                      height: screenMedia * 0.20,
+                      width: screenMedia * 0.95,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: _sriAuthorizationCodeController,
+                        decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide.none, // Color del borde
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando está enfocado
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando no está enfocado
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.red)),
+                            labelText: 'Codigo Autorizado por el SRI',
+                            labelStyle: TextStyle(
+                                fontFamily: 'Poppins Regular',
+                                color: Colors.black),
+                            filled: true,
+                            fillColor: Colors.white,
+                            errorStyle:
+                                TextStyle(fontFamily: 'Poppins Regular')),
+                        onChanged: (value) {
+                          if (_hasError == false) {
+                            setState(() {});
+                          }
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Por Favor, Ingresa un Codigo Autorizado por el SRI";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
+                    Container(
+                      height: screenMedia * 0.20,
+                      width: screenMedia * 0.95,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: _establishmentController,
+                        decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide.none, // Color del borde
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando está enfocado
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando no está enfocado
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.red)),
+                            labelText: 'Establecimiento',
+                            errorStyle:
+                                TextStyle(fontFamily: 'Poppins Regular'),
+                            labelStyle: TextStyle(
+                                fontFamily: 'Poppins Regular',
+                                color: Colors.black),
+                            filled: true,
+                            fillColor: Colors.white),
+                        onChanged: (value) {
+                          if (_hasError == false) {
+                            setState(() {});
+                          }
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Por Favor, ingrese un establecimiento";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
+                    Container(
+                      height: screenMedia * 0.20,
+                      width: screenMedia * 0.95,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: _emisionController,
+                        onChanged: (value) {
+                          if (_hasError == false) {
+                            setState(() {});
+                          }
+                        },
+                        decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide.none, // Color del borde
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando está enfocado
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 25,
+                              ), // Color del borde cuando no está enfocado
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.red)),
+                            labelText: 'Emisión',
+                            labelStyle: TextStyle(
+                                fontFamily: 'Poppins Regular',
+                                color: Colors.black),
+                            filled: true,
+                            fillColor: Colors.white,
+                            errorStyle:
+                                TextStyle(fontFamily: 'Poppins Regular')),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Por Favor, ingresa el numero de emision";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
+                    Container(
+                      height: screenMedia * 0.20,
+                      width: screenMedia * 0.95,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: _sequenceController,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 25, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                            borderSide: BorderSide.none, // Color del borde
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                              width: 25,
+                            ), // Color del borde cuando está enfocado
+                          ),
+                          enabledBorder: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                              width: 25,
+                            ), // Color del borde cuando no está enfocado
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Colors.red),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.red)),
+                          labelStyle: TextStyle(
+                              fontFamily: 'Poppins Regular',
+                              color: Colors.black),
+                          errorStyle: TextStyle(fontFamily: 'Poppins Regular'),
+                          labelText: 'Secuencia',
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        onChanged: (value) {
+                          if (_hasError == false) {
+                            setState(() {});
+                          }
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Por Favor, ingrese el numero de secuencia";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.02,
+                    ),
+                    Container(
+                      width: screenMedia * 0.97,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 7,
+                                spreadRadius: 2,
+                                color: Colors.grey.withOpacity(0.5))
+                          ]),
+                      child: DropdownButtonFormField<String>(
+                        icon: Image.asset('lib/assets/Abajo.png'),
+                        value: taxSustance,
+                        onChanged: (String? newValue) {
                           setState(() {
-                            _addOrUpdateProduct(selectedProductsResult);
-
-                            montoController.text =
-                                '\$${calcularMontoTotal().toStringAsFixed(2)}';
+                            taxSustance = newValue;
                           });
-                        }
-                      },
-                      child: const Text('Agregar Productos'),
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: saldoNetoController,
-                      decoration:
-                          const InputDecoration(labelText: 'Saldo Neto'),
-                      keyboardType: TextInputType.number,
-                    ),
-                    TextField(
-                      readOnly: true,
-                      controller: montoController,
-                      decoration: const InputDecoration(labelText: 'Monto'),
-                      keyboardType: TextInputType.number,
-                    ),
 
+                          if (newValue ==
+                              'Crédito Tributario para declaración de IVA') {
+                            setState(() {
+                              _selectTaxSutance = '01';
+                            });
+                          } else if (newValue ==
+                              'Costo o Gasto para declaración de Imp. a la Renta') {
+                            setState(() {
+                              _selectTaxSutance = '02';
+                            });
+                          } else if (newValue == "Activo Fijo") {
+                            setState(() {
+                              _selectTaxSutance = '03';
+                            });
+                          } else if (newValue ==
+                              "Activo Fijo - Costo o Gasto") {
+                            setState(() {
+                              _selectTaxSutance = '04';
+                            });
+                          } else if (newValue ==
+                              'Liquidación de Gastos de Viaje, hospedaje y Alimentación') {
+                            setState(() {
+                              _selectTaxSutance = '05';
+                            });
+                          } else if (newValue ==
+                              'Inventario - Crédito Tributario para la declaración de IVA') {
+                            setState(() {
+                              _selectTaxSutance = '06';
+                            });
+                          } else if (newValue ==
+                              'Inventario - Costo o Gasto para declaración de Imp.') {
+                            setState(() {
+                              _selectTaxSutance = '07';
+                            });
+                          } else if (newValue ==
+                              'Valor pagado para solicitar Reembolso de Gastos') {
+                            setState(() {
+                              _selectTaxSutance = '08';
+                            });
+                          } else if (newValue == 'Reembolso por Siniestros') {
+                            setState(() {
+                              _selectTaxSutance = '09';
+                            });
+                          } else if (newValue ==
+                              'Distribución de Dividendos, Beneficios o Utilidades') {
+                            setState(() {
+                              _selectTaxSutance = '10';
+                            });
+                          } else if (newValue ==
+                              'Impuestos y retenciones presuntivos') {
+                            setState(() {
+                              _selectTaxSutance = '11';
+                            });
+                          } else if (newValue ==
+                              'Valores reconocidos por entidades del sector público') {
+                            setState(() {
+                              _selectTaxSutance = '12';
+                            });
+                          }
+
+                          print(
+                              'Este es el valor de Sustento Tributario $taxSustance && este es el valor de $_selectTaxSutance');
+                        },
+                        items: <String>[
+                          'Crédito Tributario para declaración de IVA',
+                          'Costo o Gasto para declaración de Imp. a la Renta',
+                          'Activo Fijo',
+                          'Activo Fijo - Costo o Gasto',
+                          'Liquidación de Gastos de Viaje, hospedaje y Alimentación',
+                          'Inventario - Crédito Tributario para la declaración de IVA',
+                          'Inventario - Costo o Gasto para declaración de Imp.',
+                          'Valor pagado para solicitar Reembolso de Gastos',
+                          'Reembolso por Siniestros',
+                          'Distribución de Dividendos, Beneficios o Utilidades',
+                          'Impuestos y retenciones presuntivos',
+                          'Valores reconocidos por entidades del sector público'
+                        ].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: SizedBox(
+                                width: screenMedia,
+                                child: Text(
+                                  value,
+                                  overflow: TextOverflow
+                                      .ellipsis, // Para manejar texto largo
+                                )),
+                          );
+                        }).toList(),
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.red)),
+                          errorBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.red)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                              borderSide:
+                                  BorderSide(width: 25, color: Colors.white)),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                              borderSide:
+                                  BorderSide(width: 25, color: Colors.white)),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                              borderSide: BorderSide.none),
+                          labelStyle: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Poppins Regular',
+                          ),
+                          errorStyle: TextStyle(fontFamily: 'Poppins Regular'),
+                          label: SizedBox(
+                              width: scrennSelect,
+                              child: Text(
+                                'Sustento Tributario',
+                              )),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 20),
+                        ),
+                        onTap: () {
+                          if (_hasError == false) {
+                            setState(() {});
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return "Por Favor, selecciona un sustento tributario";
+                          }
+
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.05,
+                    ),
+                    const Text(
+                      'Productos',
+                      style:
+                          TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.03,
+                    ),
+                    Container(
+                      width: screenMedia * 0.97,
+                      height: screenHeight * 0.32,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 7,
+                                spreadRadius: 2)
+                          ]),
+                      child: Stack(
+                        children: [
+                          Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Nombre',
+                                      style: TextStyle(
+                                          fontFamily: 'Poppins Bold',
+                                          fontSize: 18),
+                                    ),
+                                    Text(
+                                      'Cant.',
+                                      style: TextStyle(
+                                          fontFamily: 'Poppins Bold',
+                                          fontSize: 18),
+                                    ),
+                                    Text(
+                                      'Precio',
+                                      style: TextStyle(
+                                          fontFamily: 'Poppins Bold',
+                                          fontSize: 18),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: selectedProducts.length,
+                                  itemBuilder: (context, index) {
+                                    final product = selectedProducts[index];
+
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _removeProduct(index);
+                                                        });
+                                                      },
+                                                      child: Image.asset(
+                                                          'lib/assets/Eliminar.png')),
+                                                  SizedBox(
+                                                    width: screenMedia * 0.01,
+                                                  ),
+                                                  SizedBox(
+                                                      width: screenMedia * 0.23,
+                                                      child: Text(
+                                                          product['name'])),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  GestureDetector(
+                                                      onTap: () {
+                                                        if (product[
+                                                                'quantity'] <=
+                                                            0) {
+                                                          return;
+                                                        }
+
+                                                        setState(() {
+                                                          product['quantity'] -=
+                                                              1;
+                                                          calcularMontoTotal();
+
+                                                          print(
+                                                              'Productos ${product['quantity_avaible']}');
+                                                        });
+                                                      },
+                                                      child: Image.asset(
+                                                        'lib/assets/menos.png',
+                                                        width: 16,
+                                                      )),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            1.0),
+                                                    child: SizedBox(
+                                                      width: screenMedia * 0.15,
+                                                      child: Text(
+                                                        product['quantity']
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                            fontFamily:
+                                                                'Poppins Regular'),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          product['quantity'] +=
+                                                              1;
+                                                          calcularMontoTotal();
+                                                        });
+                                                      },
+                                                      child: Image.asset(
+                                                        'lib/assets/Más-2.png',
+                                                        width: 16,
+                                                      )),
+                                                ],
+                                              ),
+                                              Container(
+                                                width: screenMedia * 0.2,
+                                                height: screenHeight * 0.06,
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Color(int.parse(
+                                                              '0xFF7531FF')),
+                                                          blurRadius: 7,
+                                                          spreadRadius: 2)
+                                                    ]),
+                                                child: TextFormField(
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  initialValue:
+                                                      '${product['price']}', // Valor inicial del precio
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          border:
+                                                              OutlineInputBorder(
+                                                                  borderSide:
+                                                                      BorderSide
+                                                                          .none),
+                                                          contentPadding:
+                                                              EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          16,
+                                                                      vertical:
+                                                                          2)),
+
+                                                  onChanged: (newValue) {
+                                                    _handlePriceChange(
+                                                        newValue, index);
+
+                                                    setState(() {
+                                                      montoController.text =
+                                                          '\$${calcularMontoTotal()}';
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: screenHeight * 0.01,
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                width: screenMedia,
+                                height: screenHeight * 0.07,
+                              )
+                            ],
+                          ),
+                          Positioned(
+                            top: screenHeight * 0.26,
+                            left: screenMedia * 0.45,
+                            child: GestureDetector(
+                                onTap: () async {
+                                  final selectedProductsResult =
+                                      await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProductSelectionComprasScreen()),
+                                  );
+                                  print(
+                                      "Cantidad de productos $selectedProductsResult");
+                                  if (selectedProductsResult != null) {
+                                    setState(() {
+                                      _addOrUpdateProduct(
+                                          selectedProductsResult);
+
+                                      montoController.text =
+                                          '\$${calcularMontoTotal()}';
+                                    });
+                                  }
+                                },
+                                child: Image.asset(
+                                  'lib/assets/Más@3x.png',
+                                  width: 23,
+                                )),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total',
+                            style: TextStyle(
+                                fontFamily: 'Poppins Bold', fontSize: 18),
+                          ),
+                          Text(
+                            montoController.text,
+                            style: const TextStyle(
+                                fontFamily: 'Poppins Bold', fontSize: 18),
+                          )
+                        ],
+                      ),
+                    ),
                     const SizedBox(
                       height: 5,
                     ),
-
                     Center(
                       child: SizedBox(
                         width: screenMedia,
                         child: Column(
                           children: [
-                            // ...otros widgets aquí
                             const SizedBox(
                               height: 5,
                             ),
                             SizedBox(
-                              width: double
-                                  .infinity, // Asegura que el botón ocupe todo el ancho disponible
+                              width: screenMedia * 0.97,
                               child: ElevatedButton(
+                                style: ButtonStyle(
+                                    foregroundColor:
+                                        WidgetStatePropertyAll(Colors.white),
+                                    backgroundColor: WidgetStatePropertyAll(
+                                        Color(0xFF7531FF)),
+                                    shape: WidgetStatePropertyAll(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8)))),
                                 onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    final info =
+                                        await getApplicationSupportDirectory();
+                                    print("esta es la ruta ${info.path}");
 
-                                  if(_formKey.currentState!.validate()){
-                                  final info =
-                                      await getApplicationSupportDirectory();
-                                  print("esta es la ruta ${info.path}");
+                                    final String filePathEnv =
+                                        '${info.path}/.env';
+                                    final File archivo = File(filePathEnv);
+                                    String contenidoActual =
+                                        await archivo.readAsString();
+                                    print(
+                                        'Contenido actual del archivo:\n$contenidoActual');
 
-                                  final String filePathEnv =
-                                      '${info.path}/.env';
-                                  final File archivo = File(filePathEnv);
-                                  String contenidoActual =
-                                      await archivo.readAsString();
-                                  print(
-                                      'Contenido actual del archivo:\n$contenidoActual');
+                                    // Convierte el contenido JSON a un mapa
+                                    Map<String, dynamic> jsonData =
+                                        jsonDecode(contenidoActual);
+                                    print(
+                                        'Esto es cbpartnerId ${_cbPartnerIdController.text} ');
+                                    print(
+                                        'Esto es provider id ${_providerIdController.text}');
+                                    print(
+                                        'Esto es el cbpartnerlocationid ${_cbPartnerLocationIdController.text}');
+                                    print('Esto es el jsonData $jsonData');
 
-                                  // Convierte el contenido JSON a un mapa
-                                  Map<String, dynamic> jsonData =
-                                      jsonDecode(contenidoActual);
-                                  print(
-                                      'Esto es cbpartnerId ${_cbPartnerIdController.text} ');
-                                  print(
-                                      'Esto es provider id ${_providerIdController.text}');
-                                  print(
-                                      'Esto es el cbpartnerlocationid ${_cbPartnerLocationIdController.text}');
-                                  print('Esto es el jsonData $jsonData');
+                                    dynamic userId = await getLogin();
 
-                                  dynamic userId = await getLogin();
+                                    Map<String, dynamic> nuevaRetencion = {
+                                      'ad_client_id': jsonData['ClientID'],
+                                      'ad_org_id': jsonData['OrgID'],
+                                      'c_bpartner_id':
+                                          _cbPartnerIdController.text,
+                                      'c_bpartner_location_id':
+                                          _cbPartnerLocationIdController.text,
+                                      'c_currency_id': variablesG[0]
+                                          ['c_currency_id'],
+                                      'c_doctypetarget_id': variablesG[0]
+                                          ['c_doc_type_target_fr'],
+                                      'c_paymentterm_id': variablesG[0]
+                                          ['c_paymentterm_id'],
+                                      'description': descripcionController.text,
+                                      'documentno':
+                                          numeroDocumentoController.text,
+                                      'date': fechaFacturacionController.text,
+                                      'is_sotrx': 'N',
+                                      'm_pricelist_id': variablesG[0]
+                                          ['m_pricelist_id'],
+                                      'payment_rule': _selectTypePaymentRule,
+                                      'date_invoiced':
+                                          fechaIdempiereController.text,
+                                      'date_acct':
+                                          fechaIdempiereController.text,
+                                      'sales_rep_id': userId['userId'],
+                                      'sri_authorization_code':
+                                          _sriAuthorizationCodeController.text,
+                                      'ing_establishment':
+                                          _establishmentController.text,
+                                      'ing_emission': _emisionController.text,
+                                      'ing_sequence': _sequenceController.text,
+                                      'ing_taxsustance': _selectTaxSutance,
+                                      'provider_id': _providerIdController.text,
+                                      'monto': double.parse(
+                                          montoController.text.substring(1)),
+                                      'productos': selectedProducts,
+                                    };
 
-                                  Map<String, dynamic> nuevaRetencion = {
-                                    'ad_client_id': jsonData['ClientID'],
-                                    'ad_org_id': jsonData['OrgID'],
-                                    'c_bpartner_id':
-                                        _cbPartnerIdController.text,
-                                    'c_bpartner_location_id':
-                                        _cbPartnerLocationIdController.text,
-                                    'c_currency_id': variablesG[0]
-                                        ['c_currency_id'],
-                                    'c_doctypetarget_id': variablesG[0]
-                                        ['c_doc_type_target_fr'],
-                                    'c_paymentterm_id': variablesG[0]
-                                        ['c_paymentterm_id'],
-                                    'description': descripcionController.text,
-                                    'documentno':
-                                        numeroDocumentoController.text,
-                                    'date': fechaFacturacionController.text,
-                                    'is_sotrx': 'N',
-                                    'm_pricelist_id': variablesG[0]
-                                        ['m_pricelist_id'],
-                                    'payment_rule': _selectTypePaymentRule,
-                                    'date_invoiced':
-                                        fechaIdempiereController.text,
-                                    'date_acct': fechaIdempiereController.text,
-                                    'sales_rep_id': userId['userId'],
-                                    'sri_authorization_code':
-                                        _sriAuthorizationCodeController.text,
-                                    'ing_establishment':
-                                        _establishmentController.text,
-                                    'ing_emission': _emisionController.text,
-                                    'ing_sequence': _sequenceController.text,
-                                    'ing_taxsustance': _selectTaxSutance,
-                                    'provider_id': _providerIdController.text,
-                                    'monto': double.parse(
-                                        montoController.text.substring(1)),
-                                    'productos': selectedProducts,
-                                  };
+                                    if (selectedProducts.isEmpty) {
+                                      // Mostrar un diálogo o mensaje indicando que la orden debe tener productos adjuntos
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text('Error'),
+                                            content: const Text(
+                                                'La orden debe tener productos adjuntos.'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(
+                                                      context); // Cerrar el diálogo
+                                                },
+                                                child: const Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
 
-                                  print('Esto es la factura con retencion $nuevaRetencion');
-                                  createInvoicedWithholdingIdempiere(nuevaRetencion);
-                                  insertRetencion(nuevaRetencion);
-                                  _formKey.currentState?.reset();
+                                      return;
+                                    }
 
-                                  totalBdi.clear();
-                                  numeroDocumentoController.clear();
-                                  porcentaje.clear();
+                                    print(
+                                        'Esto es la factura con retencion $nuevaRetencion');
+                                    createInvoicedWithholdingIdempiere(
+                                        nuevaRetencion);
+                                    insertRetencion(nuevaRetencion);
+                                    _formKey.currentState?.reset();
 
-                                  // Mostrar un mensaje al usuario
-                                  ScaffoldMessenger.of(currentContext!)
-                                      .showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Retención creada exitosamente'),
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                  // Navigator.pop(context);
-                                  }else{  
+                                    totalBdi.clear();
+                                    numeroDocumentoController.clear();
+                                    porcentaje.clear();
 
-                                   
-
-                                       setState(() {
-                                        _hasError = true;
-                                         });
-
-                                        
+                                    // Mostrar un mensaje al usuario
+                                    ScaffoldMessenger.of(currentContext!)
+                                        .showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Retención creada exitosamente'),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                    // Navigator.pop(context);
+                                  } else {
+                                    setState(() {
+                                      _hasError = true;
+                                    });
                                   }
                                 },
-                                child: const Text('Crear retención'),
+                                child: const Text(
+                                  'Crear retención',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins Bold', fontSize: 17),
+                                ),
                               ),
                             ),
                             const SizedBox(
                               height: 5,
-                            ),
-                            SizedBox(
-                              width: double
-                                  .infinity, // Asegura que el botón ocupe todo el ancho disponible
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Acción al hacer clic en el botón "Cancelar"
-                                },
-                                child: const Text('Cancelar'),
-                              ),
                             ),
                           ],
                         ),
