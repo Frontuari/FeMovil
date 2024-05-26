@@ -568,7 +568,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                                                 onChanged:
                                                                     (value) {
                                                                   if (mounted) {
-                                                                    setState(
+                                                                    setStateDialog(
                                                                         () {
                                                                       filteredTerceros = tercerosData
                                                                           .where((tercero) =>
@@ -693,6 +693,10 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                                                           _hasError =
                                                                               false;
                                                                         },
+                                                                      );
+
+                                                                      setStateDialog(
+                                                                        () {},
                                                                       );
 
                                                                       _textTerceroController
