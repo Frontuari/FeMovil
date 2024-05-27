@@ -194,7 +194,7 @@ createInvoicedWithholdingIdempiere(retenciones) async {
               "serviceType": "completeInvoce",
               "tableName": "C_Invoice",
               "recordIDVariable": "@C_Invoice.C_Invoice_ID",
-              "docAction": variablesG[0]['doc_status_invoice_so'],
+              "docAction": "PR",
           }
       };
                 

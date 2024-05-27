@@ -29,7 +29,6 @@ class _RetencionesState extends State<Retenciones> {
 
             Future<void>  _loadWithholdings() async{ 
 
-
                       List<Map<String, dynamic>> retenciones = await getRetencionesWithProveedorNames();
 
                   setState(() {
@@ -169,7 +168,9 @@ class _RetencionesState extends State<Retenciones> {
                           ),
                           IconButton(
                               onPressed: () {
-                                _loadWithholdings;
+                                  
+                                _loadWithholdings();
+                                
                               },
                               icon: const Icon(
                                 Icons.refresh,
