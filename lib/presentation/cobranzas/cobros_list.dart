@@ -4,7 +4,6 @@ import 'package:femovil/presentation/cobranzas/cobro_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-
 class CobrosList extends StatefulWidget {
   const CobrosList({super.key});
 
@@ -23,16 +22,15 @@ class _CobrosListState extends State<CobrosList> {
   bool _hasMoreCobros = true;
   final TextEditingController _searchController = TextEditingController();
   TextEditingController inputValue = TextEditingController();
-  DateTimeRange? _selectedDateRange; 
-
+  DateTimeRange? _selectedDateRange;
 
   @override
   void initState() {
     super.initState();
-   _scrollController.addListener(_onScroll);
-   
+    _scrollController.addListener(_onScroll);
 
-    _cobrosFuture = getCobros(page: cobros.length ~/ _pageSize + 1, pageSize: _pageSize);
+    _cobrosFuture =
+        getCobros(page: cobros.length ~/ _pageSize + 1, pageSize: _pageSize);
     _cobrosFuture.then((data) {
       setState(() {
         cobros = data;
@@ -44,9 +42,9 @@ class _CobrosListState extends State<CobrosList> {
   Future<void> _loadMoreCobros() async {
     if (_isLoading || !_hasMoreCobros) return;
 
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       final List<Map<String, dynamic>> newData = await getCobros(
@@ -81,7 +79,8 @@ class _CobrosListState extends State<CobrosList> {
 
   void _onScroll() {
     print('Entre aqui ');
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
       _loadMoreCobros();
     }
   }
@@ -91,8 +90,10 @@ class _CobrosListState extends State<CobrosList> {
       final clientName = cobro['client_name'].toString().toLowerCase();
       final orderNumber = cobro['orden_venta_nro'].toString();
       final documentNo = cobro['documentno'].toString();
-      final searchQuery = query.toLowerCase(); 
-      return clientName.contains(searchQuery) || orderNumber.contains(searchQuery) || documentNo.contains(searchQuery) ;
+      final searchQuery = query.toLowerCase();
+      return clientName.contains(searchQuery) ||
+          orderNumber.contains(searchQuery) ||
+          documentNo.contains(searchQuery);
     }).toList();
 
     setState(() {
@@ -102,25 +103,24 @@ class _CobrosListState extends State<CobrosList> {
   }
 
   double parseNumberToDouble(String number) {
-  number = number.replaceAll('.', '').replaceAll(',', '.');
-  return double.parse(number);
+    number = number.replaceAll('.', '').replaceAll(',', '.');
+    return double.parse(number);
   }
 
   void _filterByMaxPrice(double maxPrice) {
-  setState(() {
+    setState(() {
       filteredCobros = cobros.where((cobro) {
-  double monto = cobro['pay_amt'];
-  return monto <= maxPrice;
-  }).toList();
+        double monto = cobro['pay_amt'];
+        return monto <= maxPrice;
+      }).toList();
 
-  filteredCobros.sort((a, b) {
-    double montoA = a['pay_amt'];
-    double montoB = b['pay_amt'];
-    return montoB.compareTo(montoA);
-  }); 
+      filteredCobros.sort((a, b) {
+        double montoA = a['pay_amt'];
+        double montoB = b['pay_amt'];
+        return montoB.compareTo(montoA);
+      });
     });
   }
-
 
   void _showMaxPriceDialog(BuildContext context, screenMedia) {
     showDialog(
@@ -152,8 +152,7 @@ class _CobrosListState extends State<CobrosList> {
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
-                      borderSide: BorderSide(width: 1, color: Colors.white))
-                      ),
+                      borderSide: BorderSide(width: 1, color: Colors.white))),
             ),
           ),
           actions: [
@@ -162,7 +161,11 @@ class _CobrosListState extends State<CobrosList> {
                 Navigator.of(context).pop();
                 inputValue.clear();
               },
-              child: const Text('Cancelar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(
+                    fontFamily: 'Poppins SemiBold', color: Colors.red),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -175,7 +178,11 @@ class _CobrosListState extends State<CobrosList> {
                 Navigator.of(context).pop();
                 inputValue.clear();
               },
-              child: const Text('Aceptar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Color(0xFF7531ff)),),
+              child: const Text(
+                'Aceptar',
+                style: TextStyle(
+                    fontFamily: 'Poppins SemiBold', color: Color(0xFF7531ff)),
+              ),
             ),
           ],
         );
@@ -228,15 +235,12 @@ class _CobrosListState extends State<CobrosList> {
     });
   }
 
-
-   void _showDateRangePicker(BuildContext context) async {
+  void _showDateRangePicker(BuildContext context) async {
     // Enhanced user experience with custom date range and better initial selection
-
-
 
     final picked = await showDateRangePicker(
       context: context,
-      locale: const Locale("es", "ES"), 
+      locale: const Locale("es", "ES"),
       initialDateRange: DateTimeRange(
         start: DateTime.now()
             .subtract(const Duration(days: 7)), // Default to past week
@@ -258,8 +262,6 @@ class _CobrosListState extends State<CobrosList> {
     }
   }
 
-
-
   void _showFilterOptions(BuildContext context, screenMax) {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -277,8 +279,10 @@ class _CobrosListState extends State<CobrosList> {
       context: context,
       position: RelativeRect.fromRect(
         Rect.fromPoints(
-          const Offset(20, 180), // Punto de inicio en la esquina superior izquierda
-        const Offset(175, 240),  // Punto de fin en la esquina superior izquierda
+          const Offset(
+              20, 180), // Punto de inicio en la esquina superior izquierda
+          const Offset(
+              175, 240), // Punto de fin en la esquina superior izquierda
         ),
         overlay.localToGlobal(Offset.zero) & overlay.size, // Tamaño del overlay
       ),
@@ -303,7 +307,8 @@ class _CobrosListState extends State<CobrosList> {
             ),
             onTap: () {
               Navigator.pop(context);
-              _cobrosFuture = getCobros(page: cobros.length ~/ _pageSize + 1, pageSize: _pageSize);
+              _cobrosFuture = getCobros(
+                  page: cobros.length ~/ _pageSize + 1, pageSize: _pageSize);
             },
           ),
         ),
@@ -366,13 +371,9 @@ class _CobrosListState extends State<CobrosList> {
 
     return GestureDetector(
       onTap: () {
-
-          if(MediaQuery.of(context).viewInsets.bottom > 0){
-
-            FocusScope.of(context).unfocus();
-
-          }
-
+        if (MediaQuery.of(context).viewInsets.bottom > 0) {
+          FocusScope.of(context).unfocus();
+        }
       },
       child: Scaffold(
         appBar: const PreferredSize(
@@ -385,10 +386,12 @@ class _CobrosListState extends State<CobrosList> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: screenHeight * 0.035,),
+                SizedBox(
+                  height: screenHeight * 0.035,
+                ),
                 Container(
                   width: screenMax,
-                  height: screenMax * 0.18,
+                  height: screenMax * 0.19,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
@@ -409,7 +412,7 @@ class _CobrosListState extends State<CobrosList> {
                         color: Colors.black,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                        vertical: 25,
+                        vertical: 28,
                         horizontal: 20,
                       ),
                       border: const OutlineInputBorder(
@@ -430,33 +433,36 @@ class _CobrosListState extends State<CobrosList> {
                           width: 25,
                         ), // Color del borde cuando no está enfocado
                       ),
-                      labelText: 'Buscar por nombre o numero de orden',
+                      label: Container(
+                          width: screenMax * 0.97,
+                          child: Text('Buscar por nombre o numero de orden')),
                       suffixIcon: Image.asset('lib/assets/Lupa.png'),
                     ),
                     style: const TextStyle(fontFamily: 'Poppins Regular'),
                   ),
                 ),
-                 SizedBox(height: screenHeight * 0.025,),
-                  
-                   
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: Image.asset(
-                                'lib/assets/filtro@3x.png',
-                                width: 25,
-                                height: 35,
-                              ),
-                              onPressed: () {
-                                _showFilterOptions(context, screenMax);
-                              },
-                            alignment: Alignment.bottomLeft,),
-                          ],
-                        ),
-                 SizedBox(height: screenHeight * 0.025,),
-            
-            
+                SizedBox(
+                  height: screenHeight * 0.025,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Image.asset(
+                        'lib/assets/filtro@3x.png',
+                        width: 25,
+                        height: 35,
+                      ),
+                      onPressed: () {
+                        _showFilterOptions(context, screenMax);
+                      },
+                      alignment: Alignment.bottomLeft,
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: screenHeight * 0.025,
+                ),
                 Expanded(
                   child: FutureBuilder(
                     future: _cobrosFuture,
@@ -470,15 +476,17 @@ class _CobrosListState extends State<CobrosList> {
                           controller: _scrollController,
                           itemCount: filteredCobros.length + 1,
                           itemBuilder: (context, index) {
-                             if (index == filteredCobros.length) {
-                              return _isLoading ? const Center(child: CircularProgressIndicator()) : const SizedBox();
+                            if (index == filteredCobros.length) {
+                              return _isLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator())
+                                  : const SizedBox();
                             }
-                            
-                            
+
                             final cobro = filteredCobros[index];
-                            
+
                             print('esto es el snapshotData ${snapshot.data}');
-            
+
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -499,16 +507,20 @@ class _CobrosListState extends State<CobrosList> {
                                       ],
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Container(
                                           height: 170,
                                           decoration: BoxDecoration(
-                                            color: const Color.fromARGB(255, 255, 255, 255),
-                                            borderRadius: BorderRadius.circular(10),
+                                            color: const Color.fromARGB(
+                                                255, 255, 255, 255),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.grey.withOpacity(0.5),
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
                                                 spreadRadius: 2,
                                                 blurRadius: 5,
                                                 offset: const Offset(0, 3),
@@ -525,29 +537,40 @@ class _CobrosListState extends State<CobrosList> {
                                                   height: 50,
                                                   width: screenMax,
                                                   decoration: BoxDecoration(
-                                                    color: const Color(0xFFF0EBFC),
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    color:
+                                                        const Color(0xFFF0EBFC),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                        color: Colors.grey.withOpacity(0.2),
+                                                        color: Colors.grey
+                                                            .withOpacity(0.2),
                                                         spreadRadius: 2,
                                                         blurRadius: 5,
-                                                        offset: const Offset(0, 3),
+                                                        offset:
+                                                            const Offset(0, 3),
                                                       ),
                                                     ],
                                                   ),
                                                   child: Padding(
-                                                    padding: const EdgeInsets.all(10.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
                                                     child: Text(
                                                       "N° ${cobro['orden_venta_nro'] != "" ? cobro['orden_venta_nro'] : ''}",
                                                       style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        fontFamily: 'Poppins Bold',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily:
+                                                            'Poppins Bold',
                                                         fontSize: 18,
                                                         color: Colors.black,
                                                       ),
-                                                      textAlign: TextAlign.start,
-                                                      overflow: TextOverflow.ellipsis,
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
                                                   ),
                                                 ),
@@ -555,31 +578,45 @@ class _CobrosListState extends State<CobrosList> {
                                               Positioned(
                                                 top: 55,
                                                 child: Padding(
-                                                  padding: const EdgeInsets.all(8.0),
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
                                                   child: SizedBox(
                                                     width: screenMax * 0.9,
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
                                                       children: [
                                                         Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Row(
                                                               children: [
                                                                 const Text(
                                                                   'Nombre: ',
-                                                                  style: TextStyle(
-                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold',
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  width: screenMax * 0.45,
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
                                                                   child: Text(
-                                                                    cobro['client_name'].toString(),
-                                                                    style: const TextStyle(
-                                                                      fontFamily: 'Poppins Regular',
+                                                                    cobro['client_name']
+                                                                        .toString(),
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular',
                                                                     ),
-                                                                    overflow: TextOverflow.ellipsis,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                   ),
                                                                 ),
                                                               ],
@@ -588,18 +625,27 @@ class _CobrosListState extends State<CobrosList> {
                                                               children: [
                                                                 const Text(
                                                                   'Fecha: ',
-                                                                  style: TextStyle(
-                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold',
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  width: screenMax * 0.45,
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
                                                                   child: Text(
-                                                                    cobro['date'],
-                                                                    style: const TextStyle(
-                                                                      fontFamily: 'Poppins Regular',
+                                                                    cobro[
+                                                                        'date'],
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular',
                                                                     ),
-                                                                    overflow: TextOverflow.ellipsis,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                   ),
                                                                 ),
                                                               ],
@@ -608,38 +654,55 @@ class _CobrosListState extends State<CobrosList> {
                                                               children: [
                                                                 const Text(
                                                                   'Monto: ',
-                                                                  style: TextStyle(
-                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold',
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  width: screenMax * 0.45,
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.45,
                                                                   child: Text(
                                                                     '${cobro['pay_amt'].toString()}\$',
-                                                                    style: const TextStyle(
-                                                                      fontFamily: 'Poppins Regular',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular',
                                                                     ),
-                                                                    overflow: TextOverflow.ellipsis,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
-                                                               Row(
+                                                            Row(
                                                               children: [
                                                                 const Text(
                                                                   'N° Documento: ',
-                                                                  style: TextStyle(
-                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold',
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  width: screenMax * 0.30,
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.30,
                                                                   child: Text(
-                                                                    cobro['documentno'].toString(),
-                                                                    style: const TextStyle(
-                                                                      fontFamily: 'Poppins Regular',
+                                                                    cobro['documentno']
+                                                                        .toString(),
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular',
                                                                     ),
-                                                                    overflow: TextOverflow.ellipsis,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                   ),
                                                                 ),
                                                               ],
@@ -648,37 +711,52 @@ class _CobrosListState extends State<CobrosList> {
                                                               children: [
                                                                 const Text(
                                                                   'Descripción: ',
-                                                                  style: TextStyle(
-                                                                    fontFamily: 'Poppins SemiBold',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins SemiBold',
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  width: screenMax * 0.40,
+                                                                  width:
+                                                                      screenMax *
+                                                                          0.40,
                                                                   child: Text(
-                                                                    cobro['description'].toString(),
-                                                                    style: const TextStyle(
-                                                                      fontFamily: 'Poppins Regular',
+                                                                    cobro['description']
+                                                                        .toString(),
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular',
                                                                     ),
-                                                                    overflow: TextOverflow.ellipsis,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
-            
                                                           ],
                                                         ),
                                                         GestureDetector(
                                                           onTap: () {
-            
-                                                              Navigator.push(context, MaterialPageRoute(builder: (context) => CobroDetails(cobro: cobro) , ));
-            
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      CobroDetails(
+                                                                          cobro:
+                                                                              cobro),
+                                                                ));
                                                           },
                                                           child: Row(
                                                             children: [
                                                               const Text(
                                                                 'Ver',
-                                                                style: TextStyle(
-                                                                  color: Color(0xFF7531FF),
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Color(
+                                                                      0xFF7531FF),
                                                                 ),
                                                               ),
                                                               const SizedBox(
@@ -699,11 +777,9 @@ class _CobrosListState extends State<CobrosList> {
                                             ],
                                           ),
                                         ),
-                                        
                                       ],
                                     ),
                                   ),
-                                  
                                 ],
                               ),
                             );
