@@ -46,6 +46,8 @@ class _OrdenDeCompraScreenState extends State<OrdenDeCompraScreen> {
   TextEditingController saldoNetoController = TextEditingController();
   TextEditingController fechaIdempiereController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+  TextEditingController saldoImpuestoController = TextEditingController();
+  TextEditingController saldoExentoController = TextEditingController();
   
   List<Map<String, dynamic>> selectedProducts = [];
   DateTime selectedDate = DateTime.now();
@@ -76,6 +78,7 @@ dynamic calcularMontoTotal() {
   double total = 0;
   double totalNeto = 0;
   double suma = 0;
+  double saldoExento = 0.0;
 
   // Formateador para el monto total y neto
   final formatter = NumberFormat('#,##0.00', 'es_ES');
@@ -87,14 +90,24 @@ dynamic calcularMontoTotal() {
 
     total += price * quantity * (impuesto / 100);
     totalNeto += price * quantity;
+
+    if(product['impuesto'] == 0.0){
+
+        saldoExento += price * quantity;
+
+    }
+
   }
 
-  saldoNetoController.text = '\$${formatter.format(totalNeto)}';
+  saldoExentoController.text = '\$ ${formatter.format(saldoExento)}';
+  saldoNetoController.text = '\$ ${formatter.format(totalNeto)}';
   suma = total + totalNeto;
-  montoController.text = '\$${formatter.format(suma)}';
+  montoController.text = '\$ ${formatter.format(suma)}';
   print('productos totales $selectedProducts');
     print('Esto es la suma $suma');
-  
+    saldoImpuestoController.text = '\$ ${formatter.format(total)}';
+
+
   String parseFormatNumber = formatter.format(suma);
 
   return parseFormatNumber;
@@ -215,7 +228,7 @@ dynamic calcularMontoTotal() {
   void _removeProduct(int index) {
     setState(() {
       selectedProducts.removeAt(index);
-      montoController.text = '\$${calcularMontoTotal()}';
+      montoController.text = '\$ ${calcularMontoTotal()}';
     });
   }
 
@@ -786,7 +799,7 @@ dynamic calcularMontoTotal() {
 
                                                   setState(() {
                                                     montoController.text =
-                                                        '\$${calcularMontoTotal()}';
+                                                        '\$ ${calcularMontoTotal()}';
                                                   });
                                                 },
                                               ),
@@ -827,7 +840,7 @@ dynamic calcularMontoTotal() {
                                     _addOrUpdateProduct(selectedProductsResult);
 
                                     montoController.text =
-                                        '\$${calcularMontoTotal()}';
+                                        '\$ ${calcularMontoTotal()}';
                                   });
                                 }
                               },
@@ -841,19 +854,69 @@ dynamic calcularMontoTotal() {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
                       children: [
-                        const Text(
-                          'Total',
-                          style: TextStyle(
-                              fontFamily: 'Poppins Bold', fontSize: 18),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'SubTotal',
+                              style: TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            ),
+                            Text(
+                              saldoNetoController.text,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            )
+                          ],
+                        ),    
+                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Exento',
+                              style: TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            ),
+                            Text(
+                              saldoExentoController.text,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            )
+                          ],
                         ),
-                        Text(
-                          montoController.text,
-                          style: const TextStyle(
-                              fontFamily: 'Poppins Bold', fontSize: 18),
-                        )
+                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Impuesto',
+                              style: TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            ),
+                            Text(
+                              saldoImpuestoController.text,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            )
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Total',
+                              style: TextStyle(
+                                  fontFamily: 'Poppins Bold', fontSize: 18),
+                            ),
+                            Text(
+                              montoController.text,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Bold', fontSize: 18),
+                            )
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -922,10 +985,12 @@ dynamic calcularMontoTotal() {
                         'id_factura': 0,
                         'fecha': fechaController.text,
                         'description': descripcionController.text,
-                        'monto': montoController.text.substring(1),
-                        'saldo_neto': saldoNetoController.text.substring(1),
+                        'monto': montoController.text.substring(2),
+                        'saldo_neto': saldoNetoController.text.substring(2),
                         'productos': selectedProducts,
                         'usuario_id': infoUserForOrder['userId'],
+                        'saldo_exento': saldoExentoController.text.substring(2),
+                        'saldo_impuesto': saldoImpuestoController.text.substring(2),
                         'status_sincronized': 'Borrador',
                       };
 

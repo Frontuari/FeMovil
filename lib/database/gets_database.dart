@@ -424,6 +424,24 @@ Future<List<Map<String, dynamic>>> getProductsWithZeroValues() async {
   return [];
 }
 
+Future<List<Map<String, dynamic>>> getCiiuActivities () async {
+
+    final db = await DatabaseHelper.instance.database;
+
+    if(db != null){
+
+        return await db.rawQuery('''
+
+        SELECT * FROM ciiu
+
+      ''');
+
+    }
+
+  return [];
+    
+
+}
 Future<List<Map<String, dynamic>>> getCustomersWithZeroValues() async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {

@@ -32,6 +32,9 @@
     final dynamic taxPayerTypeName;
     final dynamic lvePersonTypeId;
     final dynamic personTypeName;
+    final dynamic province; 
+    final dynamic ciiuId;
+    final dynamic ciiuTagName;
 
   Vendor({
    this.id,
@@ -59,6 +62,9 @@
    required this.taxPayerTypeName,
    required this.lvePersonTypeId,
    required this.personTypeName,
+   required this.ciiuId,
+   required this.ciiuTagName,
+   required this.province
 
    });
 
@@ -93,6 +99,9 @@
           'tax_payer_type_name': taxPayerTypeName,
           'lve_person_type_id': lvePersonTypeId,
           'person_type_name': personTypeName,
+          'ciiu_id' : ciiuId,
+          'ciiu_tagname': ciiuTagName,
+          'province': province
       };
 
   }

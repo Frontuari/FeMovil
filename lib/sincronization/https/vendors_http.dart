@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:femovil/config/url.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
-import 'package:femovil/sincronization/ExtractData/extract_customers_data.dart';
 import 'package:femovil/sincronization/ExtractData/extract_vendors_data.dart';
 import 'package:femovil/sincronization/sincronizar.dart';
 import 'package:path_provider/path_provider.dart';

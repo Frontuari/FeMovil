@@ -11,6 +11,7 @@ import 'package:femovil/presentation/retenciones/helpers/search_providers.dart';
 import 'package:femovil/presentation/retenciones/idempiere/create_factura_retencion.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -43,6 +44,8 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
   final TextEditingController _providerIdController = TextEditingController();
   TextEditingController saldoNetoController = TextEditingController();
   TextEditingController montoController = TextEditingController();
+  TextEditingController saldoImpuestoController = TextEditingController();
+  TextEditingController saldoExtentoController = TextEditingController();
   String? tipoRetencionSeleccionado = '';
   String? reglaRetencionSeleccionada = '';
   String? valorSeleccionado = '';
@@ -70,15 +73,27 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
     double total = 0;
     double totalNeto = 0;
     double suma = 0;
+    double sumaExenta = 0;
 
     for (var product in selectedProducts) {
       total +=
           product['price'] * product['quantity'] * (product['impuesto'] / 100);
       totalNeto += product['price'] * product['quantity'];
+
+          if(product['impuesto'] == 0.0 ){
+
+           sumaExenta += product['price'] * product['quantity'];
+
+          }
+
+
     }
+    print('Esto es el total $total');
     saldoNetoController.text = '\$${totalNeto.toStringAsFixed(2)}';
+    saldoExtentoController.text = '\$${sumaExenta.toStringAsFixed(2)}';
     suma = total + totalNeto;
     montoController.text = '\$${suma.toStringAsFixed(2)}';
+    saldoImpuestoController.text = '\$${total.toStringAsFixed(2)}';
 
     print('productos totales $selectedProducts');
 
@@ -1351,9 +1366,56 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'SubTotal',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins Regular', fontSize: 18),
+                                ),
+                                Text(
+                                  saldoNetoController.text,
+                                  style: const TextStyle(
+                                      fontFamily: 'Poppins Regular', fontSize: 18),
+                                )
+                              ],
+                            ),
+                              Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Exento',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins Regular', fontSize: 18),
+                                ),
+                                Text(
+                                  saldoExtentoController.text,
+                                  style: const TextStyle(
+                                      fontFamily: 'Poppins Regular', fontSize: 18),
+                                )
+                              ],
+                            ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Impuesto',
+                              style: TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            ),
+                            Text(
+                              saldoImpuestoController.text,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins Regular', fontSize: 18),
+                            )
+                          ],
+                        ),
+                                            Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
@@ -1367,8 +1429,11 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                 fontFamily: 'Poppins Bold', fontSize: 18),
                           )
                         ],
+                                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                   
                     const SizedBox(
                       height: 5,
                     ),

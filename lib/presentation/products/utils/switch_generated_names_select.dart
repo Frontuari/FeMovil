@@ -106,6 +106,15 @@ invoke(option, newValue, data){
           );
 
           return nombreTaxType != null ? nombreTaxType['tax_id_type_name'] : '';
+
+          case 'obtenerNombreCiiu':
+
+            Map<String, dynamic>? nombreCiiuCode = data.firstWhere(
+            (ciiu) => ciiu['lco_isic_id'] == newValue,
+          );
+
+          print('este es el nombre de el codigo ciiu $nombreCiiuCode');
+          return nombreCiiuCode != null ? nombreCiiuCode['name'] : '';
           
           case 'obtenerNombreTaxPayerVendor':
               Map<String, dynamic>? nombreTaxPayer = data.firstWhere(

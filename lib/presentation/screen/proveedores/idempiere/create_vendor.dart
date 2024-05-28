@@ -134,6 +134,10 @@ try {
                           {
                               "@column": "EMail",
                               "val": vendor['email']
+                          },
+                             {
+                              "@column": "LCO_ISIC_ID",
+                              "val": vendor['ciiu_id']
                           }
                   
                       ]
@@ -160,16 +164,16 @@ try {
                               "val": vendor['city']
                           },
                           {
-                              "@column": "Address2",
-                              "val": 0
-                          },
-                          {
                               "@column": "C_Country_ID",
                               "val": vendor['c_country_id']
                           },
                           {
                               "@column": "Postal",
                               "val": vendor['postal']
+                          },
+                           {
+                              "@column": "RegionName",
+                              "val": vendor['province']
                           }
                       
                       ]

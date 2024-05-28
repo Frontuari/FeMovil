@@ -11,7 +11,7 @@ List<Map<String, dynamic>> extractVendorsData(String responseData) {
   // Crea una lista para almacenar los datos de los productos
   List<Map<String, dynamic>> vendorsData = [];
 
-  print('Esto es la respuesta del erp $dataRows');
+  print('Esto es la respuesta del erp proveedores $dataRows');
 
   // Itera sobre cada DataRow y extrae los datos relevantes de los productos
 

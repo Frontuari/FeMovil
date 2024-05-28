@@ -16,7 +16,7 @@ class Compras extends StatefulWidget {
 
 class _ComprasState extends State<Compras> {
   String _filter = "";
-  DateTimeRange? _selectedDateRange; // Declare and initialize to null
+  DateTimeRange? _selectedDateRange; 
 
   late List<Map<String, dynamic>> compras = [];
   List<Map<String, dynamic>> filteredCompras = [];

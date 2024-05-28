@@ -5,6 +5,7 @@ import 'package:femovil/presentation/retenciones/idempiere/payment_terms_sincron
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:femovil/sincronization/design_charger/striped_design.dart';
 import 'package:femovil/sincronization/https/bank_account.dart';
+import 'package:femovil/sincronization/https/ciuu_activities.dart';
 import 'package:femovil/sincronization/https/impuesto_http.dart';
 import 'package:femovil/sincronization/sincronizar_create.dart';
 import 'package:flutter/material.dart';
@@ -471,16 +472,16 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                     });
                     
                   }
-              
+                  sincronizationCiuActivities(setState);
                   sincronizationBankAccount(setState);
                   sincronizationPaymentTerms();
                   sincronizationImpuestos(setState);
                   await synchronizeCustomersWithIdempiere(setState);
                   await synchronizeVendorsWithIdempiere(setState);
                   await synchronizeProductsWithIdempiere(setState);
-                  // sincronizationCustomers(setState);
                   await synchronizeOrderSalesWithIdempiere(setState);
               
+                  // sincronizationCustomers(setState);
                   setState(() {
                     _enableButtons = true;
                     setearValoresEnCero = false;

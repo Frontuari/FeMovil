@@ -211,6 +211,23 @@ class ProvidersDetailsScreen extends StatelessWidget {
                             Row(
                               children: [
                                 const Text(
+                                  'Provincia: ',
+                                  style: TextStyle(fontFamily: 'Poppins Bold'),
+                                ),
+                                Flexible(
+                                    child: Text(
+                                  provider['province'] != '{@nil=true}'
+                                      ? provider['province'].toString()
+                                      : '',
+                                  style: const TextStyle(
+                                      fontFamily: 'Poppins Regular'),
+                                  overflow: TextOverflow.clip,
+                                ))
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
                                   'Ciudad: ',
                                   style: TextStyle(fontFamily: 'Poppins Bold'),
                                 ),

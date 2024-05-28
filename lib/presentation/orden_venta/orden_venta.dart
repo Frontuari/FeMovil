@@ -43,6 +43,8 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   TextEditingController descripcionController = TextEditingController();
   TextEditingController montoController = TextEditingController();
   TextEditingController saldoNetoController = TextEditingController();
+  TextEditingController saldoImpuestoController = TextEditingController();
+  TextEditingController saldoExentoController = TextEditingController();
   List<Map<String, dynamic>> selectedProducts = [];
   DateTime selectedDate = DateTime.now();
   double? saldoNeto;
@@ -54,6 +56,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   double total = 0;
   double totalNeto = 0;
   double suma = 0;
+  double saldoExento = 0;
 
   // Formateador para el monto total y neto
   final formatter = NumberFormat('#,##0.00', 'es_ES');
@@ -63,13 +66,20 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
     double quantity = double.tryParse(product['quantity'].toString()) ?? 0;
     double impuesto = double.tryParse(product['impuesto'].toString()) ?? 0;
 
+    if(impuesto == 0.0){
+      saldoExento = price * quantity;
+    }
+
     total += price * quantity * (impuesto / 100);
     totalNeto += price * quantity;
   }
 
-  saldoNetoController.text = '\$${formatter.format(totalNeto)}';
+  saldoExentoController.text = '\$ ${formatter.format(saldoExento)}';
+  saldoImpuestoController.text = '\$ ${formatter.format(total)}';
+
+  saldoNetoController.text = '\$ ${formatter.format(totalNeto)}';
   suma = total + totalNeto;
-  montoController.text = '\$${formatter.format(suma)}';
+  montoController.text = '\$ ${formatter.format(suma)}';
   
 
   String parseFormatNumber = formatter.format(suma);
@@ -193,10 +203,15 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   }
 
   void _removeProduct(int index) {
+    
     setState(() {
+      
       selectedProducts.removeAt(index);
-      montoController.text = calcularMontoTotal();
+      montoController.text = '\$ ${calcularMontoTotal()}';
+
     });
+    
+
   }
 
   initGetUser() async {
@@ -806,7 +821,7 @@ Color getColorBg(Set<WidgetState> states){
                                     _addOrUpdateProduct(selectedProductsResult);
 
                                     montoController.text =
-                                        '\$${calcularMontoTotal()}';
+                                        '\$ ${calcularMontoTotal()}';
                                   });
                                 }
                               },
@@ -822,13 +837,39 @@ Color getColorBg(Set<WidgetState> states){
 
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal ,
-                    child: Container(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    child: SizedBox(
+                      width: mediaScreen,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text('Total', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
-                          SizedBox(width: mediaScreen * 0.55,),
-                          Text(montoController.text, style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),)
+                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('SubTotal', style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                              Text(saldoNetoController.text, style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),)
+                            ],
+                          ),
+                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Exento', style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                              Text(saldoExentoController.text, style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),)
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Impuesto', style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                              Text(saldoImpuestoController.text, style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),)
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Total', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                              Text(montoController.text, style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),)
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -890,13 +931,12 @@ Color getColorBg(Set<WidgetState> states){
                             'documentno': numeroReferenciaController.text,
                             'fecha': fechaController.text,
                             'descripcion': descripcionController.text,
-                            'monto': montoController.text.substring(1),
-                            'saldo_neto': saldoNetoController.text.substring(1),
+                            'monto': montoController.text.substring(2),
+                            'saldo_neto': saldoNetoController.text.substring(2),
                             'productos': selectedProducts,
                             'c_bpartner_id': widget.cBPartnerId,
                             'c_bpartner_location_id': widget.cBPartnerLocationId,
-                            'c_doctypetarget_id': variablesG[0]
-                                ['c_doc_type_order_id'],
+                            'c_doctypetarget_id': variablesG[0]['c_doc_type_order_id'],
                             'ad_client_id': infoUserForOrder['clientid'],
                             'ad_org_id': infoUserForOrder['orgid'],
                             'm_warehouse_id': infoUserForOrder['warehouseid'],
@@ -904,6 +944,8 @@ Color getColorBg(Set<WidgetState> states){
                             'date_ordered': fechaIdempiereController.text,
                             'salesrep_id': infoUserForOrder['userId'],
                             'usuario_id': infoUserForOrder['userId'],
+                            'saldo_exento': saldoExentoController.text.substring(2),
+                            'saldo_impuesto' : saldoImpuestoController.text.substring(2),
                             'status_sincronized': 'Borrador',
                           };
                     
@@ -938,6 +980,9 @@ Color getColorBg(Set<WidgetState> states){
                             descripcionController.clear();
                             montoController.clear();
                             saldoNetoController.clear();
+                            saldoExentoController.clear();
+                            saldoImpuestoController.clear();
+                          
                     
                             // Limpiar la lista de productos seleccionados después de guardar la orden
                             setState(() {

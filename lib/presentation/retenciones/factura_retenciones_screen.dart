@@ -4,6 +4,7 @@ import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/presentation/retenciones/crear_factura_retencion.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 
@@ -26,8 +27,12 @@ class _RetencionesState extends State<Retenciones> {
       TextEditingController searchController = TextEditingController();
         List<Map<String, dynamic>> filteredRetenciones = [];
         List<Map<String, dynamic>> retentions = [];
+        DateTimeRange? _selectedDateRange; 
+            TextEditingController inputValue = TextEditingController();
 
             Future<void>  _loadWithholdings() async{ 
+
+                    List<Map<String, dynamic>> taxes = await getTaxs();
 
                       List<Map<String, dynamic>> retenciones = await getRetencionesWithProveedorNames();
 
@@ -35,7 +40,9 @@ class _RetencionesState extends State<Retenciones> {
                   filteredRetenciones = retenciones;
                   retentions = retenciones;
                     
-                  });
+                  }); 
+
+                  print('Estos son los taxes agregados $taxes');
 
                   print('Estos son las retenciones $retenciones');
             }     
@@ -48,6 +55,218 @@ class _RetencionesState extends State<Retenciones> {
       _loadWithholdings();
     super.initState();
   }
+
+void _filterByMaxPrice(double maxPrice) {
+  setState(() {
+      filteredRetenciones = retentions.where((venta) {
+    double monto = venta['monto'];
+    return monto <= maxPrice;
+  }).toList();
+
+  filteredRetenciones.sort((a, b) {
+    double montoA = a['monto'];
+    double montoB = b['monto'];
+    return montoB.compareTo(montoA);
+  });
+  });
+}
+
+void _showDateRangePicker(BuildContext context) async {
+    // Enhanced user experience with custom date range and better initial selection
+    final picked = await showDateRangePicker(
+      context: context,
+      locale: const Locale("es", "ES"), 
+      initialDateRange: DateTimeRange(
+        start: DateTime.now().subtract(const Duration(days: 7)), // Default to past week
+        end: DateTime.now(),
+      ),
+      firstDate: DateTime(2010), // Adjust minimum year based on your requirements
+      lastDate: DateTime.now().add(const Duration(days: 365)), // Extend to a year from now
+    );
+
+    print("esto es picked $picked");
+    if (picked != null) {
+      print("Entre aqui");
+      setState(() {
+        _selectedDateRange = picked;
+        _sortByDateRange(picked.start, picked.end);
+      });
+    }
+  }
+
+void _sortByDateRange(DateTime start, DateTime end) {
+  // Guardar start y end en variables locales
+  final startDate = start;
+  final endDate = end;
+
+  print("fecha start $start y fecha end $end");
+  setState(() {
+    
+    filteredRetenciones = retentions.where((retenciones) {
+      final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+          try {
+            if (retenciones['date'] != null && retenciones['date'] != '') {
+              print("ventas  ${retenciones['date']}");
+              final retencionDate = dateFormat.parse(retenciones['date']);
+              return retencionDate.isAfter(startDate.subtract(const Duration(days: 1))) && 
+                    retencionDate.isBefore(endDate.add(const Duration(days: 1)));
+            } else {
+              // La fecha está en blanco, por lo tanto, no cumple con la condición
+              return false;
+            }
+          } catch (e) {
+            print('Error al parsear la fecha: $e');
+            return false; // O maneja el error de otra manera
+          }
+    }).toList();
+      print("entre aqui para el sort o algoritmo de ordenamiento");
+      print("Filtered retenciones $filteredRetenciones " );
+    // Ordena las ventas dentro del rango de fechas seleccionado
+        filteredRetenciones.sort((a, b) {
+          final DateFormat inputFormat = DateFormat('dd/MM/yyyy');
+          final DateTime dateA = inputFormat.parse(a['date']);
+          final DateTime dateB = inputFormat.parse(b['date']);
+          
+          // Formatea las fechas como "yyyy-mm-dd" antes de compararlas
+          final String formattedDateA = '${dateA.year}-${dateA.month.toString().padLeft(2, '0')}-${dateA.day.toString().padLeft(2, '0')}';
+          final String formattedDateB = '${dateB.year}-${dateB.month.toString().padLeft(2, '0')}-${dateB.day.toString().padLeft(2, '0')}';
+          
+          return formattedDateA.compareTo(formattedDateB);
+        });
+    
+      });
+}
+
+void _showMaxPriceDialog(BuildContext context, mediaScreen) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Ingrese el monto máximo'),
+        content: Container(
+            width: mediaScreen,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 7,
+                      spreadRadius: 2)
+                ]),
+          child: TextField(
+            controller: inputValue, // Controlador para el campo de entrada
+            keyboardType: TextInputType.number, // Teclado numérico para ingresar el monto
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(10),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderSide: BorderSide(width: 1, color: Colors.white)),
+              hintText: 'Ingrese el monto máximo'),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              inputValue.clear();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancelar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Colors.red),),
+          ),
+          TextButton(
+            onPressed: () {
+              // Obtener el valor ingresado por el usuario
+              
+              final double maxPrice = double.tryParse(inputValue.text) ?? 0.0; // Convertir a double
+              print("esto es el maxprice ${inputValue.text}");
+              _filterByMaxPrice(maxPrice);
+              Navigator.of(context).pop();
+              inputValue.clear();
+            },
+            child: const Text('Aceptar', style: TextStyle(fontFamily: 'Poppins SemiBold', color: Color(0xFF7531ff)),),
+          ),
+        ],
+      );
+      
+    },
+  );
+}
+
+void _showFilterOptions(BuildContext context, mediaScreen) {
+  final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
+
+  showMenu(
+    
+    context: context,
+    shape: RoundedRectangleBorder(
+          // Redondear los bordes del menú emergente
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(
+            width: 5,
+            color: Colors.grey.withOpacity(
+                0.5), // Establece el color transparente como punto inicial del gradiente
+          )),
+    position: RelativeRect.fromRect(
+      
+      Rect.fromPoints(
+        const Offset(25, 250), // Punto de inicio en la esquina superior izquierda
+        const Offset(160, 240), // Punto de fin en la esquina superior izquierda
+      ),
+      overlay.localToGlobal(Offset.zero) & overlay.size, // Tamaño del overlay
+    ),
+    items: <PopupMenuEntry>[
+      PopupMenuItem(
+        child: ListTile(
+          title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/Check@3x.png',
+                  width: 25,
+                  color: const Color(0xFF7531ff),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.02,
+                ),
+              const Text('Filtrar Por el monto Mayor'),
+            ],
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            _showMaxPriceDialog(context, mediaScreen);
+          },
+        ),
+      ),
+      PopupMenuItem(
+        child: ListTile(
+          title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/Check@3x.png',
+                  width: 25,
+                  color: const Color(0xFF7531ff),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.02,
+                ),
+              const Text('Ordenar por un rango de fecha'),
+            ],
+          ),
+          onTap: () {
+            Navigator.pop(context);
+              _showDateRangePicker(context);
+        
+        },
+        ),
+      ),
+ 
+    ],
+  );
+}
+
+
 
   @override
   void dispose(){
@@ -163,7 +382,7 @@ class _RetencionesState extends State<Retenciones> {
                               height: 35,
                             ),
                             onPressed: () {
-                              // _showFilterOptions(context);
+                              _showFilterOptions(context,screenSize);
                             },
                           ),
                           IconButton(

@@ -53,6 +53,15 @@ class DatabaseHelper {
       version: 1,
       onCreate: (Database db, int version) async {
 
+         await db.execute('''
+          CREATE TABLE ciiu(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cod_ciiu INTEGER,
+            lco_isic_id INTEGER,
+            name STRING
+          )
+        ''');
+
         await db.execute('''
           CREATE TABLE products(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -130,6 +139,9 @@ class DatabaseHelper {
             c_location_id INTEGER,
             address STRING,
             city STRING,
+            ciiu_id INTEGER,
+            ciiu_tagname STRING,
+            province STRING,
             country_name STRING,
             postal STRING,
             c_city_id INTEGER,
@@ -160,6 +172,8 @@ class DatabaseHelper {
           fecha TEXT,
           descripcion TEXT,
           id_factura TEXT,
+          saldo_exento REAL,
+          saldo_impuesto REAL,
           monto REAL,
           saldo_neto REAL,
           usuario_id INTEGER,
@@ -210,6 +224,8 @@ class DatabaseHelper {
           c_conversion_type_id INTEGER,
           po_reference STRING,
           description STRING,
+          saldo_exento REAL,
+          saldo_impuesto REAL,
           id_factura INTEGER,
           fecha TEXT,
           monto REAL,

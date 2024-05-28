@@ -130,7 +130,7 @@ class _ProductsState extends State<Products> {
 
     _scrollController.addListener(_scrollListener);
     print('Esto es el montaje');
-    // _deleteBaseDatos();
+    _deleteBaseDatos();
     super.initState();
     // sincronizationProducts();
   }

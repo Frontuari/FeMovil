@@ -5,7 +5,9 @@ import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/update_database.dart';
 import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class VentasDetails extends StatefulWidget {
@@ -61,9 +63,10 @@ class _VentasDetailsState extends State<VentasDetails> {
 
 
 
-    double calcularSaldoTotalProducts(dynamic price, dynamic quantity) {
+    double calcularSaldoTotalProducts(dynamic price, dynamic quantity, dynamic impuesto) {
     double prices;
     double quantitys;
+  
 
     // Verificar si quantity es un String
     if (quantity is String || price is String) {
@@ -82,10 +85,11 @@ class _VentasDetailsState extends State<VentasDetails> {
       quantitys = quantity.toDouble();
       prices = price.toDouble();
     }
+   
+      
+   
     double sum = prices * quantitys;
 
-    print('price $price & quantity is $quantity');
-    print('Suma es $sum');
     return sum;
   }
 
@@ -436,7 +440,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                                 itemCount: productsData.length,
                                 itemBuilder: (context, index) {
                                   final product = productsData[index];
-                        
+                                    
                                   return Column(children: [
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -483,7 +487,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                                                   children: [
                                                     Flexible(
                                                         child: Text(
-                                                            '\$${calcularSaldoTotalProducts(product['price_actual'].toString(), product['qty_entered'].toString())}')),
+                                                            '\$${calcularSaldoTotalProducts(product['price_actual'].toString(), product['qty_entered'].toString(), product['impuesto']).toString()}')),
                                                    
                                                   ],
                                                 ),
@@ -504,7 +508,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                     ),
                   ),
                       const SizedBox(height: 10),
-            
+                      
                       Container(
                           width: screenMax,
                           decoration: BoxDecoration(
@@ -515,7 +519,33 @@ class _VentasDetailsState extends State<VentasDetails> {
                             padding: const EdgeInsets.all(15.0),
                             child: Column(
                               children: [
-              
+                                   Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('SubTotal',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text('\$ ${ventaData['saldo_neto']}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
+                                  Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Exento',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text('\$ ${ventaData['saldo_exento']}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
+                                   Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Impuesto',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text('\$ ${ventaData['saldo_impuesto']}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,

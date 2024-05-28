@@ -1,8 +1,5 @@
 import 'package:femovil/config/app_bar_femovil.dart';
-import 'package:femovil/config/app_bar_sampler.dart';
-import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
-import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/ventas/ventas_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -26,6 +23,8 @@ class _VentasState extends State<Ventas> {
 
   String input = "";
   int? searchValue;
+
+  
 
   Future<void> _loadVentas() async {
     final ventasData =

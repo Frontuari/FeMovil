@@ -263,7 +263,9 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                     borderSide: BorderSide.none),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide.none)),
+                    borderSide: BorderSide.none)
+                    
+                    ),
             validator: (value) {
               if (value == null || value == 0) {
                 return 'Por favor selecciona un tipo de contribuyente';
@@ -307,6 +309,69 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
             return null;
           },
         );
+
+         case 'ciiuTypeActivities':
+        return Container(
+          height: mediaScreen * 0.20,
+          width: mediaScreen,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 7,
+                    spreadRadius: 2),
+              ]),
+          child: DropdownButtonFormField<int>(
+            icon: Image.asset('lib/assets/Abajo.png'),
+            value: selectedIndex,
+            items: dataList
+                .where((ciiuList) =>
+                    ciiuList['lco_isic_id'] is int &&
+                    ciiuList['name'] != '')
+                .map<DropdownMenuItem<int>>((ciiu) {
+              print('tax $ciiu');
+              return DropdownMenuItem<int>(
+                value: ciiu['lco_isic_id'] as int,
+                child: SizedBox(
+                    width: mediaScreen * 0.8, child: Text(ciiu['cod_ciiu'] != null ? '(${ciiu['cod_ciiu']}) ${ciiu['name']}': ciiu['name'], style: TextStyle(fontFamily: 'Poppins Regular'),)),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              print('esto es el taxList ${dataList}');
+              String nameGroup =
+                  invoke('obtenerNombreCiiu', newValue, dataList);
+          
+              print("esto es el nombre del tipo de persona $nameGroup");
+              onSelected(newValue, nameGroup);
+            },
+            decoration:  InputDecoration(
+               errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+               
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (value == null || value == 0) {
+                return 'Por favor selecciona una actividad económica';
+              }
+              return null;
+            },
+          ),
+        );
+
 
       default:
         return DropdownButtonFormField<int>(

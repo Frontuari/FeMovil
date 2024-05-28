@@ -539,7 +539,36 @@ class _ComprasDetailsState extends State<ComprasDetails> {
                             padding: const EdgeInsets.all(15.0),
                             child: Column(
                               children: [
-              
+                                      Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('SubTotal',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text(
+                                        ' \$ ${compraData['saldo_neto'].toString()}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
+                                    Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Exento',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text(
+                                        ' \$ ${compraData['saldo_exento'].toString()}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
+                                    Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Impuesto',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text(
+                                        ' \$ ${compraData['saldo_impuesto'].toString()}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,

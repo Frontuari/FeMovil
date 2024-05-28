@@ -159,7 +159,9 @@ synchronizeVendorsWithIdempiere(setState) async {
       taxPayerTypeName: vendorsData['tax_payer_type_name'],
       lvePersonTypeId: vendorsData['lve_person_type_id'],
       personTypeName: vendorsData['person_type_name'],
-
+      province: vendorsData['province'],
+      ciiuId: vendorsData['ciiu_id'],
+      ciiuTagName: vendorsData['ciiu_tagname']
     );
     dynamic result = await createVendorIdempiere(provider.toMap());
     print('este es el $result');

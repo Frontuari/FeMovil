@@ -47,8 +47,10 @@ updateAndCreateVendors(orderPurchaseList) async{
                     postal: vendorIsSincronized['postal'],
                     taxIdTypeName: vendorIsSincronized['tax_id_type_name'],
                     lcoTaxtPayerTypeId: vendorIsSincronized['lco_taxt_payer_type_id'],
-                    taxPayerTypeName: vendorIsSincronized['tax_payer_type_name']
-
+                    taxPayerTypeName: vendorIsSincronized['tax_payer_type_name'],
+                    ciiuId: vendorIsSincronized['ciiu_id'],
+                    ciiuTagName: vendorIsSincronized['ciiu_tagname'],
+                    province: vendorIsSincronized['province']
                 );
  
         print('Entre aqui en la creacion del proveedor');

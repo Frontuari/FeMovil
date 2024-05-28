@@ -1,5 +1,6 @@
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/create_database.dart';
+import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/presentation/screen/proveedores/select_vendor.dart';
@@ -22,12 +23,14 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _codePostalController = TextEditingController();
+  final TextEditingController _provinceContoller = TextEditingController();
   // List
   final List<Map<String, dynamic>> _groupVendorList = [];
   final List<Map<String, dynamic>> _taxTypeVendorList = [];
   final List<Map<String, dynamic>> _countryVendorList = [];
   final List<Map<String, dynamic>> _taxPayerList = [];
   final List<Map<String, dynamic>> _typePersonList = [];
+  final List<Map<String, dynamic>> _ciiuActivitiesList =[];
 
   //SELECTED
   int _selectedGroupIndex = 0;
@@ -35,7 +38,8 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
   int _selectedCountryIndex = 0;
   int _selectedTaxPayerIndex = 0;
   int _selectedPersonTypeIndex = 0;
-
+  int _selectedCiiuCode = 0;
+ 
   //Text o String
 
   String _groupTextVendor = '';
@@ -43,6 +47,7 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
   String _countryTex = '';
   String _taxPayerText = '';
   String _personTypeText = '';
+  String _ciiuActivitiesText = '';
 
   loadList() async {
     List<Map<String, dynamic>> getGroupVendor = await listarTypeGroupVendor();
@@ -51,10 +56,14 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     List<Map<String, dynamic>> getTaxPayerVendor =
         await listarTaxPayerVendors();
     List<Map<String, dynamic>> getTypePerson = await listarPersonTypeVendors();
+    List<Map<String, dynamic>> getCiiuActivitesCodes = await getCiiuActivities();
+
+    print('Value de ciuu $getCiiuActivitesCodes');
 
     print('Value de getGroupVendor $getGroupVendor ');
     print('Value de getTaxTypeVendor $getTaxTypeVendor');
 
+    _ciiuActivitiesList.add({'lco_isic_id':0, 'name':'Selecciona un CIIU'});
     _groupVendorList
         .add({'c_bp_group_id': 0, 'groupbpname': 'Selecciona un Grupo'});
     _taxTypeVendorList.add({
@@ -73,6 +82,7 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     });
 
     setState(() {
+      _ciiuActivitiesList.addAll(getCiiuActivitesCodes);
       _groupVendorList.addAll(getGroupVendor);
       _taxTypeVendorList.addAll(getTaxTypeVendor);
       _countryVendorList.addAll(getCountryVendor);
@@ -357,6 +367,21 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                           });
                         },
                       ),
+                            const SizedBox(
+                        height: 10,
+                      ),
+                      CustomDropdownButtonFormFieldVendor(
+                        identifier: 'ciiuTypeActivities',
+                        selectedIndex: _selectedCiiuCode,
+                        dataList: _ciiuActivitiesList,
+                        text: _ciiuActivitiesText,
+                        onSelected: (newValue, ciiuText) {
+                          setState(() {
+                            _selectedCiiuCode = newValue ?? 0;
+                            _ciiuActivitiesText = ciiuText;
+                          });
+                        },
+                      ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -425,6 +450,64 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                       const SizedBox(
                         height: 10,
                       ),
+                      Container(
+                        width: mediaScreen * 0.88,
+                        height: mediaScreen * 0.20,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2)
+                            ]),
+                        child: TextFormField(
+                          controller: _provinceContoller,
+                          decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 25, vertical: 20),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                      width: 25, color: Colors.white)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                      width: 25, color: Colors.white)),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide.none),
+                              focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  borderSide:
+                                      BorderSide(width: 1, color: Colors.red)),
+                              errorBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  borderSide:
+                                      BorderSide(width: 1, color: Colors.red)),
+                              labelText: 'Provincia',
+                              filled: true,
+                              fillColor: Colors.white),
+                          keyboardType: TextInputType.text,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, ingresa una Provincia';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+
+                       const SizedBox(
+                        height: 10,
+                      ),
+                      
                       Container(
                         width: mediaScreen * 0.88,
                         height: mediaScreen * 0.20,
@@ -646,19 +729,21 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     String address = _addressController.text;
     String city = _cityController.text;
     String codePostal = _codePostalController.text;
-
+    String province = _provinceContoller.text;
     // ID
     int idGroup = _selectedGroupIndex;
     int taxTypeId = _selectedTaxIndexType;
     int countryId = _selectedCountryIndex;
     int taxPayerVendorId = _selectedTaxPayerIndex;
     int personTypeId = _selectedPersonTypeIndex;
+    int ciiuId = _selectedCiiuCode;
     // Strings
     String groupText = _groupTextVendor;
     String taxIdText = _taxTypeText;
     String countryName = _countryTex;
     String taxPayerName = _taxPayerText;
     String personTypeName = _personTypeText;
+    String ciiuTagText = _ciiuActivitiesText;
     // Crea una instancia del producto
 
     Vendor provider = Vendor(
@@ -685,7 +770,11 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
         lcoTaxtPayerTypeId: taxPayerVendorId,
         taxPayerTypeName: taxPayerName,
         lvePersonTypeId: personTypeId,
-        personTypeName: personTypeName);
+        personTypeName: personTypeName,
+        ciiuId: ciiuId,
+        ciiuTagName: ciiuTagText,
+        province: province
+        );
 
     // Llama a un método para guardar el producto en Sqflite
     await saveProviderToDatabase(provider);
@@ -698,8 +787,10 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     _addressController.clear();
     _cityController.clear();
     _codePostalController.clear();
+    _provinceContoller.clear();
 
     setState(() {
+      _selectedCiiuCode = 0;
       _selectedGroupIndex = 0;
       _selectedTaxIndexType = 0;
       _selectedCountryIndex = 0;

@@ -1,5 +1,6 @@
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/infrastructure/bank_accounts.dart';
+import 'package:femovil/infrastructure/models/ciiu.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/infrastructure/models/impuestos.dart';
 import 'package:femovil/infrastructure/models/products.dart';
@@ -131,8 +132,10 @@ print('Esto es vendor Datas $vendorsData');
             lcoTaxtPayerTypeId: vendorData['lco_taxt_payer_type_id'],
             taxPayerTypeName: vendorData['tax_payer_type_name'],
             lvePersonTypeId: vendorData['lve_person_type_id'],
-            personTypeName: vendorData['person_type_name']
-
+            personTypeName: vendorData['person_type_name'],
+            ciiuId: vendorData['ciiu_id'],
+            ciiuTagName: vendorData['ciiu_tagname'],
+            province: vendorData['province']
           );
           
             contador++;
@@ -325,6 +328,71 @@ Future<void> syncBankAccount(List<Map<String, dynamic>> bankAccountsData,setStat
     }
 
 
+
+Future<void> syncCiiuActivities(List<Map<String, dynamic>> ciiuCode,setState) async {
+      final db = await DatabaseHelper.instance.database;
+    
+       double contador = 0;
+
+
+
+      if (db != null) {
+        // Itera sobre los datos de los productos recibidos
+        for (Map<String, dynamic> ciiuActivities in ciiuCode) {
+          // Construye un objeto Product a partir de los datos recibidos
+          Ciiu ciiu = Ciiu(
+     
+              codeCiiu: ciiuActivities['cod_ciiu'],
+              lcoIsiCid: ciiuActivities['lco_isic_id'],
+              name: ciiuActivities['name']
+            
+          );
+          
+            contador++;
+
+            
+                    setState(() {
+                      
+                              // syncPercentageBankAccount = (contador / ciiuCode.length) * 100;
+                    });
+
+                   
+                   print('esto es el valor que tiene la variable ciiu ${ciiu.toMap()}');
+
+
+
+          // Convierte el objeto Product a un mapa
+          Map<String, dynamic> ciiuCodeToMap = ciiu.toMap();
+
+
+          // Consulta si el producto ya existe en la base de datos local por su nombre
+          List<Map<String, dynamic>> existingCiiu= await db.query(
+            'ciiu',
+            where: 'lco_isic_id = ?',
+            whereArgs: [ciiu.lcoIsiCid],
+          );
+
+          if (existingCiiu.isNotEmpty) {
+            // Si el producto ya existe, actualiza sus datos
+            await db.update(
+              'ciiu',
+              ciiuCodeToMap,
+              where: 'lco_isic_id = ?',
+              whereArgs: [ciiu.lcoIsiCid],
+            );
+            print('Ciiu Activities actualizado: ${ciiu.name}');
+          } else {
+            // Si el producto no existe, inserta un nuevo registro en la tabla de productos
+            await db.insert('ciiu', ciiuCodeToMap);
+            print('Ciiu Activities insertado: ${ciiu.name}');
+          }
+        }
+        print('Sincronización de Ciiu Code completada.');
+      } else {
+        // Manejar el caso en el que db sea null
+        print('Error: db is null');
+      }
+    }
 
 
 

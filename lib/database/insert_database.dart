@@ -115,6 +115,8 @@ Future<void> insertTaxData() async {
         'salesrep_id': order['salesrep_id'],
         'usuario_id': order['usuario_id'],
         'status_sincronized': order['status_sincronized'],
+        'saldo_impuesto':order['saldo_impuesto'],
+        'saldo_exento':order['saldo_exento']
       });
 
       // Recorrer la lista de productos y agregarlos a la tabla de unión 'orden_venta_producto'
@@ -177,6 +179,8 @@ Future<void> insertTaxData() async {
         'monto' : order['monto'],
         'saldo_neto': order['saldo_neto'],
         'usuario_id':order['usuario_id'],
+        'saldo_exento': order['saldo_exento'],
+        'saldo_impuesto': order['saldo_impuesto'],
         'status_sincronized' : order['status_sincronized'],
       });
 
