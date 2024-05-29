@@ -92,5 +92,5 @@ validar los distintos casos
 35) Colocar en una variable global o posproperties la opcion del termino de pago
 
 
-
+36) agregar a los campos necesario poder copiarlos como id de factura, o numero de orden 
 
