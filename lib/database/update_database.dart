@@ -288,3 +288,34 @@ Future updateMProductIdOrderCompra(int orderId, int mProductId) async {
 
 
 
+  Future<void> updateNumberInvoiceAndDocumentNo(
+  int orderSalesId, 
+  dynamic documentNo,
+  dynamic invoiceId,
+   ) async {
+    final db = await DatabaseHelper.instance.database;
+    
+
+  if (db != null) {
+    await db.update(
+      
+      'orden_venta',
+      {
+        'id_factura': invoiceId,
+        'documentno_factura': documentNo
+      },
+      where: 'id = ?',
+      whereArgs: [orderSalesId],
+    );
+    
+    print('Orden de venta updated successfully');
+
+  } else {
+    
+    print('Error: db is null');
+  
+  }
+}
+
+
+

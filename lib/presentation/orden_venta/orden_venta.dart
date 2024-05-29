@@ -7,9 +7,7 @@ import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_venta/product_selection.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart'; // Importa la librería de formateo de fechas
 
@@ -896,7 +894,7 @@ Color getColorBg(Set<WidgetState> states){
                         backgroundColor: WidgetStateProperty.resolveWith(getColorBg)
                       ) ,
                       
-                      onPressed: () {
+                      onPressed: () async{
                           
                     
                         if (infoUserForOrder.isNotEmpty) {
@@ -950,7 +948,7 @@ Color getColorBg(Set<WidgetState> states){
                           };
                     
                           // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
-                          insertOrder(order).then((orderId) {
+                          insertOrder(order).then((orderId)  {
                             if (orderId is Map<String, dynamic> &&
                                 orderId.containsKey('failure')) {
                               if (orderId['failure'] == -1) {
@@ -968,7 +966,8 @@ Color getColorBg(Set<WidgetState> states){
                               print(
                                   'orderId no es un mapa válido o no contiene la propiedad "failure"');
                             }
-                    
+
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -997,7 +996,8 @@ Color getColorBg(Set<WidgetState> states){
 
                     ),
                   ),
-                                  SizedBox(height: mediaScreen * 0.1,),
+                
+                 SizedBox(height: mediaScreen * 0.1,),
 
                 ],
               ),

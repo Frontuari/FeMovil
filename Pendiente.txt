@@ -84,5 +84,13 @@ validar los distintos casos
 
 32) Cargar los de id de facturas en las ordenes de ventas 
 
+33) Agregar una ventana emergente a los morosos de pago
+
+
+34) agregar un copy al numero de documento
+
+35) Colocar en una variable global o posproperties la opcion del termino de pago
+
+
 
 

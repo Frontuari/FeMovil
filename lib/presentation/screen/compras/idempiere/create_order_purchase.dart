@@ -338,7 +338,7 @@ createOrdenPurchaseIdempiere(orderPurchaseList) async {
                         "@column": "M_Warehouse_ID",
                         "val": orderPurchaseList['m_warehouse_id']
                       },
-                      {"@column": "PaymentRule", "val": 'B'},
+                      {"@column": "PaymentRule", "val": 'P'},
                       {
                         "@column": "SalesRep_ID",
                         "val": orderPurchaseList['usuario_id']

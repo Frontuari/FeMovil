@@ -5,6 +5,8 @@ import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/update_database.dart';
 import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
+import 'package:femovil/presentation/screen/ventas/idempiere/query_id_dno.dart';
+import 'package:femovil/sincronization/https/search_id_invoice.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,10 +41,6 @@ class _VentasDetailsState extends State<VentasDetails> {
 
   @override
   void initState() {
-    
-      
-   
-
     super.initState();
     _ventaData = _loadVentasForId(widget.ventaId);
   }
@@ -590,10 +588,16 @@ class _VentasDetailsState extends State<VentasDetails> {
                                         if (isTrue != false) {
                                            setState(() {
                                             bottonEnable = true;
+                                          
                                           });
+                                         
+                                        
+
                                           String newValue = 'Enviado';
-                                          updateOrdereSalesForStatusSincronzed(
+                                         await updateOrdereSalesForStatusSincronzed(
                                               ventaData['id'], newValue);
+
+
                                         } else {
                                           String newValue = 'Por Enviar';
                                            setState(() {
@@ -666,12 +670,15 @@ class _VentasDetailsState extends State<VentasDetails> {
                                         
 
                                         if (isTrue != false) {
+
                                           String newValue = 'Enviado';
-                                          updateOrdereSalesForStatusSincronzed(
+                                         await updateOrdereSalesForStatusSincronzed(
                                               ventaData['id'], newValue);
+                                     
                                           setState(() {
                                             bottonEnable = true;
                                           });
+
                                         } else {
                                           String newValue = 'Por Enviar';
                                           updateOrdereSalesForStatusSincronzed(

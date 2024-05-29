@@ -61,7 +61,127 @@ try {
 
   if(cobro['c_number_ref'] != ''){
 
-  final requestBody= {
+   
+    if(cobro['c_invoice_id'] != null ){
+    
+   final requestBody= {
+
+          "CompositeRequest":{
+              
+              "ADLoginRequest": {
+              "user": variablesLogin['user'],
+              "pass": variablesLogin['password'],
+              "lang": language,
+              "ClientID": clientId,
+              "RoleID": role,
+              "OrgID": orgId,
+              "WarehouseID":wareHouseId,
+              "stage": "9",
+            },
+          "serviceType": "UCCompositePayment",
+              "operations":{
+                  "operation":[
+                      {
+                      "TargetPort": "createUpdateData",
+                      "ModelCRUD": {
+                          "serviceType":"CreateReceiptAPP",
+                          "TableName": "C_Payment",
+                          "RecordID": "0",
+                          "Action":"CreateUpdate",
+                          "DataRow": {
+                      "field": [  
+                    {
+                        "@column": "DocumentNo",
+                        "val": cobro['c_number_ref']
+                    },
+                    {
+                        "@column": "C_BankAccount_ID",
+                        "val": cobro['c_bankaccount_id']
+                    }, 
+                    {
+                        "@column": "C_DocType_ID",
+                        "val": cobro['c_doctype_id'],
+                    }, 
+                    {
+                        "@column": "DateTrx",
+                        "val": cobro['date_trx'],
+                    },
+                      {
+                        "@column": "Description",
+                        "val": cobro['description']
+                    }, 
+                       {
+                        "@column": "C_BPartner_ID",
+                        "val": cobro['c_bpartner_id']
+                    }, 
+
+                     {
+                        "@column": "PayAmt",
+                        "val": cobro['pay_amt']
+                    }, 
+                    {
+                        "@column": "C_Currency_ID",
+                        "val": cobro['c_currency_id']
+                    }, 
+                     {
+                        "@column": "C_Invoice_ID",
+                        "val": cobro['c_invoice_id']
+                    },
+                       {
+                        "@column": "TenderType",
+                        "val": cobro['tender_type']
+                    },
+                    {
+                        "@column": "IsPrepayment",
+                        "val": "N"
+                    }  
+                          
+                    
+                     ]
+                      }
+
+                    }
+
+                    },
+                    {
+                    "TargetPort": "setDocAction",                      
+                    "ModelSetDocAction": {
+                        "serviceType": "completePaymentReceipt",
+                        "tableName": "C_Payment",
+                        "recordIDVariable": "@C_Payment.C_Payment_ID",
+                        "docAction": variablesG[0]['doc_status_receipt']
+                    }
+                    }
+
+
+                  ]
+              }
+
+          
+    }
+};
+
+
+
+  final jsonBody = jsonEncode(requestBody);
+
+    request.headers.set('Content-Type', 'application/json; charset=utf-8');
+    request.headers.set('Accept', 'application/json');
+
+    request.write(jsonBody);
+
+  final response = await request.close();
+  final responseBody = await response.transform(utf8.decoder).join();
+
+
+  final parsedJson = jsonDecode(responseBody);
+
+
+      print("esta es la respuesta $parsedJson");
+      return parsedJson;
+  }else{
+
+      final requestBody= {
 
           "CompositeRequest":{
               
@@ -127,7 +247,11 @@ try {
                        {
                         "@column": "TenderType",
                         "val": cobro['tender_type']
-                    }      
+                    },
+                     {
+                        "@column": "IsPrepayment",
+                        "val": "Y"
+                    }          
                     
                      ]
                       }
@@ -171,6 +295,9 @@ try {
 
       print("esta es la respuesta $parsedJson");
       return parsedJson;
+
+  }
+
   }else{
 
     final requestBody= {

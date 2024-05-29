@@ -11,6 +11,7 @@ import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
+import 'package:femovil/presentation/screen/ventas/idempiere/query_id_dno.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -131,7 +132,7 @@ Future<bool> checkInternetConnectivity() async {
 // Esta funcion nos ayudara a crear una nueva orden
 
 createOrdenSalesIdempiere(orderSalesList) async {
-  // se cargan las ordenes
+
   dynamic resOrdenSales = await orderSalesList;
 
   dynamic isConnection = await checkInternetConnectivity();
@@ -264,7 +265,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
                       "@column": "M_Warehouse_ID",
                       "val": resOrdenSales['order']['m_warehouse_id']
                     },
-                    {"@column": "PaymentRule", "val": 'B'},
+                    {"@column": "PaymentRule", "val": 'P'},
                     {
                       "@column": "SalesRep_ID",
                       "val": resOrdenSales['order']['usuario_id']
@@ -353,11 +354,15 @@ createOrdenSalesIdempiere(orderSalesList) async {
       'c_order_id': cOrderId
     };
 
+
+
     String newStatus = 'Enviado';
     await updateOrdereSalesForStatusSincronzed(
         resOrdenSales['order']['id'], newStatus);
     await actualizarDocumentNo(
         resOrdenSales['order']['id'], nuevoDocumentNoAndCOrderId);
+
+     await sincronizationSearchIdInvoiceOrderSales(cOrderId,resOrdenSales['order']['id']);
 
     return parsedJson;
   } catch (e) {

@@ -172,6 +172,7 @@ class DatabaseHelper {
           fecha TEXT,
           descripcion TEXT,
           id_factura TEXT,
+          documentno_factura TEXT,
           saldo_exento REAL,
           saldo_impuesto REAL,
           monto REAL,

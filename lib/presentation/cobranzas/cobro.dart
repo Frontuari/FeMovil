@@ -310,7 +310,7 @@ _bankAccFuture = _getBankAcc();
                                           children: [
                                             const TextSpan(text: 'Telefono: '),
                                             TextSpan(
-                                              text: clientData['phone'] != '{@nil: true}'? clientData['phone']: '',
+                                              text: clientData['phone'] != '{@nil: true}'? clientData['phone'].toString(): '',
                                               style: const TextStyle(fontFamily: 'Poppins Regular'),
                                             ),
                                           ],
@@ -357,6 +357,15 @@ _bankAccFuture = _getBankAcc();
                                       mediaScreen: screenMax,
                                       heightScreen: heightScreen,
                                     ),
+
+                                   orderData['documentno_factura'] != null ? SizedBox(height: heightScreen * 0.02,) : Container(),
+                                    
+                                     orderData['documentno_factura'] != null ? CustomTextInfo(
+                                      label: "N° Documento, Factura",
+                                      value: orderData['documentno_factura'].toString() != "" ? orderData['documentno_factura'].toString() : "",
+                                      mediaScreen: screenMax,
+                                      heightScreen: heightScreen,
+                                    ): Container(),
                                      SizedBox(height: heightScreen * 0.015,),
               
                                       CustomTextInfo(

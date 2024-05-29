@@ -766,6 +766,29 @@ Future<Map<String, dynamic>?> getClientById(int clientId) async {
   }
 }
 
+Future<List<Map<String, dynamic>>> getSalesOrdersHeader () async {
+      final db = await DatabaseHelper.instance.database;
+
+    if(db != null){
+
+      List<Map<String, dynamic>> orders = await db.query('orden_venta');
+
+        if(orders.isNotEmpty){
+
+          return orders;
+        }else{
+          return [];
+        }
+    }else{
+
+      print('Error db is null');
+      return [];
+    }
+
+
+
+}
+
 Future<Map<String, dynamic>?> getVendorsById(int vendorId) async {
   final db = await DatabaseHelper.instance.database;
 

@@ -155,10 +155,6 @@ try {
                               "val": customer['city']
                           },
                           {
-                              "@column": "Address2",
-                              "val": 0
-                          },
-                          {
                               "@column": "C_Country_ID",
                               "val": customer['c_country_id']
                           },
