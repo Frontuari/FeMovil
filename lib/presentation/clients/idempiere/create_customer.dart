@@ -20,7 +20,7 @@ try {
 
    initV() async {
     if (variablesG.isEmpty) {
-      await getPosPropertiesInit();
+
       List<Map<String, dynamic>> response = await getPosPropertiesV();
       print('variables Entre aqui');
         variablesG = response;
@@ -28,7 +28,7 @@ try {
     }
   }
  
-   initV();
+  await initV();
 
     print('variables globales $variablesG');
     print('Esto es Customer ${customer}');
@@ -61,8 +61,6 @@ try {
   // Configurar el cuerpo de la solicitud en formato JSON
 
   final requestBody= {
-
-      
 
           "CompositeRequest":{
               
@@ -124,10 +122,10 @@ try {
                               "@column": "LCO_TaxPayerType_ID",
                               "val": customer['lco_tax_payer_typeid']
                           },
-                          {
-                              "@column": "LVE_PersonType_ID",
-                              "val": customer['lve_person_type_id']
-                          },
+                          // {
+                          //     "@column": "LVE_PersonType_ID",
+                          //     "val": "customer['lve_person_type_id']"
+                          // },
                           {
                               "@column": "EMail",
                               "val": customer['email']
@@ -155,10 +153,6 @@ try {
                           {
                               "@column": "City",
                               "val": customer['city']
-                          },
-                          {
-                              "@column": "Address2",
-                              "val": 0
                           },
                           {
                               "@column": "C_Country_ID",

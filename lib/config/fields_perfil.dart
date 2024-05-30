@@ -14,7 +14,6 @@ class Fields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -29,10 +28,10 @@ class Fields extends StatelessWidget {
             child: Text(
               '$field ',
               style: const TextStyle(
-                color: Color(0xFF2B90F5),
+                color: Color(0xFF7531FF),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'OpenSans',
+                fontFamily: 'Poppins SemiBold',
                 
               ),
               textAlign: TextAlign.left,

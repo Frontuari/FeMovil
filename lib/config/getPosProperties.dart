@@ -98,7 +98,7 @@ Future<void> syncGetPosProperties(posPropertiesData) async {
               'm_warehouse_id': posPropertieData['m_warehouse_id'],
               'c_doc_type_order_id': posPropertieData['c_doc_type_order_id'].toString(),
               'c_conversion_type_id': posPropertieData['c_conversion_type_id'].toString(),
-              'c_paymentterm_id': posPropertieData['c_bankaccount_id'],
+              'c_paymentterm_id': posPropertieData['c_paymentterm_id'],
               'c_bankaccount_id': posPropertieData['c_bankaccount_id'].toString(),
               'c_bpartner_id': posPropertieData['c_bpartner_id'].toString(),
               'c_doctypepayment_id': posPropertieData['c_doctypepayment_id'],
@@ -107,6 +107,13 @@ Future<void> syncGetPosProperties(posPropertiesData) async {
               'address1':posPropertieData['address1'],
               'm_pricelist_id': posPropertieData['m_pricelist_id'],
               'c_currency_id': posPropertieData['c_currency_id'],
+              'c_doc_type_order_co': posPropertieData['c_doc_type_order_co'],
+              'm_price_saleslist_id':posPropertieData['m_price_saleslist_id'],
+              'doc_status_receipt': posPropertieData['doc_status_receipt'],
+              'doc_status_invoice_so': posPropertieData['doc_status_invoice_so'],
+              'doc_status_order_so': posPropertieData['doc_status_order_so'],
+              'doc_status_order_po': posPropertieData['doc_status_order_po'],
+              'c_doc_type_target_fr': posPropertieData['c_doc_type_target_fr']
           };
        
           // Parseo el objeto a json 
@@ -133,12 +140,12 @@ Future<void> syncGetPosProperties(posPropertiesData) async {
               whereArgs: [objeto['country_id']],
             );
 
-            print('cliente actualizado: ${objeto['country_id']}');
+            print('PosProperties actualizado: ${objeto['country_id']}');
             
           } else {
             // Si el producto no existe, inserta un nuevo registro en la tabla de productos
             await db.insert('posproperties', objeto);
-            print('cliente insertado: ${objeto['country_id']}');
+            print('PosProperties insertado: ${objeto['country_id']}');
           }
         }
         print('Sincronización de posProperties completada.');
@@ -177,7 +184,15 @@ Future<List<Map<String, dynamic>>> getPosPropertiesV() async {
           c_doctypereceipt_id,
           city,
           address1,
-          m_pricelist_id
+          m_pricelist_id,
+          c_doc_type_order_co,
+          m_price_saleslist_id,
+          c_currency_id,
+          doc_status_receipt,
+          doc_status_invoice_so,
+          doc_status_order_so,
+          doc_status_order_po,
+          c_doc_type_target_fr
         FROM posproperties
         WHERE country_id > ?
       ''', [0]);

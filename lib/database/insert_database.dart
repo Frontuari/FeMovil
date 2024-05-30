@@ -25,34 +25,56 @@ Future<void> insertTaxData() async {
 
 
 
- Future<void> insertCobro({
-    required int numberReference,
-    required String? typeDocument,
-    required String? paymentType,
-    required String date,
-    required String? coin,
-    required double amount,
-    required String? bankAccount,
-    required String observation,
+ Future insertCobro({
+    required int cBankAccountId,
+    required String bankAccountT,
+    required int? cDocTypeId,
+    required String? dateTrx,
+    required String description,
+    required int? cBPartnerId,
+    required dynamic payAmt,
+    required String? date,
+    required dynamic cCurrencyId,
+    required String cCurrencyIso,
+    required dynamic cOrderId,
+    required dynamic cInvoiceId,
+    required dynamic documentNo,
+    required dynamic tenderType,
+    required String tenderTypeName,
     required int saleOrderId,
+  
   }) async {
     final db = await DatabaseHelper.instance.database;
-    await db!.insert(
+
+        
+
+  int cobroId =  await db!.insert(
       'cobros',
       {
-        'number_reference': numberReference,
-        'type_document': typeDocument,
-        'payment_type': paymentType,
+        'c_bankaccount_id': cBankAccountId,
+        'c_doctype_id': cDocTypeId,
+        'date_trx': dateTrx,
         'date': date,
-        'coin': coin,
-        'amount': amount,
-        'bank_account': bankAccount,
-        'observation': observation,
+        'description': description,
+        'c_bpartner_id': cBPartnerId,
+        'pay_amt': payAmt,
+        'c_currency_id': cCurrencyId,
+        'c_order_id': cOrderId,
+        'c_invoice_id': cInvoiceId,
+        'documentno': documentNo,
+        'tender_type': tenderType,
         'sale_order_id': saleOrderId,
+        'c_bankaccount_name': bankAccountT,
+        'c_currency_iso': cCurrencyIso,
+        'tender_type_name': tenderTypeName
       },
     // Esto significa que si hay un conflicto, es decir si ya existe un registro con la misma clave primaria o restriccion unica, el registro existente se remplazara por el nuevo
       conflictAlgorithm: ConflictAlgorithm.replace, 
     );
+
+
+    return cobroId;
+
   }
 
  
@@ -93,6 +115,8 @@ Future<void> insertTaxData() async {
         'salesrep_id': order['salesrep_id'],
         'usuario_id': order['usuario_id'],
         'status_sincronized': order['status_sincronized'],
+        'saldo_impuesto':order['saldo_impuesto'],
+        'saldo_exento':order['saldo_exento']
       });
 
       // Recorrer la lista de productos y agregarlos a la tabla de unión 'orden_venta_producto'
@@ -106,7 +130,6 @@ Future<void> insertTaxData() async {
           'm_product_id': product['m_product_id'],
           'ad_client_id': order['ad_client_id'],
           'ad_org_id': order['ad_org_id'],
-          'c_order_id': order['c_order_id']
 
         });
 
@@ -130,37 +153,49 @@ Future<void> insertTaxData() async {
     Future insertOrderCompra(Map<String, dynamic> order) async {
     final db = await DatabaseHelper.instance.database;
     if (db != null) {
-      // Verificar la disponibilidad de productos antes de insertar la orden
-      // for (Map<String, dynamic> product in order['productos']) {
-      //   final productId = product['id'];
-      //   final productName = product['name'];
-      //   final productQuantity = product['quantity'];
-      //   final productAvailableQuantity = await getProductAvailableQuantity(productId);
-        
-      //   if (productQuantity > productAvailableQuantity) {
-      //     // Si la cantidad solicitada es mayor que la cantidad disponible, mostrar un mensaje de error
-      //     print('Error: Producto con ID $productId no tiene suficiente stock disponible.');
-      //     return {"failure": -1, "Error":"Producto $productName no tiene suficiente stock disponible." };
-      //   }
-      // }
+
 
       // Insertar la orden de venta en la tabla 'orden_venta'
       int orderId = await db.insert('orden_compra', {
         'proveedor_id': order['proveedor_id'],
-        'numero_referencia': order['numero_referencia'],
-        'numero_factura': order['numero_factura'],
-        'fecha': order['fecha'],
-        'descripcion': order['descripcion'],
-        'monto': order['monto'],
-        'saldo_neto':order['saldo_neto'],
+        'documentno': order['documentno'],
+        'c_doc_type_target_id': order['c_doc_type_target_id'],
+        'ad_client_id': order['ad_client_id'],
+        'ad_org_id': order['ad_org_id'],
+        'm_warehouse_id': order['m_warehouse_id'],
+        'payment_rule': order['payment_rule'],
+        'dateordered':order['dateordered'],
+        'sales_rep_id': order['sales_rep_id'],
+        'c_bpartner_id': order['c_bpartner_id'],
+        'c_bpartner_location_id': order['c_bpartner_location_id'],
+        'm_price_list_id' : order['m_price_list_id'],
+        'c_currency_id': order['c_currency_id'],
+        'c_payment_term_id': order['c_payment_term_id'],
+        'c_conversion_type_id' : order['c_conversion_type_id'],
+        'po_reference' : order['po_reference'], 
+        'description' : order['description'], 
+        'id_factura' : order['id_factura'], 
+        'fecha': order['fecha'], 
+        'monto' : order['monto'],
+        'saldo_neto': order['saldo_neto'],
+        'usuario_id':order['usuario_id'],
+        'saldo_exento': order['saldo_exento'],
+        'saldo_impuesto': order['saldo_impuesto'],
+        'status_sincronized' : order['status_sincronized'],
       });
 
       // Recorrer la lista de productos y agregarlos a la tabla de unión 'orden_venta_producto'
       for (Map<String, dynamic> product in order['productos']) {
-        await db.insert('orden_venta_producto', {
-          'orden_venta_id': orderId,
+        await db.insert('orden_compra_lines', {
+          'orden_compra_id': orderId,
           'producto_id': product['id'],
-          'cantidad': product['quantity'], // Agrega la cantidad del producto si es necesario
+          'qty_entered': product['quantity'],
+          'ad_client_id': order['ad_client_id'],
+          'ad_org_id': order['ad_org_id'], 
+          'price_entered': product['price'], 
+          'price_actual': product['price'],
+          'm_product_id': product['m_product_id'],  
+
         });
 
         // Actualizar la cantidad disponible del producto en la tabla 'products'
@@ -182,14 +217,68 @@ Future<void> insertTaxData() async {
 
 
 
-     Future<void> insertRetencion(Map<String, dynamic> retencion) async {
+     Future insertRetencion(Map<String, dynamic> retencion) async {
           final db = await DatabaseHelper.instance.database;
 
-      await db?.insert(
-        'retenciones',
-        retencion,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+        if (db != null) {
+              int retencionId = await db.insert('f_retenciones', {
+                'ad_client_id': retencion['ad_client_id'],
+                'ad_org_id': retencion['ad_org_id'],
+                'c_bpartner_id': retencion['c_bpartner_id'],
+                'c_bpartner_location_id': retencion['c_bpartner_location_id'],
+                'c_currency_id': retencion['c_currency_id'],
+                'c_doctypetarget_id': retencion['c_doctypetarget_id'],
+                'c_paymentterm_id': retencion['c_paymentterm_id'],
+                'description':retencion['description'],
+                'documentno': retencion['documentno'],
+                'is_sotrx': retencion['is_sotrx'],
+                'm_pricelist_id': retencion['m_pricelist_id'],
+                'payment_rule' : retencion['payment_rule'],
+                'date_invoiced': retencion['date_invoiced'],
+                'date_acct': retencion['date_acct'],
+                'sales_rep_id' : retencion['sales_rep_id'],
+                'sri_authorization_code' : retencion['sri_authorization_code'], 
+                'ing_establishment' : retencion['ing_establishment'], 
+                'ing_emission' : retencion['ing_emission'], 
+                'ing_sequence': retencion['ing_sequence'], 
+                'ing_taxsustance' : retencion['ing_taxsustance'],
+                'date': retencion['date'],
+                'monto':retencion['monto'],
+                'provider_id': retencion['provider_id'],
+              });
+
+       for (Map<String, dynamic> product in retencion['productos']) {
+        await db.insert('f_retencion_lines', {  
+          'f_retencion_id': retencionId,
+          'producto_id': product['id'],
+          'qty_entered': product['quantity'],
+          'ad_client_id': retencion['ad_client_id'],
+          'ad_org_id': retencion['ad_org_id'], 
+          'price_entered': product['price'], 
+          'price_actual': product['price'],
+          'm_product_id': product['m_product_id'],  
+
+        });
+
+        // Actualizar la cantidad disponible del producto en la tabla 'products'
+        // int productId = product['id'];
+        // int soldQuantity = product['quantity'];
+        // await db.rawUpdate(
+        //   'UPDATE products SET quantity = quantity + ? WHERE id = ?',
+        //   [soldQuantity, productId],
+        // );
+      }
+      print('Se inserto correctamente');
+        return retencionId;
+        
+        }else{
+
+          return -1;
+        }
+
+
+    
+
     }
 
 

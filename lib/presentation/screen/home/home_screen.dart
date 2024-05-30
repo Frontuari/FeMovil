@@ -1,4 +1,5 @@
 import 'package:femovil/assets/nav_bar_bottom.dart';
+import 'package:femovil/config/banner_app.dart';
 import 'package:femovil/config/getPosProperties.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/infrastructure/models/info_perfil.dart';
@@ -6,7 +7,8 @@ import 'package:femovil/presentation/cobranzas/cobranzas_list.dart';
 import 'package:femovil/presentation/clients/clients_screen.dart';
 import 'package:femovil/presentation/precios/precios.dart';
 import 'package:femovil/presentation/products/products_screen.dart';
-import 'package:femovil/presentation/retenciones/retenciones_screen.dart';
+import 'package:femovil/presentation/retenciones/factura_retenciones_screen.dart';
+import 'package:femovil/presentation/screen/compras/compras.dart';
 import 'package:femovil/presentation/screen/login/progress_indicator.dart';
 import 'package:femovil/presentation/screen/proveedores/providers_screen.dart';
 import 'package:femovil/presentation/screen/ventas/ventas.dart';
@@ -20,6 +22,8 @@ String mensaje = '';
 InfPerfil? perfilData;
 List<Map<dynamic, dynamic>> variablesG = [];
 
+
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -28,32 +32,22 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
+
   final scrollController = ScrollController();
   String selectedOperationType = 'Todos';
   bool primeraActualizacion = true;
   bool closeScreen = false;
-
   var showErrorCon = false;
   String messageErrorCon = "Hay problemas de conexion";
   String mensajeSuc = "Se ha Aprobado correctamente";
 
-  initV() async {
-    if (variablesG.isEmpty) {
-      List<Map<String, dynamic>> response = await getPosPropertiesV();
 
-      setState(() {
-        variablesG = response;
-      });
-    }
-  }
 
   @override
   void initState() {
     DatabaseHelper.instance.initDatabase();
-    getPosPropertiesInit();
-    initV();
+     print('Esto es la variable global de country_id ${variablesG}');
     super.initState();
-    print('Esto es la variable global de country_id ${variablesG}');
     print("me monte");
   }
 
@@ -71,44 +65,67 @@ class HomeState extends State<Home> {
 
     if (closeScreen == false) {
       return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-        appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-          title: const Text(
-            'Home',
-            style: TextStyle(
-              fontFamily:
-                  'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
-              fontSize: 20.0, // Tamaño de la fuente
-              fontWeight:
-                  FontWeight.w400, // Peso de la fuente (por ejemplo, bold)
-              color: Color.fromARGB(255, 105, 102, 102), // Color del texto
-            ),
-          ),
-          leading: actualizando == false
-              ? Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  IconButton(
-                    icon: Image.asset(
-                      'lib/assets/Ajustes.png',
-                      width: 25,
-                      height: 35,
-                    ),
-                    onPressed: () {
-                      // _showFilterOptions(context);
-                    },
-                  ),
-                ])
-              : CustomProgressIndicator(),
+        appBar: PreferredSize(
+      preferredSize: const Size.fromHeight(170), // Altura del AppBar
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(50), // Radio del borde redondeado
         ),
+        child: AppBar(
+         automaticallyImplyLeading: false,
+          flexibleSpace: Stack(
+            children: [
+              CustomPaint(
+                painter: CirclePainter(),
+              ),
+               Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 35), // Ajuste de la posición vertical
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      
+                      Image.asset('lib/assets/Bande ECU@3x.png', width: 55,),
+
+                      const SizedBox(width: 15,),
+
+                      const Text(
+                        'Inicio',
+                        style: TextStyle(
+                          fontFamily: 'Poppins ExtraBold',
+                          color: Colors.white,
+                          fontSize: 30, // Tamaño del texto
+                          shadows: <Shadow>[
+                            Shadow(
+                              offset: Offset(2, 2),
+                              blurRadius: 3.0,
+                              color: Colors.grey,
+                            )
+                          ],
+                        ),
+                      ),
+                   
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xFF7531FF), // Color hexadecimal
+        ),
+      ),
+    ),
         body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  const SizedBox(height: 45,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 150),
+                      const SizedBox(height: 50),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -119,35 +136,28 @@ class HomeState extends State<Home> {
                         },
                         child: Column(
                           children: [
-                            const Text("Productos"),
-                            Image.network(
-                              'https://thefoodtech.com/wp-content/uploads/2023/04/Productos-nestle.jpg',
-                              width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    'No se pudo cargar la imagen');
-                              },
+                          Container(
+                            width: 100,
+                            height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 218, 248, 219), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                            child: Center( // Centra la imagen dentro del contenedor
+                              child: Image.asset(
+                                'lib/assets/Productos@3x.png',
+                                width: 45,
+                                height: 45,
+                                fit: BoxFit.contain, // Ajusta la imagen para que quepa dentro del contenedor
+                              ),
                             ),
+                          ),
+                            const SizedBox(height: 5,),
+                            const Text("Productos", style:  TextStyle(fontFamily: 'Poppins SemiBold'),),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 100),
+                      const SizedBox(width: 10),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -158,79 +168,62 @@ class HomeState extends State<Home> {
                         },
                         child: Column(
                           children: [
-                            const Text("Clientes"),
-                            Image.network(
-                              'https://www.clienteindiscreto.com/wp/wp-content/uploads/2018/10/tipos-de-clientes-parte-ii.jpg',
+                            Container(
                               width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    'No se pudo cargar la imagen');
-                              },
-                            ),
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 211, 210, 253), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(
+                                child: Image.asset('lib/assets/clientes@3x.png', width: 45, height: 45,
+                                fit: BoxFit.contain
+                                ),
+                              )),
+                            const SizedBox(height: 5,),
+                            const Text("Clientes", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                       
                           ],
                         ),
                       ),
+                      const SizedBox(width: 10,),
+                       GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Precios(),
+                                  ));
+                            },
+                            child: Column(
+                              children: [
+                               
+                                Container(
+                                   width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 253, 238, 192), // Establece el color de fondo verde
+                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                                    ),
+                                  child: Center(
+                                    child: Image.asset('lib/assets/Precios@3x.png', width: 45, height: 45,
+                                    fit: BoxFit.contain,
+                                    ),
+                                  )),
+                                const SizedBox(height: 5,),
+                                const Text("Precios", style: TextStyle(fontFamily: 'Poppins SemiBold') ,),
+                              
+                            ],
+                          ),
+                        ),
                     ],
                   ),
+                  const SizedBox(height: 25,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 150),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Precios(),
-                              ));
-                        },
-                        child: Column(
-                          children: [
-                            const Text("Precios"),
-                            Image.network(
-                              'https://www.fijaciondeprecios.com/wp-content/uploads/2017/01/Puedo-cobrar-un-precio-mas-alto-Conozcalo-por-5-se%C3%B1ales-clave.jpg',
-                              width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    'No se pudo cargar la imagen');
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 100),
+                      const SizedBox(height: 120),
+                     
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -241,41 +234,22 @@ class HomeState extends State<Home> {
                         },
                         child: Column(
                           children: [
-                            const Text("Ventas"),
-                            Image.network(
-                              'https://www.cloudtalk.io/wp-content/uploads/2021/12/Article-202105-ImproveSalesEfforts-2x-1024x538.png',
-                              width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
 
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    "No se pudo cargar la imagen");
-                              },
-                            )
+                            Container(
+                               width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 224, 211, 249), // Establece el color de fondo verde
+                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                                    ),
+                              child: Center(child: Image.asset('lib/assets/Ventas@3x.png', width: 45, height: 45, fit: BoxFit.contain, ))),
+                            const SizedBox(height:  5,),
+                            const Text("Ventas", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                           
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 150),
+                      const SizedBox(width: 10,),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -286,37 +260,54 @@ class HomeState extends State<Home> {
                         },
                         child: Column(
                           children: [
-                            const Text("Compras"),
-                            Image.network(
-                              'https://cdn-3.expansion.mx/dims4/default/5339ade/2147483647/strip/true/crop/8409x5945+0+0/resize/1200x848!/format/webp/quality/60/?url=https%3A%2F%2Fcdn-3.expansion.mx%2Fd8%2F15%2F97756b4a444287dbf850dee43121%2Fistock-1292443598.jpg',
-                              width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    "No se pudo cargar la imagen");
-                              },
-                            )
+                            Container(  
+                               width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 245, 208, 171), // Establece el color de fondo verde
+                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                                    ),
+                              child: Center(child: Image.asset("lib/assets/proveedores.png", width: 45, height: 45, fit: BoxFit.contain,))),
+                            const SizedBox(height: 5,),
+                            const Text("Proveedores", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                        
                           ],
                         ),
                       ),
-                      const SizedBox(width: 100),
-                      GestureDetector(
+                        const SizedBox(width: 10,),
+                        GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Compras(),
+                              ));
+                        },
+                        child:  Column(
+                          children: [
+
+                            Container(
+                                width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 212, 245, 246), // Establece el color de fondo verde
+                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(child: Image.asset('lib/assets/Compras@3x.png', width: 45, height: 45,))),
+                            const SizedBox(height: 5,),
+                            const Text("Compras", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                          
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                 const SizedBox(height: 25,),
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                               context,
@@ -324,44 +315,28 @@ class HomeState extends State<Home> {
                                 builder: (context) => const Cobranzas(),
                               ));
                         },
-                        child: Column(
+                        child:  Column(
                           children: [
-                            const Text("Cobranzas"),
-                            Image.network(
-                              'https://www.g-talent.net/cdn/shop/articles/img-1659972637173_d775bd22-cd61-445a-aa42-48c0832b7472.jpg?v=1675217410',
-                              width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
 
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    "No se pudo cargar la imagen");
-                              },
-                            )
+                            Container(
+                                width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 246, 205, 205), // Establece el color de fondo verde
+                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(
+                                
+                                child: Image.asset('lib/assets/Cobranzas@3x.png', width: 45, height: 45, fit: BoxFit.contain,))),
+                              const SizedBox(height: 5,),
+                              const Text("Cobranzas", style: TextStyle(fontFamily: 'Poppins SemiBold'), ),
+                           
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 150),
-                      GestureDetector(
+                      const SizedBox(width: 10,),
+
+                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                               context,
@@ -371,36 +346,24 @@ class HomeState extends State<Home> {
                         },
                         child: Column(
                           children: [
-                            const Text("Retenciones"),
-                            Image.network(
-                              'https://static.wixstatic.com/media/b21422_23a906f84cfc45d5ba8d3a422f0847e7~mv2.jpg/v1/fill/w_640,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/b21422_23a906f84cfc45d5ba8d3a422f0847e7~mv2.jpg',
-                              width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    "No se pudo cargar la imagen");
-                              },
-                            )
+                            
+                            Container(
+                                width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 250, 201, 249), // Establece el color de fondo verde
+                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(child: Image.asset('lib/assets/Retenciones@3x.png', width: 45, height: 45, fit: BoxFit.contain,))),
+                            const SizedBox(height: 5,),
+                            const Text("Retenciones", style: TextStyle(fontFamily: 'Poppins SemiBold' ), ),
+                         
                           ],
                         ),
                       ),
-                      const SizedBox(width: 100),
+
+                      const SizedBox(height: 25, width: 10,),
+                    
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -410,39 +373,29 @@ class HomeState extends State<Home> {
                                     const SynchronizationScreen(),
                               ));
                         },
-                        child: Column(
+                        child:  Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Text("Sincronizar"),
-                            Image.network(
-                              'https://leadersadvantage.us/wp-content/uploads/Leaders-Advantage-synchronization-flow.png',
-                              width: 100,
-                              height: 100,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
 
-                                return CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                );
-                              },
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                return const Text(
-                                    "No se pudo cargar la imagen");
-                              },
-                            )
+                            Container(
+                               width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 217, 247, 255), // Establece el color de fondo verde
+                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(child: Image.asset('lib/assets/Sincro@3x.png', width: 45, height:  45, fit: BoxFit.contain , ))),
+                            const SizedBox(height: 5,)
+,                            const Text("Sincronización", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
+                        
                           ],
                         ),
                       ),
+                      
+                   
                     ],
                   ),
+           
                 ],
               ),
             )),

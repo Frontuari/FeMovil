@@ -1,26 +1,23 @@
 
 1) retencion se puede reactivar el comprobante, anular el comprobante o cerrar. pero eso es despues
-de completar el documento
+de completar el documento - Listo
 
 
 2) crear una nueva tabla que se va a a llamar tax va tener los siguientes campos
 (id,name,rate, isWithHolding)
 si isWithHolding es n aparecera en las ordenes de compra y venta si es y entonces
-aparecera en cobros
+aparecera en cobros - Listo
 
-agregar a la tabla de productos el impuesto 
+agregar a la tabla de productos el impuesto - Listo
 
-cada producto tiene propio impuesto es decir cada linea de la orden 
+cada producto tiene propio impuesto es decir cada linea de la orden  - Listo
 
 
-3) el usuario al loguearse se insertara automaticamente en la tabla los datos de el 
-
-5) se aplicaran diferentes tipos de impuesto dependiendo del check isWithHolding, Si esta en N se puede utilizar
-para ordenes y facturas, y si esta en Y solo sera para retenciones
+3) el usuario al loguearse se insertara automaticamente en la tabla los datos de el - Listo
 
 
 6) Para identificar el tipo de documento se creara otra variable en las variables globales que nos ayudara
-identificar el tipo de documento
+identificar el tipo de  documento - Listo
 
 7) para finalizar la sincronizacion va a tener una tabla donde cargare el porcentaje que se guardo entre 
 los productos que hay clientes, y otros modulos sincronizados con idempiere
@@ -30,12 +27,70 @@ esto nos permitira mostrarle al usuario en la vista el porcentaje por modulo sin
 8) se agregara un campo a la tabla de usuarios en idempiere para asi al consumir el endpoind identificar 
 si ese usuario puede ver ciertos modulos ya predeterminados 
 
-9) Agregar a productos un stock minimo para asi se vean mas afectadas las ventas emergentes
+9) Agregar a productos un stock minimo para asi se vean mas afectadas las ventas emergentes 
 
 
-10) se habilitara el boton de cobrar solo si la orden fue completada 
-
+10) se habilitara el boton de cobrar solo si la orden fue completada -Listo
 
 11) Se agregara otra funcionalidad al sincronizar las ordenes, es decir puede sincronizarlo directamente
-desde la orden o puede hacerlo masivamente desde el modulo de Sincronizacion
+desde la orden o puede hacerlo masivamente desde el modulo de Sincronizacion 
+
+12) Se validara si no tiene mpartnerid y codigo entonces sincronizara el tercero 
+
+13) Enviar warning de sincronizar productos, solo si el producto no esta sincronizado, si no esta sincronizado
+que lo sincronice y lo agregue sino que no lo agregue
+
+
+14) la aplicacion debe funcionar en offline para que al sincronizarce funcione de ambas formas. 
+
+15) En la creacion de una orden de venta tiene que tener una columna del id de la factura para asi actualizarce al
+sincronizar la orden de venta si posee factura guardar si id de la factura sino, podria ser un anticipo al hacer un pago
+a la orden 
+
+
+16) Primero hay que cargar todas las cuentas de bancos disponibles de esa organizacion 
+
+17) Luego crear la interfaz que creara el cobro y si dependiendo de la orden de venta tenga factura o no
+
+18) Existen dos casos al crear el cobro 1 cuando el id de la factura no existe se crea el cobro como adelanto de la orden de venta
+y en caso de que si existe se le creara al numero de factura 
+
+19) RUC  y DNI son acronimos por lo tanto van en mayusculas
+
+20) Campo de email de cliente esta como numerico 
+
+21) crear una validacion para el boton de comp y enviar de ordenes de compra y ventas, para que al presionarle se deshabilite
+
+22) Arreglar los cobros, que valide si el monto es menor no lo cree
+
+23) En agregar la orden se pueda completar en esa misma pantalla 
+
+24) Agregar ccampo CIUU en maestro de proveedores - Listo
+25) Regla general, precio de compra editable - Listo 
+26) Mostrar saldo pendiente por cobrar. - Listo
+27) Acceso por modulos(Compras/Ventas/Ambos) 
+28) Agregar configuracion para documentos de prueba(Agregar un limite para documentos de prueba que no pueda agregar mas 
+documentos del limite) 
+
+29) Enviar en idempiere en el campo documentno si existe un numero de referencia en el cobro 
+
+validar los distintos casos 
+1) si hay un numero de referencia se envia como numero de documento y no se actualiza en documentno - Listo
+2) se mostrara solamente el numero de documento del cobro como referencia al cobro realizado - Listo
+
+30) Facturas con retencion mostrar el tipo de retencion 
+
+31) Controlar los posibles errores sobre las respuesta en idempiere 
+
+32) Cargar los de id de facturas en las ordenes de ventas 
+
+33) Agregar una ventana emergente a los morosos de pago
+
+
+34) agregar un copy al numero de documento
+
+35) Colocar en una variable global o posproperties la opcion del termino de pago
+
+
+36) agregar a los campos necesario poder copiarlos como id de factura, o numero de orden 
 

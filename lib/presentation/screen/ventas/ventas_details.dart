@@ -1,17 +1,33 @@
-import 'package:femovil/database/create_database.dart';
+import 'dart:async';
+
+import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/update_database.dart';
 import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
+import 'package:femovil/presentation/screen/ventas/idempiere/query_id_dno.dart';
+import 'package:femovil/sincronization/https/search_id_invoice.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class VentasDetails extends StatefulWidget {
   final int ventaId;
   final String nameClient;
-  final double saldoTotal;
-  const VentasDetails({super.key, required this.ventaId, required this.nameClient, required this.saldoTotal});
+  final dynamic saldoTotal;
+  final String rucClient;
+  final String emailClient;
+  final String phoneClient;
+  const VentasDetails(
+      {super.key,
+      required this.ventaId,
+      required this.nameClient,
+      required this.saldoTotal,
+      required this.rucClient,
+      required this.emailClient,
+      required this.phoneClient,
+      });
 
   @override
   State<VentasDetails> createState() => _VentasDetailsState();
@@ -19,55 +35,75 @@ class VentasDetails extends StatefulWidget {
 
 class _VentasDetailsState extends State<VentasDetails> {
   late Future<Map<String, dynamic>> _ventaData;
-  dynamic ventasDate = [];
+
+
+  bool bottonEnable = true;
 
   @override
   void initState() {
     super.initState();
-    _ventaData = _loadVentasForId();
-
-    _loadOrdenesConLineas();
-
+    _ventaData = _loadVentasForId(widget.ventaId);
   }
 
 
-   _loadOrdenesConLineas() async {
 
-     dynamic response = await obtenerOrdenesDeVentaConLineas();
+  _updateAndCreateOrders() async {
+    dynamic isTrue = await createOrdenSalesIdempiere(_ventaData);
 
-                setState(() {
-
-                    ventasDate = response;
-
-                });
-
-        print('Estas son las ordenes de ventas con sus respectivas lineas $response');
-        
+    if (isTrue == false) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
+ 
 
-  Future<Map<String, dynamic>> _loadVentasForId() async {
+
+
+    double calcularSaldoTotalProducts(dynamic price, dynamic quantity, dynamic impuesto) {
+    double prices;
+    double quantitys;
   
-    return await getOrderWithProducts(widget.ventaId);
-  
+
+    // Verificar si quantity es un String
+    if (quantity is String || price is String) {
+      // Intentar convertir el String a un número
+      try {
+        quantitys = double.parse(quantity).toDouble();
+        prices = double.parse(price).toDouble();
+      } catch (e) {
+        print('Error al convertir quantity a double: $e');
+        // Si hay un error, establecer quantitys como 0
+        prices = 0.0;
+        quantitys = 0.0;
+      }
+    } else {
+      // Si quantity no es un String, asumir que es numérico
+      quantitys = quantity.toDouble();
+      prices = price.toDouble();
+    }
+   
+      
+   
+    double sum = prices * quantitys;
+
+    return sum;
+  }
+
+  Future<Map<String, dynamic>> _loadVentasForId(ordenId) async {
+    return await getOrderWithProducts(ordenId);
   }
 
   @override
   Widget build(BuildContext context) {
-            final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final screenMax = MediaQuery.of(context).size.width * 0.8;
+    final heightScreen = MediaQuery.of(context).size.height * 0.9;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-      appBar: AppBar(
-        title: const Text('Orden de Venta', style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            color: Color.fromARGB(255, 105, 102, 102),
-          ),),
-      backgroundColor: const Color.fromARGB(255, 236, 247, 255),
-                iconTheme: const IconThemeData(color: Color.fromARGB(255, 105, 102, 102)),
-
-      ),
+      appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(50),
+          child: AppBarSample(label: 'Orden de Venta')),
       body: Align(
         alignment: Alignment.topCenter,
         child: FutureBuilder(
@@ -82,6 +118,7 @@ class _VentasDetailsState extends State<VentasDetails> {
               final productsData = snapshot.data!['products'];
               print("Esto es lo que hay productsData ${snapshot.data}");
               print("esto es ventas data $ventaData");
+              print("Esto es snapshot data ${snapshot.data}");
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
@@ -89,354 +126,652 @@ class _VentasDetailsState extends State<VentasDetails> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      
+                          SizedBox(height: heightScreen * 0.015,),
                       Container(
-                        width: screenMax ,
+                        width: screenMax,
                         decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
+                          borderRadius: BorderRadius.circular(
+                              8), // Establece el radio de los bordes
                         ),
-                        child: const Text('Datos Del Cliente', style:  TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                        child: const Text(
+                          'Datos Del Cliente',
+                          style: TextStyle(
+                              color: Colors.black,fontFamily: 'Poppins Bold' , fontSize: 18),
+                          textAlign: TextAlign.start,
+                        ),
                       ),
-                        const SizedBox(height: 10,),
-                       Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        width: screenMax ,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start, // Alinea el texto hacia la izquierda  
+                      SizedBox(height: heightScreen * 0.05,),
+
+                 
+                   Container(
+                    width: screenMax,
+                    height: screenMax * 0.7,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 7,
+                              spreadRadius: 2,
+                              color: Colors.grey.withOpacity(0.5))
+                        ]),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 0, vertical: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                     children: [
-                                      const Text("N°"),
-                                      const SizedBox(height: 5,),
-                                       Text(ventaData['id'].toString(), textAlign: TextAlign.start,),
-                                     ],
-                                   ),
-                                 ),
-                                 const Divider(),
-                  
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                     children: [
-                                      const Text('Fecha'),
-                                      const SizedBox(height: 5,),
-                                       Text(ventaData['fecha']),
-                                     ],
-                                   ),
-                                 ),
-                                 const Divider(),
-                  
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                              SizedBox(
+                                width: screenMax * 0.5,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 5),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                        const Text('Cliente'),
-                                        const SizedBox(height: 5,),
-                                        Text(widget.nameClient),
-                                   
+                                      const Text(
+                                        'Nombre',
+                                        style: TextStyle(
+                                            fontFamily: 'Poppins Bold',
+                                            fontSize: 18),
+                                      ),
+                                      Text(widget.nameClient.length > 25
+                                          ? widget.nameClient.substring(0, 25)
+                                          : widget.nameClient)
                                     ],
-                                   ),
-                                 ), 
-                                 const Divider(),
-                          
-                        
-                                 Padding(
-                                   padding: const EdgeInsets.all(8.0),
-                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                     children: [
-                                       const Text('Descripción'),
-                                       const SizedBox(height: 5,),
-                                       Text(ventaData['descripcion']),
-                                     ],
-                                   ),
-                                 ),
-        
-                                 const Divider(),
-                          
-                          ],),
-                        ) ,
-                      ),
-                  
-                     
-                      const SizedBox(height: 10),
-                      Container(
-                        width: screenMax,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        child: const Text('Productos', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
-                       const SizedBox(height: 10),
-        
-                        Container(
-                        width: screenMax,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Name', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                Text('Cantidad', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                Text('Precio', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                Text('Impuesto', textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-
-                              ],
-                            ),
-                          ),
-                        )),
-                               const SizedBox(height: 10),
-
-                      Container(
-                        width: screenMax,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                        child: ListView.builder(
-                          
-                          shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(), // Deshabilita el desplazamiento
-
-                          itemCount: productsData.length,
-                          itemBuilder: (context, index) {
-                            final product = productsData[index];
-                            print('Estos son los productos $product');
-                            return Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                        Expanded(child: Text('${product['name']}',)),
-                                        const SizedBox(width: 50,),
-                                        Expanded(child: Text(product['qty_entered'].toString())),
-                                        Expanded(child: Text(product['price_actual'].toString())),
-                                        const SizedBox(width: 15,),
-                                        Expanded(child: Text('${product['impuesto'].toString()}%'))
-                                        
-                                    ] 
-                                                         
                                   ),
-                                 const Divider(),
+                                ),
+                              ),
+                              SizedBox(
+                                width: screenMax * 0.4,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Ruc/DNI',
+                                        style: TextStyle(
+                                            fontFamily: 'Poppins Bold',
+                                            fontSize: 18),
+                                      ),
+                                      Text(widget.rucClient.length > 15
+                                          ? widget.rucClient.substring(0, 15)
+                                          : widget.rucClient),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                            width: screenMax,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'Detalles',
+                                style: TextStyle(
+                                    fontFamily: 'Poppins Bold', fontSize: 18),
+                                textAlign: TextAlign.start,
+                              ),
+                            )),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Correo: ',
+                                style:
+                                    TextStyle(fontFamily: 'Poppins SemiBold'),
+                              ),
+                              Text(
+                                widget.emailClient == '{@nil: true}'
+                                    ? ''
+                                    : widget.emailClient,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Telefono: ',
+                                style:
+                                    TextStyle(fontFamily: 'Poppins SemiBold'),
+                              ),
+                              Text(
+                                widget.phoneClient == '{@nil: true}'
+                                    ? ''
+                                    : widget.phoneClient,
+                                style: const TextStyle(
+                                    fontFamily: 'Poppins Regular'),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
 
+                                        SizedBox(height: heightScreen * 0.05,),
+                    Container(
+                            width: screenMax ,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Orden N°", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    ventaData['documentno'] != ''
+                                        ? ventaData['documentno'].toString()
+                                        : ventaData['id'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
                                 ],
                               ),
-                              
-                            );
-                            
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10,),
-                    Container(
-                      width: screenMax,
-                     decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8), // Establece el radio de los bordes
-                        ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Saldo Neto', style: TextStyle(fontWeight: FontWeight.bold)),
-                                
-                                Text(' \$ ${ventaData['saldo_neto'].toString()}'),
-                              ],
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Monto', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+
+                          SizedBox(height: heightScreen * 0.025,),
+                    Container(
+                            width: screenMax ,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Fecha", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    ventaData['fecha'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: heightScreen * 0.025,),
+                    Container(
+                            width: screenMax ,
+                            height: screenMax * 0.25,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 7,
+                                  spreadRadius: 2
+                                )
+                              ]
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Descripción", style: TextStyle(fontFamily: 'Poppins Regular'),),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    ventaData['descripcion'].toString(),
+                                    textAlign: TextAlign.start,
+                            
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                               SizedBox(height: heightScreen * 0.025,),
+                         SizedBox(
+                            width: screenMax,
+                            child: const Text(
+                              "Productos",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'Poppins Bold',
+                                  fontSize: 18),
+                            ),
+                          ),
+                              SizedBox(height: heightScreen * 0.025,),
+
+
+
+                           Container(
+                    width: screenMax,
+                    height: screenMax * 0.5,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 7,
+                              spreadRadius: 2)
+                        ]),
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                             Padding(
+                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                               child: Container(
+                                 width: 400,
+                                 decoration: const BoxDecoration(
+                                   borderRadius: BorderRadius.all(Radius.circular(15)),
+                             
+                                 ),
+                                 child: const Row(
+                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                   children: [
+                                     Text(
+                                       'Nombre',
+                                       style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                     ),
+                                     Text(
+                                       'Cant.',
+                                       style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                     ),
+                                     Text(
+                                       'Precio',
+                                                   style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                                                 ),
+                                                 
+                                               ],
+                                             ),
+                                           ),
+                                         ),
+                        
+                            Expanded(
+                              child: ListView.builder(                   
                                 
-                                Text(' \$ ${ventaData['monto'].toString()}'),
-                              ],
+                                itemCount: productsData.length,
+                                itemBuilder: (context, index) {
+                                  final product = productsData[index];
+                                    
+                                  return Column(children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 0),
+                                      child: SizedBox(
+                                        width: screenMax * 0.95,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                             Image.asset('lib/assets/Check.png'),
+                                             const SizedBox(width: 10 ,),
+                                              SizedBox(
+                                                  width: 50,
+                                                  child: Text(product['name'])),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.14,
+                                              ),
+                                          
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(product['qty_entered']
+                                                    .toString()),
+                                              ),
+                                             
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.20,
+                                              ),
+                                              SizedBox(
+                                                width: screenMax * 0.35,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Flexible(
+                                                        child: Text(
+                                                            '\$${calcularSaldoTotalProducts(product['price_actual'].toString(), product['qty_entered'].toString(), product['impuesto']).toString()}')),
+                                                   
+                                                  ],
+                                                ),
+                                              ),
+                                           
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ]);
+                                },
+                              ),
                             ),
                           ],
                         ),
-                      )),
-                const SizedBox(height: 10,),
-                  Container(
-                  width: screenMax,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: ventaData['status_sincronized'] == 'Borrador' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
+                      ],
+                    ),
                   ),
-                  child: ElevatedButton(
-                    onPressed:ventaData['status_sincronized'] == 'Borrador' ? ()  {
+                      const SizedBox(height: 10),
+                      
+                      Container(
+                          width: screenMax,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                8), // Establece el radio de los bordes
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(
+                              children: [
+                                   Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('SubTotal',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text('\$ ${ventaData['saldo_neto']}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
+                                  Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Exento',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text('\$ ${ventaData['saldo_exento']}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
+                                   Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Impuesto',
+                                        style: TextStyle(fontFamily: 'Poppins Regular', fontSize: 17)),
+                                    Text('\$ ${ventaData['saldo_impuesto']}', style: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 18),),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Total',
+                                        style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 17)),
+                                    Text(
+                                        ' \$ ${ventaData['saldo_total_formatted'].toString()}', style: const TextStyle(fontFamily: 'Poppins Bold', fontSize: 18),),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      ventaData['status_sincronized'] == 'Borrador'
+                          ? Container(
+                              width: screenMax,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: ventaData['status_sincronized'] ==
+                                            'Borrador' &&
+                                        bottonEnable == true
+                                    ? const Color(0xFF7531FF)
+                                    : Colors
+                                        .grey, // Color verde para el fondo del botón
+                              ),
+                              child: ElevatedButton(
+                                onPressed: ventaData['status_sincronized'] ==
+                                            'Borrador' &&
+                                        bottonEnable == true
+                                    ? () async {
+                                        setState(() {
+                                          bottonEnable = false;
+                                        });
 
-                        String newValue = 'Completado';
-                        updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
+                                          
+                                        dynamic isTrue =
+                                            await _updateAndCreateOrders();
 
-                        setState(() {
-                          
-                        _ventaData =  _loadVentasForId();
-                        });
+                                        if (isTrue != false) {
+                                           setState(() {
+                                            bottonEnable = true;
+                                          
+                                          });
+                                         
+                                        
+
+                                          String newValue = 'Enviado';
+                                         await updateOrdereSalesForStatusSincronzed(
+                                              ventaData['id'], newValue);
 
 
-                    }: null,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
+                                        } else {
+                                          String newValue = 'Por Enviar';
+                                           setState(() {
+                                            bottonEnable = true;
+                                          });
+                                          updateOrdereSalesForStatusSincronzed(
+                                              ventaData['id'], newValue);
+                                        }
+
+                                        if (mounted) {
+                                          setState(() {
+                                            _ventaData = _loadVentasForId(
+                                                widget.ventaId);
+                                          });
+                                        }
+                                      }
+                                    : null,
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStateProperty.all<Color>(Colors
+                                          .transparent), // Hace que el color de fondo del botón sea transparente
+                                  shape: WidgetStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(15.0),
+                                  child: Text(
+                                    'Comp y Enviar',
+                                    style: TextStyle(
+                                      color: Colors
+                                          .white, // Texto blanco para que se destaque sobre el fondo verde
+                                      fontFamily: 'Poppins Bold' ,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      ventaData['status_sincronized'] == 'Por Enviar'
+                          ? Container(
+                              width: screenMax,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: ventaData['status_sincronized'] ==
+                                            'Por Enviar' &&
+                                        bottonEnable == true
+                                    ? const Color(0xFF7531FF)
+                                    : Colors
+                                        .grey, // Color verde para el fondo del botón
+                              ),
+                              child: ElevatedButton(
+                                onPressed: ventaData['status_sincronized'] ==
+                                            'Por Enviar' &&
+                                        bottonEnable == true
+                                    ? () async {
+
+                                        setState(() {
+                                          bottonEnable = false;
+                                        });
+                                      
+                                        dynamic isTrue =
+                                            await _updateAndCreateOrders();
+                                        
+
+                                        if (isTrue != false) {
+
+                                          String newValue = 'Enviado';
+                                         await updateOrdereSalesForStatusSincronzed(
+                                              ventaData['id'], newValue);
+                                     
+                                          setState(() {
+                                            bottonEnable = true;
+                                          });
+
+                                        } else {
+                                          String newValue = 'Por Enviar';
+                                          updateOrdereSalesForStatusSincronzed(
+                                              ventaData['id'], newValue);
+                                           setState(() {
+                                            bottonEnable = true;
+                                          });
+                                        }
+
+                                        if (mounted) {
+                                          setState(() {
+                                            _ventaData = _loadVentasForId(
+                                                widget.ventaId);
+                                          });
+                                        }
+                                      }
+                                    : null,
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStateProperty.all<Color>(Colors
+                                          .transparent), // Hace que el color de fondo del botón sea transparente
+                                  shape: WidgetStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(15.0),
+                                  child: Text(
+                                    'Enviar',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins Bold',
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Container(
+                        width: screenMax,
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
+                          color: widget.saldoTotal > 0 &&
+                                  ventaData['status_sincronized'] == 'Enviado'
+                              ? Colors.green
+                              : Colors
+                                  .grey, // Color verde para el fondo del botón
+                        ),
+                        child: ElevatedButton(
+                          onPressed: widget.saldoTotal > 0 &&
+                                  ventaData['status_sincronized'] == 'Enviado'
+                              ? () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => Cobro(
+                                        orderId: ventaData['id'],
+                                        cOrderId: ventaData['c_order_id'],
+                                        documentNo: ventaData['documentno'],
+                                        idFactura: ventaData['id_factura'],
+                                      ),
+                                    ),
+                                  );
+                                }
+                              : null,
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all<Color>(Colors
+                                .transparent), // Hace que el color de fondo del botón sea transparente
+                            shape: WidgetStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Text(
+                              'Cobrar',
+                              style: TextStyle(
+                                color: Colors
+                                    .white, // Texto blanco para que se destaque sobre el fondo verde
+                                fontFamily: 'Poppins Bold',
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text(
-                        'Completar',
-                        style: TextStyle(
-                          color: Colors.white, // Texto blanco para que se destaque sobre el fondo verde
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15,),
-                   Container(
-                  width: screenMax,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: ventaData['status_sincronized'] == 'Borrador' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
-                  ),
-                  child: ElevatedButton(
-                    onPressed:ventaData['status_sincronized'] == 'Borrador' ? ()  {
-
-                        String newValue = 'Completado';
-                        updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
-
-                        setState(() {
-                          
-                        _ventaData =  _loadVentasForId();
-                        });
-
-
-                    }: null,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text(
-                        'Comp y Enviar',
-                        style: TextStyle(
-                          color: Colors.white, // Texto blanco para que se destaque sobre el fondo verde
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15,),
-                     Container(
-                  width: screenMax,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: ventaData['status_sincronized'] == 'Completado' ? Colors.green:Colors.grey, // Color verde para el fondo del botón
-                  ),
-                  child: ElevatedButton(
-                    onPressed:ventaData['status_sincronized'] == 'Completado' ? ()  {
-
-                        String newValue = 'Enviado';
-                        updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue );
-                        createOrdenSalesIdempiere(ventasDate);
-
-                        setState(() {
-                          
-                        _ventaData =  _loadVentasForId();
-                        });
-
-
-                    }: null,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text(
-                        'Enviar',
-                        style: TextStyle(
-                          color: Colors.white, // Texto blanco para que se destaque sobre el fondo verde
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15,),
-                Container(
-                  width: screenMax,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: widget.saldoTotal > 0 && ventaData['status_sincronized'] == 'Completado' || ventaData['status_sincronized'] == 'Enviado' ? Colors.green: Colors.grey, // Color verde para el fondo del botón
-                  ),
-                  child: ElevatedButton(
-                    onPressed:widget.saldoTotal > 0  && ventaData['status_sincronized'] == 'Completado' || ventaData['status_sincronized'] == 'Enviado' ? () {
-
-                        // Navigator.of(context).push(
-                        //  MaterialPageRoute(
-                        //     builder: (context) =>  Cobro(orderId: ventaData['id'],saldoTotal: widget.saldoTotal, loadCobranzas: _loadVentasForId),
-                        //   ),
-                        //  );
-                              print('Estas son las ventas dates $ventasDate');
-                                    createOrdenSalesIdempiere(ventasDate);
-
-
-                    }: null,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), // Hace que el color de fondo del botón sea transparente
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text(
-                        'Cobrar',
-                        style: TextStyle(
-                          color: Colors.white, // Texto blanco para que se destaque sobre el fondo verde
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
                     ],
                   ),
                 ),

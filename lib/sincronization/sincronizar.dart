@@ -1,7 +1,10 @@
 import 'package:femovil/database/create_database.dart';
+import 'package:femovil/infrastructure/bank_accounts.dart';
+import 'package:femovil/infrastructure/models/ciiu.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/infrastructure/models/impuestos.dart';
 import 'package:femovil/infrastructure/models/products.dart';
+import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/sincronization/sincronization_screen.dart';
 
 
@@ -68,8 +71,8 @@ Future<void> syncCustomers( customersData,setState) async {
           // Consulta si el producto ya existe en la base de datos local por su nombre
           List<Map<String, dynamic>> existingCustomer= await db.query(
             'clients',
-            where: 'bp_name = ?',
-            whereArgs: [customer.bpName],
+            where: 'ruc = ?',
+            whereArgs: [customer.ruc],
           );
 
           if (existingCustomer.isNotEmpty) {
@@ -77,8 +80,8 @@ Future<void> syncCustomers( customersData,setState) async {
             await db.update(
               'clients',
               customerMap,
-              where: 'bp_name = ?',
-              whereArgs: [customer.bpName],
+              where: 'ruc = ?',
+              whereArgs: [customer.ruc],
             );
             print('cliente actualizado: ${customer.bpName}');
           } else {
@@ -87,12 +90,103 @@ Future<void> syncCustomers( customersData,setState) async {
             print('cliente insertado: ${customer.bpName}');
           }
         }
-        print('Sincronización de Impuestos completada.');
+        print('Sincronización de clientes completada.');
       } else {
         // Manejar el caso en el que db sea null
         print('Error: db is null');
       }
     }
+
+Future<void> syncVendors( vendorsData,setState) async {
+      final db = await DatabaseHelper.instance.database;
+    
+       double contador = 0;
+print('Esto es vendor Datas $vendorsData');
+
+      if (db != null) {
+        // Itera sobre los datos de los productos recibidos
+        for (Map<String, dynamic> vendorData in vendorsData) {
+          // Construye un objeto Product a partir de los datos recibidos
+          print('Vendor data $vendorData');
+          Vendor vendor = Vendor(
+            cBPartnerId: vendorData['c_bpartner_id'],
+            cCodeId: vendorData['c_code_id'],
+            bPName: vendorData['bpname'],
+            email: vendorData['email'],
+            cBPGroupId: vendorData['c_bp_group_id'],
+            groupBPName: vendorData['groupbpname'],
+            taxId: vendorData['tax_id'], 
+            isVendor: vendorData['is_vendor'],
+            lcoTaxIdTypeId: vendorData['lco_tax_id_type_id'],
+            taxIdTypeName: vendorData['tax_id_type_name'],
+            cBPartnerLocationId: vendorData['c_bpartner_location_id'],
+            isBillTo: vendorData['is_bill_to'],
+            phone: vendorData['phone'],
+            cLocationId: vendorData['c_location_id'],
+            address: vendorData['address'],
+            city: vendorData['city'],
+            countryName: vendorData['country_name'],
+            postal: vendorData['postal'],
+            cCityId: vendorData['c_city_id'],
+            cCountryId: vendorData['c_country_id'],
+            lcoTaxtPayerTypeId: vendorData['lco_taxt_payer_type_id'],
+            taxPayerTypeName: vendorData['tax_payer_type_name'],
+            lvePersonTypeId: vendorData['lve_person_type_id'],
+            personTypeName: vendorData['person_type_name'],
+            ciiuId: vendorData['ciiu_id'],
+            ciiuTagName: vendorData['ciiu_tagname'],
+            province: vendorData['province']
+          );
+          
+            contador++;
+
+         
+            
+                    setState(() {
+                      
+                          syncPercentageProviders = (contador / vendorsData.length) * 100;
+
+                    });
+
+          
+          
+                   
+
+
+          // Convierte el objeto Product a un mapa
+          Map<String, dynamic> vendorMap = vendor.toMap();
+
+          print('Esto es vendorMap $vendorMap');
+
+          // Consulta si el producto ya existe en la base de datos local por su nombre
+          List<Map<String, dynamic>> existingCustomer= await db.query(
+            'providers',
+            where: 'tax_id = ?',
+            whereArgs: [vendor.taxId],
+          );
+
+          if (existingCustomer.isNotEmpty) {
+            // Si el producto ya existe, actualiza sus datos
+            await db.update(
+              'providers',
+              vendorMap,
+              where: 'tax_id = ?',
+              whereArgs: [vendor.taxId],
+            );
+            print('proveedor actualizado: ${vendor.bPName}');
+          } else {
+            // Si el producto no existe, inserta un nuevo registro en la tabla de productos
+            await db.insert('providers', vendorMap);
+            print('proveedor insertado: ${vendor.bPName}');
+          }
+        }
+        print('Sincronización de proveedores completada.');
+      } else {
+        // Manejar el caso en el que db sea null
+        print('Error: db is null');
+      }
+    }
+
 
 
 
@@ -149,14 +243,151 @@ Future<void> syncImpuestos(List<Map<String, dynamic>> impuestosData,setState) as
               where: 'name = ?',
               whereArgs: [impuesto.name],
             );
-            print('Producto actualizado: ${impuesto.name}');
+            print('Impuesto actualizado: ${impuesto.name}');
           } else {
             // Si el producto no existe, inserta un nuevo registro en la tabla de productos
             await db.insert('tax', impuestoMap);
-            print('Producto insertado: ${impuesto.name}');
+            print('Impuesto insertado: ${impuesto.name}');
           }
         }
         print('Sincronización de Impuestos completada.');
+      } else {
+        // Manejar el caso en el que db sea null
+        print('Error: db is null');
+      }
+    }
+
+
+
+Future<void> syncBankAccount(List<Map<String, dynamic>> bankAccountsData,setState) async {
+      final db = await DatabaseHelper.instance.database;
+    
+       double contador = 0;
+
+
+
+      if (db != null) {
+        // Itera sobre los datos de los productos recibidos
+        for (Map<String, dynamic> bankAccount in bankAccountsData) {
+          // Construye un objeto Product a partir de los datos recibidos
+          BankAccounts bankAcc = BankAccounts(
+            bankId: bankAccount['c_bank_id'],
+            bankName: bankAccount['bank_name'],
+            routingNo: bankAccount['routing_no'].toString(),
+            cBankAccountId: bankAccount['c_bank_account_id'].toString(),
+            accountNo: bankAccount['account_no'],
+            cCurrencyId: bankAccount['c_currency_id'],
+            isoCode: bankAccount['iso_code'],
+            
+          );
+          
+            contador++;
+
+            
+                    setState(() {
+                      
+                              syncPercentageBankAccount = (contador / bankAccountsData.length) * 100;
+                    });
+
+                   
+                   print('esto es bankacc ${bankAcc.toMap()}');
+
+
+
+          // Convierte el objeto Product a un mapa
+          Map<String, dynamic> bankAccountMap = bankAcc.toMap();
+
+
+          // Consulta si el producto ya existe en la base de datos local por su nombre
+          List<Map<String, dynamic>> existingImpuesto= await db.query(
+            'bank_account_app',
+            where: 'c_bank_id = ?',
+            whereArgs: [bankAcc.bankId],
+          );
+
+          if (existingImpuesto.isNotEmpty) {
+            // Si el producto ya existe, actualiza sus datos
+            await db.update(
+              'bank_account_app',
+              bankAccountMap,
+              where: 'c_bank_id = ?',
+              whereArgs: [bankAcc.bankId],
+            );
+            print('Bank Account actualizado: ${bankAcc.bankName}');
+          } else {
+            // Si el producto no existe, inserta un nuevo registro en la tabla de productos
+            await db.insert('bank_account_app', bankAccountMap);
+            print('Bank Account insertado: ${bankAcc.bankName}');
+          }
+        }
+        print('Sincronización de bankAccounts completada.');
+      } else {
+        // Manejar el caso en el que db sea null
+        print('Error: db is null');
+      }
+    }
+
+
+
+Future<void> syncCiiuActivities(List<Map<String, dynamic>> ciiuCode,setState) async {
+      final db = await DatabaseHelper.instance.database;
+    
+       double contador = 0;
+
+
+
+      if (db != null) {
+        // Itera sobre los datos de los productos recibidos
+        for (Map<String, dynamic> ciiuActivities in ciiuCode) {
+          // Construye un objeto Product a partir de los datos recibidos
+          Ciiu ciiu = Ciiu(
+     
+              codeCiiu: ciiuActivities['cod_ciiu'],
+              lcoIsiCid: ciiuActivities['lco_isic_id'],
+              name: ciiuActivities['name']
+            
+          );
+          
+            contador++;
+
+            
+                    setState(() {
+                      
+                              // syncPercentageBankAccount = (contador / ciiuCode.length) * 100;
+                    });
+
+                   
+                   print('esto es el valor que tiene la variable ciiu ${ciiu.toMap()}');
+
+
+
+          // Convierte el objeto Product a un mapa
+          Map<String, dynamic> ciiuCodeToMap = ciiu.toMap();
+
+
+          // Consulta si el producto ya existe en la base de datos local por su nombre
+          List<Map<String, dynamic>> existingCiiu= await db.query(
+            'ciiu',
+            where: 'lco_isic_id = ?',
+            whereArgs: [ciiu.lcoIsiCid],
+          );
+
+          if (existingCiiu.isNotEmpty) {
+            // Si el producto ya existe, actualiza sus datos
+            await db.update(
+              'ciiu',
+              ciiuCodeToMap,
+              where: 'lco_isic_id = ?',
+              whereArgs: [ciiu.lcoIsiCid],
+            );
+            print('Ciiu Activities actualizado: ${ciiu.name}');
+          } else {
+            // Si el producto no existe, inserta un nuevo registro en la tabla de productos
+            await db.insert('ciiu', ciiuCodeToMap);
+            print('Ciiu Activities insertado: ${ciiu.name}');
+          }
+        }
+        print('Sincronización de Ciiu Code completada.');
       } else {
         // Manejar el caso en el que db sea null
         print('Error: db is null');

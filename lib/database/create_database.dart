@@ -35,7 +35,7 @@ class DatabaseHelper {
     // Verificar si la base de datos ya existe
     bool exists = await databaseExists(dbpath);
 
-    if (!exists) {
+    if (exists) {
       print("base de datos si existe");
     } else {
       print("base de datos creada");
@@ -52,6 +52,16 @@ class DatabaseHelper {
       dbPath,
       version: 1,
       onCreate: (Database db, int version) async {
+
+         await db.execute('''
+          CREATE TABLE ciiu(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cod_ciiu INTEGER,
+            lco_isic_id INTEGER,
+            name STRING
+          )
+        ''');
+
         await db.execute('''
           CREATE TABLE products(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,6 +86,7 @@ class DatabaseHelper {
 
           )
         ''');
+
         await db.execute('''
         CREATE TABLE clients(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,7 +109,7 @@ class DatabaseHelper {
             c_city_id INTEGER,
             c_region_id INTEGER,
             c_country_id INTEGER,
-            ruc STRING,
+            ruc TEXT,
             address STRING,
             lco_tax_payer_typeid INTEGER,
             tax_payer_type_name STRING,
@@ -112,11 +123,34 @@ class DatabaseHelper {
 
         CREATE TABLE providers(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            ruc INTEGER,
-            correo TEXT,
-            telefono INTEGER,
-            grupo TEXT
+            c_bpartner_id INTEGER,
+            c_code_id INTEGER,
+            bpname TEXT,
+            email STRING,
+            c_bp_group_id INTEGER,
+            groupbpname STRING,
+            tax_id TEXT,
+            is_vendor STRING,
+            lco_tax_id_type_id INTEGER,
+            tax_id_type_name STRING,
+            c_bpartner_location_id INTEGER,
+            is_bill_to STRING,
+            phone STRING,
+            c_location_id INTEGER,
+            address STRING,
+            city STRING,
+            ciiu_id INTEGER,
+            ciiu_tagname STRING,
+            province STRING,
+            country_name STRING,
+            postal STRING,
+            c_city_id INTEGER,
+            c_country_id INTEGER,
+            lco_taxt_payer_type_id INTEGER, 
+            tax_payer_type_name STRING, 
+            lve_person_type_id INTEGER,
+            person_type_name STRING
+
         )
 
     ''');
@@ -129,6 +163,7 @@ class DatabaseHelper {
           ad_org_id INTEGER,
           m_warehouse_id INTEGER,
           documentno INTEGER,
+          c_order_id INTEGER,
           paymentrule INTEGER,
           date_ordered TEXT,
           salesrep_id INTEGER,
@@ -136,13 +171,17 @@ class DatabaseHelper {
           c_bpartner_location_id INTEGER,
           fecha TEXT,
           descripcion TEXT,
+          id_factura TEXT,
+          documentno_factura TEXT,
+          saldo_exento REAL,
+          saldo_impuesto REAL,
           monto REAL,
           saldo_neto REAL,
           usuario_id INTEGER,
           cliente_id INTEGER,
           status_sincronized STRING,
           FOREIGN KEY (cliente_id) REFERENCES clients(id),
-          FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+          FOREIGN KEY (usuario_id) REFERENCES usuarios(ad_user_id)
 
         )
       ''');
@@ -155,7 +194,6 @@ class DatabaseHelper {
             producto_id INTEGER,
             ad_client_id INTEGER,
             ad_org_id INTEGER,
-            c_order_id INTEGER,
             price_entered INTEGER,
             price_actual INTEGER,
             m_product_id INTEGER,
@@ -170,26 +208,49 @@ class DatabaseHelper {
           CREATE TABLE orden_compra (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           proveedor_id INTEGER,
-          numero_referencia TEXT,
-          numero_factura TEXT,
+          documentno TEXT,
+          c_doc_type_target_id INTEGER, 
+          ad_client_id INTEGER,
+          ad_org_id INTEGER,
+          m_warehouse_id INTEGER,
+          payment_rule STRING, 
+          c_order_id INTEGER,
+          dateordered STRING,
+          sales_rep_id INTEGER,
+          c_bpartner_id INTEGER,
+          c_bpartner_location_id INTEGER,
+          m_price_list_id INTEGER, 
+          c_currency_id INTEGER,
+          c_payment_term_id INTEGER,
+          c_conversion_type_id INTEGER,
+          po_reference STRING,
+          description STRING,
+          saldo_exento REAL,
+          saldo_impuesto REAL,
+          id_factura INTEGER,
           fecha TEXT,
-          descripcion TEXT,
           monto REAL,
           saldo_neto REAL,
           usuario_id INTEGER,
-          FOREIGN KEY (proveedor_id) REFERENCES clients(id),
-          FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+          status_sincronized,
+          FOREIGN KEY (proveedor_id) REFERENCES providers(id),
+          FOREIGN KEY (usuario_id) REFERENCES usuarios(ad_user_id)
 
         )
       ''');
 
         await db.execute('''
 
-        CREATE TABLE orden_compra_producto (
+        CREATE TABLE orden_compra_lines (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             orden_compra_id INTEGER,
+            ad_client_id INTEGER,
+            ad_org_id INTEGER,
+            price_entered REAL,
+            price_actual REAL,
+            m_product_id INTEGER,
+            qty_entered REAL,
             producto_id INTEGER,
-            cantidad INTEGER,
             FOREIGN KEY (orden_compra_id) REFERENCES orden_compra(id),
             FOREIGN KEY (producto_id) REFERENCES products(id)
         )
@@ -199,35 +260,86 @@ class DatabaseHelper {
         await db.execute('''
           CREATE TABLE cobros(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            number_reference INTEGER,
-            type_document TEXT,
-            payment_type TEXT, 
+            c_bankaccount_id INTEGER,
+            c_bankaccount_name STRING,
+            c_doctype_id INTEGER,
+            date_trx TEXT,
+            description TEXT,
+            c_bpartner_id INTEGER,
+            pay_amt REAL,
             date TEXT,
-            coin TEXT,
-            amount INTEGER,
-            bank_account TEXT,
-            observation TEXT,
+            c_currency_id INTEGER,
+            c_currency_iso STRING,
+            c_order_id INTEGER,
+            c_invoice_id INTEGER,
+            documentno INTEGER,
+            tender_type STRING,
+            tender_type_name STRING,
             sale_order_id INTEGER,
             FOREIGN KEY (sale_order_id) REFERENCES orden_venta(id)
-
+            
           )
         ''');
 
         await db.execute('''
-          CREATE TABLE retenciones(
+          CREATE TABLE f_retenciones(
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            total_bdi INTEGER,
-            impuesto TEXT,
-            fecha_transaccion TEXT,
-            tipo_retencion TEXT,
-            nro_document INTEGER,
-            porcentaje REAL, 
-            total_impuesto REAL, 
-            regla_retencion TEXT,
-            orden_compra_id INTEGER,
-            FOREIGN KEY(orden_compra_id) REFERENCES orden_compra(id)
+            ad_client_id INTEGER,
+            ad_org_id TEXT,
+            c_bpartner_id TEXT,
+            c_bpartner_location_id TEXT,
+            c_currency_id INTEGER, 
+            c_doctypetarget_id INTEGER, 
+            c_paymentterm_id INTEGER,
+            description TEXT,
+            documentno TEXT,
+            is_sotrx TEXT,
+            m_pricelist_id INTEGER,
+            payment_rule STRING,
+            date_invoiced TEXT,
+            date_acct TEXT, 
+            sales_rep_id INTEGER,
+            sri_authorization_code TEXT,
+            ing_establishment INTEGER, 
+            ing_emission INTEGER, 
+            ing_sequence INTEGER,
+            ing_taxsustance TEXT,
+            provider_id INTEGER,
+            date TEXT,
+            monto REAL,
+            FOREIGN KEY (provider_id) REFERENCES providers(id)
+
+
             )
 
+        ''');
+
+           await db.execute('''
+
+        CREATE TABLE f_retencion_lines (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            f_retencion_id INTEGER,
+            ad_client_id INTEGER,
+            ad_org_id INTEGER,
+            price_entered REAL,
+            price_actual REAL,
+            m_product_id INTEGER,
+            qty_entered REAL,
+            producto_id INTEGER,
+            FOREIGN KEY (f_retencion_id) REFERENCES f_retenciones(id),
+            FOREIGN KEY (producto_id) REFERENCES products(id)
+        )
+
+      ''');
+
+         await db.execute('''
+
+          CREATE TABLE payment_term_fr(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            c_paymentterm_id INTEGER,
+            name TEXT
+            )
+            
         ''');
 
         await db.execute('''
@@ -260,7 +372,15 @@ class DatabaseHelper {
             city STRING,
             address1 STRING, 
             m_pricelist_id INTEGER,
-            c_currency_id INTEGER
+            m_price_saleslist_id INTEGER,
+            c_currency_id INTEGER,
+            c_doc_type_order_co INTEGER,
+            doc_status_receipt STRING,
+            doc_status_invoice_so STRING,
+            doc_status_order_so STRING,
+            doc_status_order_po STRING,
+            c_doc_type_target_fr INTEGER,
+            orden_compra_id INTEGER
             )
         ''');
 
@@ -275,6 +395,23 @@ class DatabaseHelper {
           iswithholding TEXT
           )
         ''');
+
+
+           await db.execute('''
+          CREATE TABLE bank_account_app(
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          c_bank_id INTEGER,
+          bank_name STRING,
+          routing_no TEXT,
+          c_bank_account_id INTEGER,
+          account_no TEXT,
+          c_currency_id INTEGER,
+          iso_code STRING
+          )
+        ''');
+
+
+
       },
     );
 

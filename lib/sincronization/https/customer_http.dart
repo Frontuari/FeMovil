@@ -69,7 +69,9 @@ sincronizationCustomers(setState) async {
   final response = await request.close();
   final responseBody = await response.transform(utf8.decoder).join();
   dynamic customer =  extractCustomersData(responseBody);
+  
   print('Estos son los clientes registrados en idempiere $customer');
+
   await syncCustomers(customer,setState); 
 
   final parsedJson = jsonDecode(responseBody);
