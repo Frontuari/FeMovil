@@ -485,7 +485,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                   await synchronizeOrderSalesWithIdempiere(setState);
               
                   // sincronizationCustomers(setState);
-                  
+                   
                   setState(() {
                     _enableButtons = true;
                     setearValoresEnCero = false;
