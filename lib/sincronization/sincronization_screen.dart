@@ -475,14 +475,14 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                   }
               
                   sincronizationSearchIdInvoice(setState);  
-                  // sincronizationCiuActivities(setState);
-                  // sincronizationBankAccount(setState);
-                  // sincronizationPaymentTerms();
-                  // sincronizationImpuestos(setState);
-                  // await synchronizeCustomersWithIdempiere(setState);
-                  // await synchronizeVendorsWithIdempiere(setState);
-                  // await synchronizeProductsWithIdempiere(setState);
-                  // await synchronizeOrderSalesWithIdempiere(setState);
+                  sincronizationCiuActivities(setState);
+                  sincronizationBankAccount(setState);
+                  sincronizationPaymentTerms();
+                  sincronizationImpuestos(setState);
+                  await synchronizeCustomersWithIdempiere(setState);
+                  await synchronizeVendorsWithIdempiere(setState);
+                  await synchronizeProductsWithIdempiere(setState);
+                  await synchronizeOrderSalesWithIdempiere(setState);
               
                   // sincronizationCustomers(setState);
                   setState(() {
