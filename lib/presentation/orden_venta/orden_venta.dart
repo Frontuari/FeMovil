@@ -7,6 +7,7 @@ import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_venta/product_selection.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
+import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart'; // Importa la librería de formateo de fechas
@@ -256,6 +257,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   void initState() {
     initV();
     initGetUser();
+    print('infouser $infoUserForOrder');
     print('infouser $variablesG');
     fechaController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
     print("Esto es el id ${widget.clientId}");
@@ -948,7 +950,7 @@ Color getColorBg(Set<WidgetState> states){
                           };
                     
                           // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
-                          insertOrder(order).then((orderId)  {
+                          await insertOrder(order).then((orderId) async {
                             if (orderId is Map<String, dynamic> &&
                                 orderId.containsKey('failure')) {
                               if (orderId['failure'] == -1) {
@@ -966,6 +968,33 @@ Color getColorBg(Set<WidgetState> states){
                               print(
                                   'orderId no es un mapa válido o no contiene la propiedad "failure"');
                             }
+                          print('Esto es el orderid $orderId');
+                             final orderCreateIdempiere = {
+                            'client': [{'id': widget.clientId,}],
+                            'order':{
+                            'id': orderId,
+                            'documentno': numeroReferenciaController.text,
+                            'fecha': fechaController.text,
+                            'descripcion': descripcionController.text,
+                            'monto': montoController.text.substring(2),
+                            'saldo_neto': saldoNetoController.text.substring(2),
+                            'c_bpartner_id': widget.cBPartnerId,
+                            'c_bpartner_location_id': widget.cBPartnerLocationId,
+                            'c_doctypetarget_id': variablesG[0]['c_doc_type_order_id'],
+                            'ad_client_id': infoUserForOrder['clientid'],
+                            'ad_org_id': infoUserForOrder['orgid'],
+                            'm_warehouse_id': infoUserForOrder['warehouseid'],
+                            'paymentrule': 'P',
+                            'date_ordered': fechaIdempiereController.text,
+                            'salesrep_id': infoUserForOrder['userId'],
+                            'usuario_id': infoUserForOrder['userId'],
+                            'saldo_exento': saldoExentoController.text.substring(2),
+                            'saldo_impuesto' : saldoImpuestoController.text.substring(2),
+                            'status_sincronized': 'Borrador'},
+                            'products': selectedProducts,
+                          };
+
+                        await  createOrdenSalesIdempiere(orderCreateIdempiere);
 
 
                             ScaffoldMessenger.of(context).showSnackBar(

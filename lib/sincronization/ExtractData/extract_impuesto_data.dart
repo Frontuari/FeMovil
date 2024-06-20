@@ -11,7 +11,7 @@ List<Map<String, dynamic>> extractImpuestoData(String responseData) {
   // Crea una lista para almacenar los datos de los productos
   List<Map<String, dynamic>> impuestosData = [];
 
-  print('Esto es la respuesta del erp $dataRows');
+  print('Esto es la respuesta del erp Impuestos  $dataRows');
 
   // Itera sobre cada DataRow y extrae los datos relevantes de los productos
 
@@ -21,12 +21,12 @@ try {
   
   for (var row in dataRows) {
     Map<String, dynamic> impuestoData = {
-      'c_tax_id': row['field'][0]['val'],
-      'tax_indicator': row['field'][3]['val'],
-      'rate': row['field'][4]['val'],
-      'name': row['field'][1]['val'],
-      'c_tax_category_id': row['field'][5]['val'],
-      'iswithholding':row['field'][6]['val']
+      'c_tax_id': row['field'].firstWhere((field) => field['@column'] == 'C_Tax_ID')['val'],
+      'tax_indicator': row['field'].firstWhere((field) => field['@column'] == 'TaxIndicator')['val'],
+      'rate': row['field'].firstWhere((field) => field['@column'] == 'Rate')['val'],
+      'name': row['field'].firstWhere((field) => field['@column'] == 'Name')['val'],
+      'c_tax_category_id': row['field'].firstWhere((field) => field['@column'] == 'C_TaxCategory_ID')['val'],
+      'iswithholding':row['field'].firstWhere((field) => field['@column'] == 'IsWithholding')['val']
      // Asegúrate de convertir la cantidad a un tipo numérico adecuado
       // Añade otros campos que necesites sincronizar
     };

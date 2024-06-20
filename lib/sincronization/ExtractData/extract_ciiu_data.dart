@@ -21,9 +21,9 @@ try {
       print('Estos son los rows $row');
 
     Map<String, dynamic> ciiuActivityData = {
-      'cod_ciiu': row['field'][1]['val'],
-      'lco_isic_id': row['field'][0]['val'],
-      'name': row['field'][2]['val'],
+      'cod_ciiu': row['field'].firstWhere((field) => field['@column'] == 'Value')['val'],
+      'lco_isic_id': row['field'].firstWhere((field) => field['@column'] == 'LCO_ISIC_ID')['val'],
+      'name': row['field'].firstWhere((field) => field['@column'] == 'Name')['val'],
    
 
 

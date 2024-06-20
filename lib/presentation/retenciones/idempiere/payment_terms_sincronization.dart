@@ -161,8 +161,8 @@ try {
   for (var row in dataRows) {
 
     Map<String, dynamic> paymentTermData = {
-      'c_paymentterm_id': row['field'][0]['val'],
-      'name': row['field'][1]['val'],
+      'c_paymentterm_id': row['field'].firstWhere((field) => field['@column'] == 'C_PaymentTerm_ID')['val'],
+      'name': row['field'].firstWhere((field) => field['@column'] == 'Name')['val'],
      
     };
 

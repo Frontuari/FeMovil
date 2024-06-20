@@ -12,7 +12,6 @@ import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/query_id_dno.dart';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 updateAndCreateTercero(orderSalesList) async {
@@ -133,7 +132,15 @@ Future<bool> checkInternetConnectivity() async {
 
 createOrdenSalesIdempiere(orderSalesList) async {
 
-  dynamic resOrdenSales = await orderSalesList;
+  dynamic resOrdenSales = orderSalesList;
+
+  if (resOrdenSales is Future) {
+    
+    resOrdenSales = await resOrdenSales;
+  
+  }
+
+  print('esto resOrdenSales $resOrdenSales');
 
   dynamic isConnection = await checkInternetConnectivity();
 
@@ -290,10 +297,11 @@ createOrdenSalesIdempiere(orderSalesList) async {
       }
     };
 
+    print('llegue auqi');
     // Crear las líneas de la orden
     final lines =
         createLines(resOrdenSales['products'], resOrdenSales['order']);
-
+    print('llegue auqi 2');
     // Agregar las líneas de la orden al JSON de la orden
     for (var line in lines) {
       requestBody['CompositeRequest']['operations']['operation'].add(line);
@@ -373,6 +381,8 @@ createOrdenSalesIdempiere(orderSalesList) async {
 createLines(lines, order) {
   List linea = [];
 
+  print('llegue aqui en las lineas');
+
   lines.forEach((line) => {
         print("line $line"),
         linea.add({
@@ -389,11 +399,11 @@ createLines(lines, order) {
                 {"@column": "AD_Client_ID", "val": order['ad_client_id']},
                 {"@column": "AD_Org_ID", "val": order['ad_org_id']},
                 {"@column": "C_Order_ID", "val": "@C_Order.C_Order_ID"},
-                {"@column": "PriceEntered", "val": line['price_actual']},
-                {"@column": "PriceActual", "val": line['price_actual']},
+                {"@column": "PriceEntered", "val": line['price_actual'] ?? line['price']},
+                {"@column": "PriceActual", "val": line['price_actual'] ?? line['price']},
                 {"@column": "M_Product_ID", "val": line['m_product_id']},
-                {"@column": "QtyOrdered", "val": line['qty_entered']},
-                {"@column": "QtyEntered", "val": line['qty_entered']},
+                {"@column": "QtyOrdered", "val": line['qty_entered'] ?? line['quantity']},
+                {"@column": "QtyEntered", "val": line['qty_entered'] ?? line['quantity'] },
                 {"@column": "SalesRep_ID", "val": order['salesrep_id']}
               ]
             }

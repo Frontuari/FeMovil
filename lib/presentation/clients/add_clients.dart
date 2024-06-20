@@ -1,4 +1,5 @@
 import 'package:femovil/config/app_bar_sampler.dart';
+import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/presentation/clients/helpers/save_client_to_database.dart';
@@ -647,40 +648,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
                             if (_formKey.currentState!.validate()) {
                               
                               _saveProduct();
-                              showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 20),
-                                  backgroundColor: Colors.white,
-                                  // Center the title, content, and actions using a Column
-                                  content: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize
-                                        .min, // Wrap content vertically
-                                    children: [
-                                      Image.asset('lib/assets/Check@2x.png',
-                                          width: 50,
-                                          height:
-                                              50), // Adjust width and height
-                                      const Text('Cliente Creado con Exito',
-                                          style: TextStyle(
-                                              fontFamily: 'Poppins Bold')),
-                                      TextButton(
-                                        onPressed: () => {
-                                          Navigator.pop(context),
-                                          Navigator.pop(context)
-
-                                        },
-                                        child: const Text('Volver'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-
+                              
 
                             }
                           },
@@ -731,6 +699,49 @@ class _AddClientsFormState extends State<AddClientsForm> {
    String taxTypeName = _taxTypeText;
    String groupBpName = _groupText;
 
+    bool ifExists = await customerExists(ruc);
+
+if (ifExists) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Cliente ya registrado',
+          style: TextStyle(
+            fontFamily: 'Poppins SemiBold',
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'El Cliente con el ID fiscal proporcionado ya está registrado en el sistema.',
+          style: TextStyle(
+            fontFamily: 'Poppins Regular',
+            fontSize: 16,
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: Text(
+              'Aceptar',
+              style: TextStyle(
+                fontFamily: 'Poppins SemiBold',
+                fontSize: 16,
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+
+  return;
+}
+
+
     // Crea una instancia del producto
     Customer client = Customer(
       bpName: name,
@@ -780,6 +791,40 @@ class _AddClientsFormState extends State<AddClientsForm> {
       _seletectedTypePerson = 0;
     });
 
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 20),
+                                  backgroundColor: Colors.white,
+                                  // Center the title, content, and actions using a Column
+                                  content: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize
+                                        .min, // Wrap content vertically
+                                    children: [
+                                      Image.asset('lib/assets/Check@2x.png',
+                                          width: 50,
+                                          height:
+                                              50), // Adjust width and height
+                                      const Text('Cliente Creado con Exito',
+                                          style: TextStyle(
+                                              fontFamily: 'Poppins Bold')),
+                                      TextButton(
+                                        onPressed: () => {
+                                          Navigator.pop(context),
+                                          Navigator.pop(context)
+
+                                        },
+                                        child: const Text('Volver'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+
 
     // Muestra un mensaje de éxito o realiza cualquier otra acción necesaria
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -787,6 +832,8 @@ class _AddClientsFormState extends State<AddClientsForm> {
     ));
 
   }
+
+  
 
   
 

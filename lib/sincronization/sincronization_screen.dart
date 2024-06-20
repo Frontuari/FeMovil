@@ -464,7 +464,6 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
               
                   await getPosPropertiesInit();
               
-                  if (variablesG.isEmpty) {
                     List<Map<String, dynamic>> response =
                         await getPosPropertiesV();
               
@@ -472,7 +471,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                       variablesG = response;
                     });
                     
-                  }
+                  
               
                   sincronizationSearchIdInvoice(setState);  
                   sincronizationCiuActivities(setState);
