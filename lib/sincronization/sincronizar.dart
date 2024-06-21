@@ -5,6 +5,7 @@ import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/infrastructure/models/impuestos.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
+import 'package:femovil/sincronization/sincronizar_create.dart';
 import 'package:femovil/sincronization/sincronization_screen.dart';
 
 
@@ -399,15 +400,22 @@ Future<void> syncCiiuActivities(List<Map<String, dynamic>> ciiuCode,setState) as
 
 Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) async {
       final db = await DatabaseHelper.instance.database;
-    
-       double contador = 0;
 
 
+       totalSyncCount = productsData.length;
+      totalProducts += totalSyncCount;
+
+      isUpdate = true;
 
       if (db != null) {
         // Itera sobre los datos de los productos recibidos
         for (Map<String, dynamic> productData in productsData) {
           // Construye un objeto Product a partir de los datos recibidos
+
+          try {
+            
+         
+
           Product product = Product(
             mProductId: productData['m_product_id'].toString(),
             productType: productData['product_type'].toString(),
@@ -428,15 +436,8 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) asyn
             priceListSales: productData['pricelistsales'],
           );
           
-            contador++;
 
-            
-                    setState(() {
-                      
-                              syncPercentage = (contador / productsData.length) * 100;
-                    });
-
-                   
+           
 
 
 
@@ -465,12 +466,26 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) asyn
             await db.insert('products', productMap);
             print('Producto insertado: ${product.name}');
           }
+         
+         } catch (e) {
+
+              print('Este es el error $e');
+            
+          continue;
+         }finally{
+            syncedProducts++;
+            updateSyncPercentage(setState);
+         }
+
         }
+
         print('Sincronización de productos completada.');
       } else {
         // Manejar el caso en el que db sea null
         print('Error: db is null');
-      }
+      } 
+
+     
     }
 
 

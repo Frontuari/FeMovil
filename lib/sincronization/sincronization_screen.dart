@@ -18,6 +18,7 @@ double syncPercentageSelling = 0.0;
 double syncPercentageImpuestos = 0.0;
 double syncPercentageBankAccount = 0.0;
 bool setearValoresEnCero = true;
+bool isUpdate = true;
 
 class SynchronizationScreen extends StatefulWidget {
   const SynchronizationScreen({super.key});
@@ -78,7 +79,21 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                         child: Container(
                               margin: const EdgeInsets.only(top: 6),
                             width: 150,
-                          child: Text('Productos', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
+                          child: Row(
+                            children: [
+                              isUpdate == false ?
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow,
+                                  borderRadius: BorderRadius.circular(35)
+                                ),
+                              ):Container(),
+                              SizedBox(width: 25,),
+                              Text('Productos', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,),
+                            ],
+                          )),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -457,6 +472,9 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                       syncPercentageSelling = 0;
                       syncPercentageBankAccount = 0;
                       setearValoresEnCero = true;
+                      totalProducts = 0;
+                      currentSyncCount = 0;
+                      syncedProducts = 0;
                    
                     });
         
@@ -480,7 +498,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                   sincronizationImpuestos(setState);
                   await synchronizeCustomersWithIdempiere(setState);
                   await synchronizeVendorsWithIdempiere(setState);
-                  await synchronizeProductsWithIdempiere(setState);
+                  await synchronizeProductsUpdateWithIdempiere(setState);
                   await synchronizeOrderSalesWithIdempiere(setState);
               
                   // sincronizationCustomers(setState);

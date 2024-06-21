@@ -116,9 +116,12 @@ updateAndCreateVendors(orderPurchaseList) async{
     final productId = line['m_product_id'];
     if (productId == 0) {
       // Si el m_product_id es 0, busca y actualiza el producto en la base de datos
-      final products = await findProductById(line['producto_id']); 
-        print('Entre aqui $line');
 
+
+      final products = await findProductById(line['producto_id']); 
+        
+        print('Entre aqui $line');
+        
         print('esto es products id ${products['id']}');
 
         print('Estos son los productos $products');

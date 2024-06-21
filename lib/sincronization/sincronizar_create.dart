@@ -6,6 +6,7 @@ import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
 import 'package:femovil/presentation/products/idempiere/create_product.dart';
+import 'package:femovil/presentation/products/idempiere/update_product.dart';
 import 'package:femovil/presentation/products/products_http.dart';
 import 'package:femovil/presentation/screen/proveedores/idempiere/create_vendor.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
@@ -20,6 +21,10 @@ synchronizeProductsWithIdempiere(setState) async {
   await sincronizationProducts(setState);
   
   for (var productData in productsWithZeroValues) {
+
+    try {
+      
+   
     Product product = Product(
       mProductId: productData['m_product_id'],
       productType: productData['product_type'],
@@ -50,8 +55,85 @@ synchronizeProductsWithIdempiere(setState) async {
     // Limpia los controladores de texto después de guardar el producto
     await updateProductMProductIdAndCodProd(
         productData['id'], mProductId, codProdc);
+         } catch (e) {
+
+          print('este es el error $e');
+          continue;
+    }
   }
 }
+
+int totalProducts = 0;
+int syncedProducts = 0;
+int currentSyncCount = 0;
+int totalSyncCount = 0;
+
+void updateSyncPercentage(setState) {
+  setState(() {
+    syncPercentage = (syncedProducts / totalProducts) * 100;
+  });
+}
+
+
+
+synchronizeProductsUpdateWithIdempiere(setState) async {
+  List<Map<String, dynamic>> products =
+      await getProductsNotZeroValues();
+
+  print('Estos son los productos en actualizacion $products');
+
+   totalSyncCount = products.length;
+  totalProducts += totalSyncCount;
+
+  isUpdate = false;
+
+  for (var productData in products) {
+    try {
+      
+    Product product = Product(
+      mProductId: productData['m_product_id'],
+      productType: productData['product_type'],
+      productTypeName: productData['product_type_name'],
+      codProd: productData['cod_product'],
+      prodCatId: productData['pro_cat_id'],
+      taxName: productData['tax_cat_name'],
+      productGroupId: productData['product_group_id'],
+      produtGroupName: productData['product_group_name'],
+      umId: productData['um_id'],
+      umName: productData['um_name'],
+      name: productData['name'],
+      price: productData['price'],
+      quantity: productData['quantity'],
+      categoria: productData['categoria'],
+      qtySold: productData['total_sold'],
+      taxId: productData['tax_cat_id'],
+      priceListSales: productData['pricelistsales'],
+    );
+    dynamic result = await updateProductIdempiere(product.toMap());
+    print('este es el $result');
+
+    final mProductId =
+        result['StandardResponse']['outputFields']['outputField'][0]['@value'];
+    final codProdc =
+        result['StandardResponse']['outputFields']['outputField'][1]['@value'];
+    print('Este es el mp product id $mProductId && el codprop $codProdc');
+    // Limpia los controladores de texto después de guardar el producto
+    await updateProductMProductIdAndCodProd(
+        productData['id'], mProductId, codProdc);
+
+           } catch (e) {
+          print('Este es el error $e');
+      continue;
+
+    } finally {
+        syncedProducts++;
+        updateSyncPercentage(setState);
+      }
+  }
+   await synchronizeProductsWithIdempiere(setState);
+
+}
+
 
 synchronizeCustomersWithIdempiere(setState) async {
   List<Map<String, dynamic>> customersWithZeroValues =
@@ -117,7 +199,8 @@ synchronizeCustomersWithIdempiere(setState) async {
       print('Error al procesar cliente: $error');
       // Continuar con el siguiente cliente
       continue;
-    }
+    
+    } 
   }
 }
 

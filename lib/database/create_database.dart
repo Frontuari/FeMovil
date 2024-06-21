@@ -82,7 +82,9 @@ class DatabaseHelper {
             um_name STRING,
             quantity_sold INTEGER,
             pricelistsales INTEGER,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(tax_cat_id) REFERENCES tax(id)
+
 
           )
         ''');
@@ -114,7 +116,9 @@ class DatabaseHelper {
             lco_tax_payer_typeid INTEGER,
             tax_payer_type_name STRING,
             lve_person_type_id INTEGER,
-            person_type_name STRING
+            person_type_name STRING,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
         )
 
     ''');

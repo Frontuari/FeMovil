@@ -1003,7 +1003,7 @@ Color getColorBg(Set<WidgetState> states){
                                     'Orden de venta guardada correctamente con ID: $orderId'),
                               ),
                             );
-                    
+                        
                             numeroReferenciaController.clear();
                             descripcionController.clear();
                             montoController.clear();
