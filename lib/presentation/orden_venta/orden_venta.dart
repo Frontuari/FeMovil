@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/config/getPosProperties.dart';
+import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_venta/product_selection.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
+import 'package:femovil/presentation/screen/ventas/ventas.dart';
+import 'package:femovil/presentation/screen/ventas/ventas_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart'; // Importa la librería de formateo de fechas
@@ -50,6 +53,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   double? totalImpuesto;
   Map<String, dynamic> infoUserForOrder = {};
   bool isDragging = false;
+  bool enableButton = true;
 
  dynamic calcularMontoTotal() {
   double total = 0;
@@ -166,37 +170,15 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
         // Si el producto no existe, verificar la disponibilidad antes de agregarlo
         final availableQuantity = product['quantity_avaible'] ??
             0; // Obtener la cantidad disponible del producto
-        final selectedQuantity =
-            product['quantity']; // Obtener la cantidad seleccionada
 
         print("cantidad disponible $availableQuantity");
 
-        if (selectedQuantity > availableQuantity) {
-          // Si la cantidad seleccionada es mayor que la cantidad disponible, mostrar un mensaje de error
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text('Error'),
-                content:
-                    Text('No hay suficientes ${product['name']} disponibles.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
+      
           // Si la cantidad seleccionada es menor o igual que la cantidad disponible, agregar el producto a la lista
           setState(() {
             selectedProducts.add(product);
           });
-        }
+        
       }
     }
   }
@@ -751,11 +733,7 @@ Color getColorBg(Set<WidgetState> states){
                                               ),
                                               GestureDetector(
                                                   onTap: () {
-                                                    if (product['quantity'] >=
-                                                        product[
-                                                            'quantity_avaible']) {
-                                                      return;
-                                                    }
+                                                
 
                                                     setState(() {
                                                       product['quantity'] += 1;
@@ -896,7 +874,7 @@ Color getColorBg(Set<WidgetState> states){
                         backgroundColor: WidgetStateProperty.resolveWith(getColorBg)
                       ) ,
                       
-                      onPressed: () async{
+                      onPressed: enableButton ? () async{
                           
                     
                         if (infoUserForOrder.isNotEmpty) {
@@ -948,22 +926,16 @@ Color getColorBg(Set<WidgetState> states){
                             'saldo_impuesto' : saldoImpuestoController.text.substring(2),
                             'status_sincronized': 'Borrador',
                           };
-                    
+
+                          setState(() {
+                            enableButton = false;
+                          });
+
                           // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
                           await insertOrder(order).then((orderId) async {
                             if (orderId is Map<String, dynamic> &&
                                 orderId.containsKey('failure')) {
-                              if (orderId['failure'] == -1) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      orderId['Error'],
-                                    ),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                                return;
-                              }
+                          
                             } else {
                               print(
                                   'orderId no es un mapa válido o no contiene la propiedad "failure"');
@@ -1003,6 +975,19 @@ Color getColorBg(Set<WidgetState> states){
                                     'Orden de venta guardada correctamente con ID: $orderId'),
                               ),
                             );
+
+                          Map<String, dynamic> order = await getOrderWithProducts(orderId);
+
+                          print('Esto es la order $order');
+
+                             double saldoTotal;
+                                  try {
+                                    saldoTotal = double.parse(order['order']['saldo_total'].toString());
+                                  } catch (e) {
+                                    saldoTotal = 0.0; // Valor predeterminado en caso de error
+                                  }
+
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VentasDetails(ventaId: orderId, emailClient: order['client'][0]['email'],nameClient: order['client'][0]['bp_name'], phoneClient: order['client'][0]!['phone'].toString(), rucClient: order['client'][0]['ruc'].toString(), saldoTotal: saldoTotal , ) ,));
                         
                             numeroReferenciaController.clear();
                             descripcionController.clear();
@@ -1010,17 +995,21 @@ Color getColorBg(Set<WidgetState> states){
                             saldoNetoController.clear();
                             saldoExentoController.clear();
                             saldoImpuestoController.clear();
+
+
+
                           
                     
                             // Limpiar la lista de productos seleccionados después de guardar la orden
                             setState(() {
                               selectedProducts.clear();
+                              enableButton = true;
                             });
                     
                             // Notificar al usuario que la orden se ha guardado exitosamente
                           });
                         }
-                      },
+                      }: null,
                       child: const Text('Agregar Orden'),
 
                     ),

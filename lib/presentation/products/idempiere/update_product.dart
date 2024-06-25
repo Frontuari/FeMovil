@@ -52,6 +52,7 @@ try {
             "Action": "Update",
             "DataRow": {
                 "field": [
+                
                     {
                         "@column": "Name",
                         "val": encodedName
@@ -123,7 +124,7 @@ try {
   final parsedJson = jsonDecode(responseBody);
 
 
-      print("esta es la respuesta $parsedJson");
+      print("esta es la respuesta $encodedName  $parsedJson");
       return parsedJson;
         } catch (e) {
           return 'este es el error e $e';

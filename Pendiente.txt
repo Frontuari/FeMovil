@@ -94,3 +94,11 @@ validar los distintos casos
 
 36) agregar a los campos necesario poder copiarlos como id de factura, o numero de orden 
 
+Ultima revision ~
+
+Listo / 1) Al crear producto o  editar se cambia parámetros como categoría de producto, tipo de producto etc. Al actualizar no guarda y al sincronizar no genera cambio alguno
+Listo / 2) En clientes puedo ingresar n veces a un mismo cliente con los mismos datos no existe control 
+Listo / 3) En cliente al realizar actualizaciones de datos no actualiza, regresa a los datos originales que ya fueron ingresados
+Listo / 4) Al agregar cliente a la orden y agregar productos no permite ingresar cantidad si no existe stock 
+Listo / 5) Se agrega productos con stoPe queda en pantalla orden de venta. No debe quedar debe ir a la orden generada. Toca salir dando hacia atrás de la orden en blanco y salir de los detalles del cliente y de cliente para buscar la orden creada  o venta.
+6) Adjunto un video de un sistema que se maneja para compras, pero quisiera revises la parte de agregar productos que es muy sencillo y la parte de la orden 

@@ -18,7 +18,6 @@ double syncPercentageSelling = 0.0;
 double syncPercentageImpuestos = 0.0;
 double syncPercentageBankAccount = 0.0;
 bool setearValoresEnCero = true;
-bool isUpdate = true;
 
 class SynchronizationScreen extends StatefulWidget {
   const SynchronizationScreen({super.key});
@@ -75,21 +74,13 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                   child: Column(
                     children: [
                        Padding(
-                        padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                        padding:  const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                         child: Container(
                               margin: const EdgeInsets.only(top: 6),
                             width: 150,
-                          child: Row(
+                          child: const Row(
                             children: [
-                              isUpdate == false ?
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: Colors.yellow,
-                                  borderRadius: BorderRadius.circular(35)
-                                ),
-                              ):Container(),
+                            
                               SizedBox(width: 25,),
                               Text('Productos', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,),
                             ],
@@ -147,7 +138,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                         child: Container(
                           margin: const EdgeInsets.only(top: 6),
                             width: 150,
-                          child: Text('Clientes', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
+                          child: const Text('Clientes', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -211,7 +202,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                         child: Container(
                            margin: const EdgeInsets.only(top: 6),
                             width: 150,
-                          child: Text('Proveedores', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
+                          child: const Text('Proveedores', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -261,11 +252,11 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                        Padding(
-                        padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                        padding:  const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                         child: Container(
                           margin: const EdgeInsets.only(top: 6),
                             width: 155,
-                          child: Text('Ventas', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
+                          child: const Text('Ventas', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -327,7 +318,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                         child: Container(
                           margin: const EdgeInsets.only(top: 6),
                             width: 155,
-                          child: Text('Impuestos', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
+                          child: const Text('Impuestos', style: TextStyle(fontFamily: 'Poppins SemiBold'),textAlign: TextAlign.center,)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -426,7 +417,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
               ],
             ),
           ),
-          SizedBox(height: 25,),
+          const SizedBox(height: 25,),
           Align(
             alignment: Alignment.topCenter,
             child: Container(
@@ -446,7 +437,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
 
                 style: ButtonStyle(
                   elevation:  WidgetStateProperty.all<double>(0),
-                  foregroundColor: WidgetStatePropertyAll(Colors.black),
+                  foregroundColor: const WidgetStatePropertyAll(Colors.black),
                   shape: WidgetStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
                      borderRadius: BorderRadius.circular(8),
                      side: BorderSide.none
@@ -496,7 +487,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                   sincronizationBankAccount(setState);
                   sincronizationPaymentTerms();
                   sincronizationImpuestos(setState);
-                  await synchronizeCustomersWithIdempiere(setState);
+                  await synchronizeCustomersUpdateWithIdempiere(setState);
                   await synchronizeVendorsWithIdempiere(setState);
                   await synchronizeProductsUpdateWithIdempiere(setState);
                   await synchronizeOrderSalesWithIdempiere(setState);
@@ -508,7 +499,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                     setearValoresEnCero = false;
                   });
                 }: null,
-                child:  Text('Sincronizar', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 17, color: _enableButtons ? Color(0XFF7531FF): Color.fromARGB(255, 82, 78, 78)),),
+                child:  Text('Sincronizar', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 17, color: _enableButtons ? const Color(0XFF7531FF): const Color.fromARGB(255, 82, 78, 78)),),
               ),
             ),
           ),

@@ -405,7 +405,6 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) asyn
        totalSyncCount = productsData.length;
       totalProducts += totalSyncCount;
 
-      isUpdate = true;
 
       if (db != null) {
         // Itera sobre los datos de los productos recibidos

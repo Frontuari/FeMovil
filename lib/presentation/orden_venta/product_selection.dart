@@ -245,16 +245,10 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                                                     selectedProductIndex] =
                                                 selectedProduct;
                                           } else {
-                                            if (newQuantity > 0 &&
-                                                newQuantity <=
-                                                    filteredProducts[index]
-                                                        ['quantity']) {
+                                        
                                               selectedProducts
                                                   .add(selectedProduct);
-                                            } else {
-                                              print(
-                                                  'La cantidad seleccionada es mayor que la cantidad disponible');
-                                            }
+                                           
                                           }
                                           productQuantities[productName] =
                                               newQuantity;
@@ -349,13 +343,9 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                         IconButton(
                           onPressed: () {
                             setState(() {
-                              final availableQuantity =
-                                  filteredProducts.firstWhere((product) =>
-                                      product['name'] ==
-                                      productName)['quantity'];
-                              if (selectedQuantity < availableQuantity) {
+                            
                                 selectedQuantity++;
-                              }
+                              
                             });
                           },
                           icon: const Icon(Icons.add),
