@@ -50,6 +50,8 @@ class OrderSales {
     Map<String, dynamic> toMap(){
 
       return {
+          'client':[{'id': clientId }],
+          'order':{
           'id':id,
           'c_doctypetarget_id' : cDoctypeTargetId,
           'ad_client_id': adClientId, 
@@ -66,9 +68,8 @@ class OrderSales {
           'monto': monto,
           'saldo_neto' : saldoNeto,
           'usuario_id': usuarioId,
-          'client_id': clientId, 
-          'status_sincronized': statusSincronized,
-          'lines': lines
+          'status_sincronized': statusSincronized},
+          'products': lines
 
       };
 
