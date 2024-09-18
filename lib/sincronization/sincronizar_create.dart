@@ -5,7 +5,9 @@ import 'package:femovil/infrastructure/models/order_sales.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
+import 'package:femovil/presentation/clients/idempiere/update_customer.dart';
 import 'package:femovil/presentation/products/idempiere/create_product.dart';
+import 'package:femovil/presentation/products/idempiere/update_product.dart';
 import 'package:femovil/presentation/products/products_http.dart';
 import 'package:femovil/presentation/screen/proveedores/idempiere/create_vendor.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
@@ -20,6 +22,10 @@ synchronizeProductsWithIdempiere(setState) async {
   await sincronizationProducts(setState);
   
   for (var productData in productsWithZeroValues) {
+
+    try {
+      
+   
     Product product = Product(
       mProductId: productData['m_product_id'],
       productType: productData['product_type'],
@@ -50,7 +56,162 @@ synchronizeProductsWithIdempiere(setState) async {
     // Limpia los controladores de texto después de guardar el producto
     await updateProductMProductIdAndCodProd(
         productData['id'], mProductId, codProdc);
+         } catch (e) {
+
+          print('este es el error $e');
+          continue;
+    }
   }
+}
+
+int totalProducts = 0;
+int syncedProducts = 0;
+int currentSyncCount = 0;
+int totalSyncCount = 0;
+
+void updateSyncPercentage(setState) {
+  setState(() {
+    syncPercentage = (syncedProducts / totalProducts) * 100;
+  });
+}
+
+
+
+synchronizeProductsUpdateWithIdempiere(setState) async {
+  List<Map<String, dynamic>> products =
+      await getProductsNotZeroValues();
+
+  print('Estos son los productos en actualizacion $products');
+
+   totalSyncCount = products.length;
+  totalProducts += totalSyncCount;
+
+
+  for (var productData in products) {
+    try {
+      
+    Product product = Product(
+      mProductId: productData['m_product_id'],
+      productType: productData['product_type'],
+      productTypeName: productData['product_type_name'],
+      codProd: productData['cod_product'],
+      prodCatId: productData['pro_cat_id'],
+      taxName: productData['tax_cat_name'],
+      productGroupId: productData['product_group_id'],
+      produtGroupName: productData['product_group_name'],
+      umId: productData['um_id'],
+      umName: productData['um_name'],
+      name: productData['name'],
+      price: productData['price'],
+      quantity: productData['quantity'],
+      categoria: productData['categoria'],
+      qtySold: productData['total_sold'],
+      taxId: productData['tax_cat_id'],
+      priceListSales: productData['pricelistsales'],
+    );
+    dynamic result = await updateProductIdempiere(product.toMap());
+    print('este es el $result');
+
+    final mProductId =
+        result['StandardResponse']['outputFields']['outputField'][0]['@value'];
+    final codProdc =
+        result['StandardResponse']['outputFields']['outputField'][1]['@value'];
+    print('Este es el mp product id $mProductId && el codprop $codProdc');
+    // Limpia los controladores de texto después de guardar el producto
+ 
+
+           } catch (e) {
+          print('Este es el error $e');
+      continue;
+
+    } finally {
+        syncedProducts++;
+        updateSyncPercentage(setState);
+      }
+  }
+
+   await synchronizeProductsWithIdempiere(setState);
+
+}
+
+
+synchronizeCustomersUpdateWithIdempiere(setState) async {
+  List<Map<String, dynamic>> customers =
+      await getCustomers();
+  int contador = 0;
+  // await sincronizationCustomers(setState);
+
+  print('Esto es custommer en cero $customers');
+  
+  for (var customersData in customers) {
+    try {
+      Customer customer = Customer(
+          cbPartnerId: customersData['c_bpartner_id'],
+          codClient: customersData['cod_client'],
+          isBillTo: 'Y',
+          address: customersData['address'],
+          bpName: customersData['bp_name'],
+          cBpGroupId: customersData['c_bp_group_id'],
+          cBpGroupName: customersData['group_bp_name'],
+          cBparnetLocationId: 0,
+          cCityId: customersData['c_city_id'],
+          cCountryId: customersData['c_country_id'],
+          cLocationId: 0, 
+          cRegionId: 0,
+          city: customersData['city'],
+          codePostal: customersData['code_postal'],
+          country: customersData['country'],
+          email: customersData['email'],
+          lcoTaxIdTypeId: customersData['lco_tax_id_typeid'],
+          lcoTaxPayerTypeId: customersData['lco_tax_payer_typeid'],
+          lvePersonTypeId: customersData['lve_person_type_id'],
+          personTypeName: customersData['person_type_name'],
+          phone: customersData['phone'],
+          region: customersData['region'],
+          ruc: customersData['ruc'],
+          taxIdTypeName: customersData['tax_id_type_name'],
+          taxPayerTypeName: customersData['tax_payer_type_name']
+      );
+
+      dynamic result = await updateCustomerIdempiere(customer.toMap());
+      print('este es el $result');
+
+          contador++;
+
+         
+            
+                    setState(() {
+                      
+                          syncPercentageClient = (contador / customersData.length) * 100;
+
+                    });
+
+
+      final cBParnertId =
+          result['CompositeResponses']['CompositeResponse']
+          ['StandardResponse'][0]['outputFields']
+          ['outputField'][0]['@value'];
+      final newCodClient =
+          result['CompositeResponses']['CompositeResponse']
+          ['StandardResponse'][0]['outputFields']
+          ['outputField'][1]['@value'];
+      final cLocationId =  result['CompositeResponses']['CompositeResponse']
+          ['StandardResponse'][1]['outputFields']
+          ['outputField']['@value'];
+      final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
+          ['StandardResponse'][2]['outputFields']
+          ['outputField']['@value'];
+
+      print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
+
+    } catch (error) {
+      print('Error al procesar cliente: $error');
+      // Continuar con el siguiente cliente
+      continue;
+    
+    } 
+  }
+  synchronizeCustomersWithIdempiere(setState);
 }
 
 synchronizeCustomersWithIdempiere(setState) async {
@@ -117,7 +278,8 @@ synchronizeCustomersWithIdempiere(setState) async {
       print('Error al procesar cliente: $error');
       // Continuar con el siguiente cliente
       continue;
-    }
+    
+    } 
   }
 }
 

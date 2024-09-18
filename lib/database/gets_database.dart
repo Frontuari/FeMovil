@@ -47,6 +47,20 @@ Future<List<Map<String, dynamic>>> getProducts() async {
   }
 }
 
+Future<List<Map<String, dynamic>>> getProductsNotZeroValues() async {
+  final db = await DatabaseHelper.instance.database;
+  if (db != null) {
+    // Realiza la consulta para recuperar todos los registros de la tabla "products"
+    return await db.query('products',
+    where:'cod_product != 0 AND m_product_id != 0'
+    );
+  } else {
+    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+    print('Error: db is null');
+    return [];
+  }
+}
+
 Future<List<Map<String, dynamic>>> getTaxs() async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {
@@ -453,6 +467,16 @@ Future<List<Map<String, dynamic>>> getCustomersWithZeroValues() async {
   return [];
 }
 
+
+Future<List<Map<String, dynamic>>> getCustomers() async {
+  final db = await DatabaseHelper.instance.database;
+  if (db != null) {
+    return await db.query('clients' 
+    );
+  }
+  return [];
+}
+
 Future<List<Map<String, dynamic>>> getVendorWithZeroValues() async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {
@@ -653,8 +677,9 @@ Future<Map<String, dynamic>> obtenerOrdenDeVentaConLineasPorId(
 
 Future<Map<String, dynamic>> obtenerOrdenDeCompraConLineasPorId(
     int orderId) async {
-  print(
-      'Entre aqui a obtenerordedecomprasconlineas y esta es el orderid $orderId');
+
+  print('Entre aqui a obtener orde de compras conlineas y esta es el orderid $orderId');
+  
   final db = await DatabaseHelper.instance.database;
 
   final List<Map<String, dynamic>> resultado = await db!.rawQuery('''
@@ -759,11 +784,13 @@ Future<Map<String, dynamic>?> getClientById(int clientId) async {
       // Si no se encontró ningún cliente con el ID especificado, devuelve null
       return null;
     }
+
   } else {
     // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
     print('Error: db is null');
     return null;
   }
+    
 }
 
 Future<List<Map<String, dynamic>>> getSalesOrdersHeader () async {
@@ -788,6 +815,62 @@ Future<List<Map<String, dynamic>>> getSalesOrdersHeader () async {
 
 
 }
+
+
+
+Future<bool> proveedorExists(String ruc) async {
+  final db = await DatabaseHelper.instance.database;
+
+  if (db != null) {
+    // Realiza la consulta para recuperar el cliente con el ID especificado
+    List<Map<String, dynamic>> results = await db.query(
+      'providers',
+      where: 'tax_id = ?',
+      whereArgs: [ruc],
+    );
+
+    // Verifica si se encontró un cliente con el ID especificado
+    if (results.isNotEmpty) {
+      // Devuelve el primer cliente encontrado (debería ser único ya que se filtra por ID)
+      return true;
+    } else {
+      // Si no se encontró ningún cliente con el ID especificado, devuelve null
+      return false;
+    }
+  } else {
+    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+    print('Error: db is null');
+    return false;
+  }
+}
+
+
+Future<bool> customerExists(String ruc) async {
+  final db = await DatabaseHelper.instance.database;
+
+  if (db != null) {
+    // Realiza la consulta para recuperar el cliente con el ID especificado
+    List<Map<String, dynamic>> results = await db.query(
+      'clients',
+      where: 'ruc = ?',
+      whereArgs: [ruc],
+    );
+
+    // Verifica si se encontró un cliente con el ID especificado
+    if (results.isNotEmpty) {
+      // Devuelve el primer cliente encontrado (debería ser único ya que se filtra por ID)
+      return true;
+    } else {
+      // Si no se encontró ningún cliente con el ID especificado, devuelve null
+      return false;
+    }
+  } else {
+    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+    print('Error: db is null');
+    return false;
+  }
+}
+
 
 Future<Map<String, dynamic>?> getVendorsById(int vendorId) async {
   final db = await DatabaseHelper.instance.database;

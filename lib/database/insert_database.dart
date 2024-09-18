@@ -84,17 +84,17 @@ Future<void> insertTaxData() async {
     final db = await DatabaseHelper.instance.database;
     if (db != null) {
       // Verificar la disponibilidad de productos antes de insertar la orden
-      for (Map<String, dynamic> product in order['productos']) {
-        final productId = product['id'];
-        final productName = product['name'];
-        final productQuantity = product['quantity'];
-        final productAvailableQuantity = await getProductAvailableQuantity(productId);
-        if (productQuantity > productAvailableQuantity) {
-          // Si la cantidad solicitada es mayor que la cantidad disponible, mostrar un mensaje de error
-          print('Error: Producto con ID $productId no tiene suficiente stock disponible.');
-          return {"failure": -1, "Error":"Producto $productName no tiene suficiente stock disponible." };
-        }
-      }
+      // for (Map<String, dynamic> product in order['productos']) {
+      //   final productId = product['id'];
+      //   final productName = product['name'];
+      //   final productQuantity = product['quantity'];
+      //   final productAvailableQuantity = await getProductAvailableQuantity(productId);
+      //   if (productQuantity > productAvailableQuantity) {
+      //     // Si la cantidad solicitada es mayor que la cantidad disponible, mostrar un mensaje de error
+      //     print('Error: Producto con ID $productId no tiene suficiente stock disponible.');
+      //     return {"failure": -1, "Error":"Producto $productName no tiene suficiente stock disponible." };
+      //   }
+      // }
 
       // Insertar la orden de venta en la tabla 'orden_venta'
       int orderId = await db.insert('orden_venta', {

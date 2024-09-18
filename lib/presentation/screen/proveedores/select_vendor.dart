@@ -335,7 +335,7 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
               return DropdownMenuItem<int>(
                 value: ciiu['lco_isic_id'] as int,
                 child: SizedBox(
-                    width: mediaScreen * 0.8, child: Text(ciiu['cod_ciiu'] != null ? '(${ciiu['cod_ciiu']}) ${ciiu['name']}': ciiu['name'], style: TextStyle(fontFamily: 'Poppins Regular'),)),
+                    width: mediaScreen * 0.7, child: Text(ciiu['cod_ciiu'] != null ? '(${ciiu['cod_ciiu']}) ${ciiu['name']}': ciiu['name'], style: TextStyle(fontFamily: 'Poppins Regular'),)),
               );
             }).toList(),
             onChanged: (newValue) {

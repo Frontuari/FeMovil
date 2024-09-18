@@ -20,13 +20,13 @@ try {
   
   for (var row in dataRows) {
     Map<String, dynamic> bankAccountData = {
-      'c_bank_id': row['field'][0]['val'],
-      'bank_name': row['field'][1]['val'],
-      'routing_no': row['field'][2]['val'],
-      'c_bank_account_id': row['field'][3]['val'],
-      'account_no': row['field'][4]['val'],
-      'c_currency_id':row['field'][5]['val'],
-      'iso_code': row['field'][6]['val']
+      'c_bank_id': row['field'].firstWhere((field) => field['@column'] == 'C_Bank_ID')['val'],
+      'bank_name': row['field'].firstWhere((field) => field['@column'] == 'BankName')['val'],
+      'routing_no': row['field'].firstWhere((field) => field['@column'] == 'RoutingNo')['val'],
+      'c_bank_account_id': row['field'].firstWhere((field) => field['@column'] == 'C_BankAccount_ID')['val'],
+      'account_no': row['field'].firstWhere((field) => field['@column'] == 'AccountNo')['val'],
+      'c_currency_id':row['field'].firstWhere((field) => field['@column'] == 'C_Currency_ID')['val'],
+      'iso_code': row['field'].firstWhere((field) => field['@column'] == 'ISO_Code')['val']
      // Asegúrate de convertir la cantidad a un tipo numérico adecuado
       // Añade otros campos que necesites sincronizar
 

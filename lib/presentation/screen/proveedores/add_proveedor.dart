@@ -746,6 +746,49 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     String ciiuTagText = _ciiuActivitiesText;
     // Crea una instancia del producto
 
+   bool ifExists = await proveedorExists(taxId);
+
+if (ifExists) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Proveedor ya registrado',
+          style: TextStyle(
+            fontFamily: 'Poppins SemiBold',
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'El proveedor con el ID fiscal proporcionado ya está registrado en el sistema.',
+          style: TextStyle(
+            fontFamily: 'Poppins Regular',
+            fontSize: 16,
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: Text(
+              'Aceptar',
+              style: TextStyle(
+                fontFamily: 'Poppins SemiBold',
+                fontSize: 16,
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+
+  return;
+}
+
+
     Vendor provider = Vendor(
         cBPartnerId: 0,
         cCodeId: 0,
