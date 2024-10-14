@@ -4,6 +4,7 @@ import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/database/update_database.dart';
 import 'package:femovil/presentation/clients/select_customer.dart';
+import 'package:femovil/presentation/cobranzas/cobranzas_list.dart';
 import 'package:femovil/presentation/cobranzas/idempiere/create_cobro.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class _CobroState extends State<Cobro> {
     List<Map<String, dynamic>> typeCoinsList = [];
   List<Map<String, dynamic>> cobrosList = [];
   late Future<void> _bankAccFuture;
-  bool disabledButton = true;
+  bool enabledButton = true;
   // Selecteds 
 
   int _selectsBankAccountId =  0; 
@@ -717,37 +718,36 @@ _bankAccFuture = _getBankAcc();
                                                 ),
                                      
                                             ),  
-                                              SizedBox(height: heightScreen * 0.025,),
+                                            SizedBox(height: heightScreen * 0.025),
               
-                                               ElevatedButton(
-                                                    onPressed: orderData['status_sincronized'] == 'Enviado' && orderData['saldo_total'] > 0 && disabledButton ?   () async {                                                             
+                                            ElevatedButton(
+                                              onPressed: orderData['status_sincronized'] == 'Enviado' && orderData['saldo_total'] > 0 && enabledButton ? () async {                                                             
                                      
-                                                            if (_formKey.currentState!.validate()) {
+                                                if (_formKey.currentState!.validate()) {
 
-                                                                  setState(() {
-                                                                    disabledButton = false;
-                                                                  });
-                                                                   await _createCobro();
+                                                  setState(() {
+                                                    enabledButton = false;
+                                                  });
+                                                  
+                                                  await _createCobro();
               
-                                                                  setState(() {
-                                                                  _ordenVenta = _loadOrdenVentasForId();
-                                                                  });
+                                                  setState(() {
+                                                    _ordenVenta = _loadOrdenVentasForId();
+                                                  });
                                                                
-                                                            }
-                                                    } : null,
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: (const Color(0xFF7531FF)),
-                                                      foregroundColor: Colors.white, // Color de fondo verde
-                                                      minimumSize: Size(screenMax * 0.85, 50),
-                                                       // Ancho máximo y altura de 50
-                                                    ),
-                                                    child: const Text(
-                                                      'Crear Cobro',
-                                                      style: TextStyle(fontSize: 16, fontFamily: 'Poppins Bold'), // Tamaño de fuente 16
-                                                    ),
-                                                  ),
-                                             SizedBox(height: heightScreen * 0.025,),
-              
+                                                }
+                                              } : null,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: (const Color(0xFF7531FF)),
+                                                foregroundColor: Colors.white, // Color de fondo verde
+                                                minimumSize: Size(screenMax * 0.85, 50), // Ancho máximo y altura de 50
+                                              ),
+                                              child: Text(
+                                                !enabledButton ? 'Procesando...' : 'Crear Cobro',
+                                                style: TextStyle(fontSize: 16, fontFamily: 'Poppins Bold'), // Tamaño de fuente 16
+                                              ),
+                                            ),
+                                            SizedBox(height: heightScreen * 0.025),              
                                                                                   
                                           ],
                                         ),
@@ -766,160 +766,155 @@ _bankAccFuture = _getBankAcc();
     );
   }
 
- Future<void> _createCobro() async {
-  final dynamic bankAccountId = _selectsBankAccountId;
-  //Tipo del documento de cobro
-  final dynamic cDocTypeId = variablesG[0]['c_doctypereceipt_id'];
-  final dynamic dateTrx = _fechaIdempiereController.text;
-  final dynamic description = observacionController.text;
-  final dynamic cBPartnerId = cBPartnerIds;
-  final double payAmt = double.parse(montoController.text);
-  final dynamic currencyId = _selectTypeCoins;
-  final dynamic cOrderId = widget.cOrderId;
-  final dynamic cInvoiceId = widget.idFactura;
-  final dynamic tenderType = _selectTypePayment;
-  final String typeMoney = _currencyText;
-  final String bankAccount = _bankAccountText;
-  final String tenderTypeT = paymentTypeValue!;
+  Future<void> _createCobro() async {
+    final dynamic bankAccountId = _selectsBankAccountId;
+    //Tipo del documento de cobro
+    final dynamic cDocTypeId = variablesG[0]['c_doctypereceipt_id'];
+    final dynamic dateTrx = _fechaIdempiereController.text;
+    final dynamic description = observacionController.text;
+    final dynamic cBPartnerId = cBPartnerIds;
+    final double payAmt = double.parse(montoController.text);
+    final dynamic currencyId = _selectTypeCoins;
+    final dynamic cOrderId = widget.cOrderId;
+    final dynamic cInvoiceId = widget.idFactura;
+    final dynamic tenderType = _selectTypePayment;
+    final String typeMoney = _currencyText;
+    final String bankAccount = _bankAccountText;
+    final String tenderTypeT = paymentTypeValue!;
 
-  print('Esto es numRef ${numRefController.text}  es currencyId $currencyId y este es el orderId $cOrderId y este es el id de la factura $cInvoiceId');
+    print('Esto es numRef ${numRefController.text}  es currencyId $currencyId y este es el orderId $cOrderId y este es el id de la factura $cInvoiceId');
 
-  // final int documentNo = int.parse(numRefController.text == 'Sin registro'  ? numRefController.text = '0': numRefController.text);
+    // final int documentNo = int.parse(numRefController.text == 'Sin registro'  ? numRefController.text = '0': numRefController.text);
 
-  final String date = dateController.text;
+    final String date = dateController.text;
 
-  final int saleOrderId = widget.orderId;
+    final int saleOrderId = widget.orderId;
 
-  // Obtener el saldo total de la orden
+    // Obtener el saldo total de la orden
 
-  final double saldoTotal;
+    final double saldoTotal;
 
-  if (orderData['saldo_total'] is double) {
-  saldoTotal = orderData['saldo_total'];
-} else if (orderData['saldo_total'] is String) {
-  saldoTotal = double.parse(orderData['saldo_total']);
-} else {
-  // Manejar el caso en el que `saldo_total` no sea ni `double` ni `String`
-  throw Exception('El tipo de saldo_total no es ni double ni String');
-}
-
-
-
-  if (payAmt > saldoTotal) {
-    // Si el monto del cobro es mayor al saldo total, mostrar mensaje de diálogo
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: const Text('El cobro no puede ser mayor al saldo total de la orden.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo
-              },
-              child: const Text('Cerrar'),
-            ),
-          ],
-        );
-      },
-    );
-  } else if (payAmt <= 0 || saldoTotal <= 0 ) {
-
-       showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: const Text('El cobro no puede ser menor o igual a 0.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo
-              },
-              child: const Text('Cerrar'),
-            ),
-          ],
-        );
-      },
-    );
-      
-
-  } else {
-    // Si el monto del cobro es menor o igual al saldo total, insertar el cobro en la base de datos
+    if (orderData['saldo_total'] is double) {
+      saldoTotal = orderData['saldo_total'];
+    } else if (orderData['saldo_total'] is String) {
+      saldoTotal = double.parse(orderData['saldo_total']);
+    } else {
+      // Manejar el caso en el que `saldo_total` no sea ni `double` ni `String`
+      throw Exception('El tipo de saldo_total no es ni double ni String');
+    }
 
 
-    Map<String, dynamic> cobro = {
-      "c_bankaccount_id" : bankAccountId, 
-      "c_doctype_id" : cDocTypeId, 
-      "date_trx" : dateTrx, 
-      "description" : description,
-      "c_bpartner_id": cBPartnerId, 
-      "pay_amt": payAmt.toStringAsFixed(2), 
-      "c_currency_id": _selectCurrencyId,
-      "c_order_id":  cOrderId, 
-      "c_invoice_id": cInvoiceId,
-      "tender_type": tenderType,
-      "c_number_ref": numRefController.text      
+    if (payAmt > saldoTotal) {
+      // Si el monto del cobro es mayor al saldo total, mostrar mensaje de diálogo
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('El cobro no puede ser mayor al saldo total de la orden.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cerrar el diálogo
+                },
+                child: const Text('Cerrar'),
+              ),
+            ],
+          );
+        },
+      );
+    } 
+    else if (payAmt <= 0 || saldoTotal <= 0 ) {
 
-    };
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('El cobro no puede ser menor o igual a 0.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cerrar el diálogo
+                },
+                child: const Text('Cerrar'),
+              ),
+            ],
+          );
+        },
+      );
+    } 
+    else {
+      // Si el monto del cobro es menor o igual al saldo total, insertar el cobro en la base de datos
+      Map<String, dynamic> cobro = {
+        "c_bankaccount_id" : bankAccountId, 
+        "c_doctype_id" : cDocTypeId, 
+        "date_trx" : dateTrx, 
+        "description" : description,
+        "c_bpartner_id": cBPartnerId, 
+        "pay_amt": payAmt.toStringAsFixed(2), 
+        "c_currency_id": _selectCurrencyId,
+        "c_order_id":  cOrderId, 
+        "c_invoice_id": cInvoiceId,
+        "tender_type": tenderType,
+        "c_number_ref": numRefController.text     
+      };
 
+      int cobroId = await insertCobro(
+        cBankAccountId: bankAccountId,
+        cDocTypeId: cDocTypeId,
+        dateTrx: dateTrx,
+        date: date,
+        description: description,
+        cBPartnerId: cBPartnerId,
+        payAmt: payAmt.toStringAsFixed(2),
+        cCurrencyId: _selectCurrencyId,
+        cOrderId: cOrderId,
+        cInvoiceId: cInvoiceId,
+        documentNo: 0,
+        tenderType: tenderType ,
+        saleOrderId: saleOrderId,
+        bankAccountT: bankAccount,
+        cCurrencyIso: typeMoney,
+        tenderTypeName: tenderTypeT ,
+      );
 
-    int cobroId = await insertCobro(
-      cBankAccountId: bankAccountId,
-      cDocTypeId: cDocTypeId,
-      dateTrx: dateTrx,
-      date: date,
-      description: description,
-      cBPartnerId: cBPartnerId,
-      payAmt: payAmt.toStringAsFixed(2),
-      cCurrencyId: _selectCurrencyId,
-      cOrderId: cOrderId,
-      cInvoiceId: cInvoiceId,
-      documentNo: 0,
-      tenderType: tenderType ,
-      saleOrderId: saleOrderId,
-      bankAccountT: bankAccount,
-      cCurrencyIso: typeMoney,
-      tenderTypeName: tenderTypeT ,
-    );
+      // setState(() {
+        // _loadOrdenVentasForId();
+      // });
 
-    // setState(() {
-      
-    // _loadOrdenVentasForId();
-    // });
+      dynamic response = await createCobroIdempiere(cobro);
 
-   
-
-   dynamic response = await createCobroIdempiere(cobro);
-
-    dynamic numDoc = response['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
-    print('Esto es cobroId $cobroId, y numdoc $numDoc');
+      dynamic numDoc = response['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
+      print('Esto es cobroId $cobroId, y numdoc $numDoc');
     
-    await updateDocumentNoCobro(cobroId, numDoc);
+      await updateDocumentNoCobro(cobroId, numDoc);
       
-    print('NumDoc $numDoc');
-    print("esto es el cobro $cobro y la respuesta $response" );
+      print('NumDoc $numDoc');
+      print("esto es el cobro $cobro y la respuesta $response" );
 
 
-    // Limpiar los campos de texto después de insertar el cobro
-    numRefController.clear();
-    montoController.clear();
-    observacionController.clear();
+      // Limpiar los campos de texto después de insertar el cobro
+      numRefController.clear();
+      montoController.clear();
+      observacionController.clear();
     
+      setState(() {
+        _selectCurrencyId = 0;
+        _selectsBankAccountId = 0;
+        enabledButton = true;
+      });
+
+      // Mostrar un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cobro creado con éxito')));
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Cobranzas()));
+    }
+
     setState(() {
-      _selectCurrencyId = 0;
-      _selectsBankAccountId = 0;
-      disabledButton = true;
-
+      enabledButton = true;
     });
-
-    // Mostrar un mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cobro creado con éxito')));
   }
-}
-
-
 }
 
 

@@ -7,6 +7,7 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
   final String text;
   final List<Map<String, dynamic>> dataList;
   final Function(int?, String) onSelected;
+  final bool readOnly;
 
   const CustomDropdownButtonFormFieldVendor(
       {super.key,
@@ -14,7 +15,8 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
       required this.selectedIndex,
       required this.dataList,
       required this.text,
-      required this.onSelected});
+      required this.onSelected,
+      this.readOnly = false});
 
   @override
   Widget build(BuildContext context) {
@@ -76,20 +78,14 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none)),
-            validator: (value) {
-              if (value == null || value == 0) {
-                return 'Por favor selecciona un grupo';
-              }
-              return null;
-            },
           ),
         );
-      case 'taxTypeVendor':
+      case 'idTypeVendor':
         return Container(
           height: mediaScreen * 0.20,
           width: mediaScreen,
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: readOnly ? Colors.grey.shade300 : Colors.white,
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
@@ -112,11 +108,14 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                     width: mediaScreen * 0.70,
                     child: Text(
                       group['tax_id_type_name'] as String,
-                      style: const TextStyle(fontFamily: 'Poppins Regular'),
+                      style: const TextStyle(
+                        fontFamily: 'Poppins Regular', 
+                        color: Colors.black
+                      ),
                     )),
               );
             }).toList(),
-            onChanged: (newValue) {
+            onChanged: readOnly ? null : (newValue) {
               print('esto es el taxList ${dataList}');
               String nameGroup =
                   invoke('obtenerNombreTaxVendor', newValue, dataList);
@@ -129,7 +128,7 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: readOnly ? Colors.grey.shade300 : Colors.white,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none),
@@ -141,7 +140,7 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
                     borderSide: BorderSide.none)),
             validator: (value) {
               if (value == null || value == 0) {
-                return 'Por favor selecciona un tipo de impuesto';
+                return 'Por favor, selecciona un tipo de identificación';
               }
               return null;
             },

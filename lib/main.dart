@@ -74,7 +74,6 @@ class _MyAppState extends State<MyApp> {
         '/home' :(context) => const Home(),
         '/perfil':(context) =>  const Perfil(),
         '/products':(context) =>  const Products(),
-
         '/informacion':(context) =>  const Informacion(),
       },
     );

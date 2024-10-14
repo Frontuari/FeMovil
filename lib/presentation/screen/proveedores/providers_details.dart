@@ -10,6 +10,8 @@ class ProvidersDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('data proveedor: $provider');
+
     final screenMax = MediaQuery.of(context).size.width * 0.8;
 
     return Scaffold(
@@ -180,100 +182,77 @@ class ProvidersDetailsScreen extends StatelessWidget {
                             SizedBox(
                               height: screenMax * 0.040,
                             ),
+
+                            // DOMICILIO FISCAL
                             SizedBox(
                               width: screenMax,
-                              child: const Text(
-                                'Domicilio Fiscal',
-                                style: TextStyle(
-                                    fontFamily: 'Poppins Bold', fontSize: 18),
-                              ),
+                              child: const Text('Domicilio Fiscal', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18)),
                             ),
-                            SizedBox(
-                              height: screenMax * 0.040,
+                            SizedBox(height: screenMax * 0.040),
+                            
+                            // PAIS
+                            Row(
+                              children: [
+                                const Text('País: ', style: TextStyle(fontFamily: 'Poppins Bold')),
+                                Flexible(
+                                  child: Text(
+                                    provider['country_name'] != '{@nil=true}' ? provider['country_name'].toString() : '',
+                                    style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                    overflow: TextOverflow.clip,
+                                  )
+                                )
+                              ],
                             ),
+                            // PROVINCIA
+                            Row(
+                              children: [
+                                const Text('Provincia: ', style: TextStyle(fontFamily: 'Poppins Bold')),
+                                Flexible(
+                                  child: Text(
+                                    provider['province'] != '{@nil=true}' ? provider['province'].toString() : '',
+                                    style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                    overflow: TextOverflow.clip,
+                                  )
+                                )
+                              ],
+                            ),
+                            // CIUDAD
+                            Row(
+                              children: [
+                                const Text('Ciudad: ', style: TextStyle(fontFamily: 'Poppins Bold')),
+                                Flexible(
+                                  child: Text(
+                                    provider['city'] != '{@nil=true}' ? provider['city'].toString() : '',
+                                    style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                    overflow: TextOverflow.clip,
+                                  )
+                                )
+                              ],
+                            ),
+                            // DIRECCION
                             Container(
-                                width: screenMax,
-                                child: const Text(
-                                  'Dirección: ',
-                                  style: TextStyle(fontFamily: 'Poppins Bold'),
-                                  textAlign: TextAlign.start,
-                                )),
-                            Container(
-                                width: screenMax,
-                                child: Text(
-                                  provider['address'] != '{@nil=true}'
-                                      ? provider['address'].toString()
-                                      : '',
-                                  style: const TextStyle(
-                                      fontFamily: 'Poppins Regular'),
-                                  overflow: TextOverflow.clip,
-                                )),
-                            Row(
-                              children: [
-                                const Text(
-                                  'Provincia: ',
-                                  style: TextStyle(fontFamily: 'Poppins Bold'),
-                                ),
-                                Flexible(
-                                    child: Text(
-                                  provider['province'] != '{@nil=true}'
-                                      ? provider['province'].toString()
-                                      : '',
-                                  style: const TextStyle(
-                                      fontFamily: 'Poppins Regular'),
-                                  overflow: TextOverflow.clip,
-                                ))
-                              ],
+                              width: screenMax,
+                              child: const Text('Dirección: ', style: TextStyle(fontFamily: 'Poppins Bold'), textAlign: TextAlign.start)
                             ),
+                            provider['address'].toString() != '{@nil=true}' ? Container(
+                              width: screenMax,
+                              child: Text(
+                                provider['address'].toString(), 
+                                style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                overflow: TextOverflow.clip,
+                              )
+                            ) : Container(),
+                            // CODIGO POSTAL
                             Row(
                               children: [
-                                const Text(
-                                  'Ciudad: ',
-                                  style: TextStyle(fontFamily: 'Poppins Bold'),
-                                ),
+                                const Text('Codigo Postal: ', style: TextStyle(fontFamily: 'Poppins Bold')),
                                 Flexible(
-                                    child: Text(
-                                  provider['city'] != '{@nil=true}'
-                                      ? provider['city'].toString()
-                                      : '',
-                                  style: const TextStyle(
-                                      fontFamily: 'Poppins Regular'),
-                                  overflow: TextOverflow.clip,
-                                ))
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Text(
-                                  'País: ',
-                                  style: TextStyle(fontFamily: 'Poppins Bold'),
-                                ),
-                                Flexible(
-                                    child: Text(
-                                  provider['country_name'] != '{@nil=true}'
-                                      ? provider['country_name'].toString()
-                                      : '',
-                                  style: const TextStyle(
-                                      fontFamily: 'Poppins Regular'),
-                                  overflow: TextOverflow.clip,
-                                ))
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Text(
-                                  'Codigo Postal: ',
-                                  style: TextStyle(fontFamily: 'Poppins Bold'),
-                                ),
-                                Flexible(
-                                    child: Text(
-                                  provider['postal'] != '{@nil=true}'
-                                      ? provider['postal'].toString()
-                                      : '',
-                                  style: const TextStyle(
-                                      fontFamily: 'Poppins Regular'),
-                                  overflow: TextOverflow.clip,
-                                ))
+                                  child: Text(
+                                    provider['postal'] != '{@nil=true}' ? provider['postal'].toString() : '',
+                                    style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                    overflow: TextOverflow.clip,
+                                  )
+                                )
                               ],
                             ),
                           ],

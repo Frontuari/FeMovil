@@ -6,8 +6,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
-
-
 Future addConfig(url, token) async {
   final info = await getApplicationSupportDirectory();
   print('Esto es temporal $info');
@@ -70,8 +68,6 @@ class _ConfiguracionState extends State<Configuracion> {
     super.initState();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     // final saludo = dotenv.env['Hola'];
@@ -82,122 +78,119 @@ class _ConfiguracionState extends State<Configuracion> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-      preferredSize: const Size.fromHeight(170), // Altura del AppBar
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(50), // Radio del borde redondeado
-        ),
-        child: AppBar(
-          leading: IconButton(
-              icon: Image.asset('lib/assets/Atras@3x.png', width: 25, height: 25,), // Reemplaza 'tu_imagen.png' con la ruta de tu imagen en los assets
+        preferredSize: const Size.fromHeight(170), // Altura del AppBar
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(50), // Radio del borde redondeado
+          ),
+          child: AppBar(
+            leading: IconButton(
+              icon: Image.asset(
+                'lib/assets/Atras@3x.png',
+                width: 25,
+                height: 25,
+              ),
+              // Reemplaza 'tu_imagen.png' con la ruta de tu imagen en los assets
               onPressed: () {
                 // Acción al presionar el botón de flecha hacia atrás
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const Login()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Login()));
               },
             ),
-
-          flexibleSpace: Stack(
-            children: [
-              CustomPaint(
-                painter: CirclePainter(),
-              ),
-              const Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 20), // Ajuste de la posición vertical
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                   
-
-                      Text(
-                        'Configuración',
-                        style: TextStyle(
-                          fontFamily: 'Poppins ExtraBold',
-                          color: Colors.white,
-                          fontSize: 30, // Tamaño del texto
-                          shadows: <Shadow>[
-                            Shadow(
-                              offset: Offset(2, 2),
-                              blurRadius: 3.0,
-                              color: Colors.grey,
-                            )
-                          ],
+            flexibleSpace: Stack(
+              children: [
+                CustomPaint(
+                  painter: CirclePainter(),
+                ),
+                const Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    // Ajuste de la posición vertical
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Configuración',
+                          style: TextStyle(
+                            fontFamily: 'Poppins ExtraBold',
+                            color: Colors.white,
+                            fontSize: 30, // Tamaño del texto
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(2, 2),
+                                blurRadius: 3.0,
+                                color: Colors.grey,
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10,),
-                              Text(
-                        'Configura el servidor',
-                        style: TextStyle(
-                          fontFamily: 'Poppins Regular',
-                          color: Colors.white,
-                          fontSize: 12, // Tamaño del texto
-                          shadows: <Shadow>[
-                            Shadow(
-                              offset: Offset(2, 2),
-                              blurRadius: 3.0,
-                              color: Colors.grey,
-                            )
-                          ],
+                        SizedBox(
+                          height: 10,
                         ),
-                      ),
-                    ],
+                        Text(
+                          'Configura el servidor',
+                          style: TextStyle(
+                            fontFamily: 'Poppins Regular',
+                            color: Colors.white,
+                            fontSize: 12, // Tamaño del texto
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(2, 2),
+                                blurRadius: 3.0,
+                                color: Colors.grey,
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
+            backgroundColor: const Color(0xFF7531FF), // Color hexadecimal
           ),
-          backgroundColor: const Color(0xFF7531FF), // Color hexadecimal
         ),
       ),
-    )
-,
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus(); // Cierra el teclado virtual
         },
         child: SingleChildScrollView(
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            const SizedBox(height: 120),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
+          child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              const SizedBox(height: 120),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-               
                       const SizedBox(width: 8),
-                   
                       Container(
                         width: 300,
                         height: 50,
-
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              9.0), // Ajusta el radio de las esquinas
+                          borderRadius: BorderRadius.circular(9.0), // Ajusta el radio de las esquinas
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey
-                                  .withOpacity(0.2), // Color de la sombra
+                              color: Colors.grey.withOpacity(0.2), // Color de la sombra
                               spreadRadius: 2, // Extensión de la sombra
                               blurRadius: 3, // Difuminado de la sombra
-                              offset: const Offset(
-                                  0, 2), // Desplazamiento de la sombra
+                              offset: const Offset(0, 2), // Desplazamiento de la sombra,
                             ),
                           ],
                         ),
                         child: TextField(
-                      
                           controller: textUrlController,
                           decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
-                              hintText: 'Url', // Tu placeholder
-
+                              hintText: 'Url',
                               contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 2.0, horizontal: 20.0), // A
+                                  vertical: 2.0,
+                                  horizontal: 20.0
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                                 borderSide: BorderSide.none,
@@ -207,10 +200,8 @@ class _ConfiguracionState extends State<Configuracion> {
                                 child: openButton
                                     ? Image.asset(
                                         'lib/assets/Check.png', // Reemplaza con la ruta correcta de tu imagen
-                                        width:
-                                            20, // Ajusta el ancho de la imagen según tus preferencias
-                                        height:
-                                            20, // Ajusta la altura de la imagen según tus preferencias
+                                        width: 20, // Ajusta el ancho de la imagen según tus preferencias
+                                        height: 20, // Ajusta la altura de la imagen según tus preferencias
                                       )
                                     : null,
                               )),
@@ -224,13 +215,10 @@ class _ConfiguracionState extends State<Configuracion> {
                               });
                             } else {
                               print('Esto es un valor: $value');
-
                               setState(() {
                                 messageUrlInvalid = false;
                               });
                             }
-                            print(
-                                'Esto es un valor: ${textUrlController.text}');
                           },
                         ),
                       ),
@@ -240,16 +228,12 @@ class _ConfiguracionState extends State<Configuracion> {
                   if (messageUrlInvalid)
                     const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'La URL ingresada no es válida. Asegúrate de comenzar con "https://" y evita espacios.',
-                        style: TextStyle(color: Colors.red),
-                      ),
+                      child: Text('La URL ingresada no es válida. Asegúrate de comenzar con "https://" y evita espacios.', style: TextStyle(color: Colors.red),),
                     ),
                   const SizedBox(height: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                     
                       const SizedBox(width: 8),
                       Container(
                         width: 300,
@@ -273,10 +257,12 @@ class _ConfiguracionState extends State<Configuracion> {
                           decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
-                              hintText: 'Token', // Tu placeholder
+                              hintText: 'Token',
+                              // Tu placeholder
 
                               contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 2.0, horizontal: 18.0), // A
+                                  vertical: 2.0, horizontal: 18.0),
+                              // A
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                                 borderSide: BorderSide.none,
@@ -285,30 +271,29 @@ class _ConfiguracionState extends State<Configuracion> {
                                 padding: const EdgeInsets.only(right: 10.0),
                                 child: openButton
                                     ? Image.asset(
-                                        'lib/assets/Check.png', // Reemplaza con la ruta correcta de tu imagen
-                                        width:
-                                            20, // Ajusta el ancho de la imagen según tus preferencias
+                                        'lib/assets/Check.png',
+                                        // Reemplaza con la ruta correcta de tu imagen
+                                        width: 20,
+                                        // Ajusta el ancho de la imagen según tus preferencias
                                         height:
                                             20, // Ajusta la altura de la imagen según tus preferencias
                                       )
                                     : null,
                               )),
                           onChanged: (value) async {
-                            print(
-                                'Esto es un valor: ${textTokenController.text}');
-                            bool resp = await verificarConexion(
-                                textUrlController.text,
-                                textTokenController.text, setState);
-                            print('Esto es la respuesta: $resp');
+                            print('VERIFICAR CONEXION');
+                            bool resp = await verificarConexion(textUrlController.text, textTokenController.text, setState);
+                            //print(resp);
+
                             if (resp == true) {
                               setState(() {
                                 mensajeConexion = 'Conexión exitosa';
                                 openButton = true;
                               });
-                            } else {
+                            }
+                            else {
                               setState(() {
-                                mensajeConexion =
-                                    'No se pudo realizar la conexión';
+                                mensajeConexion = 'No se pudo realizar la conexión';
                                 openButton = false;
                               });
                             }
@@ -317,25 +302,19 @@ class _ConfiguracionState extends State<Configuracion> {
                       ),
                     ],
                   )
+                ]),
+              ),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 25.0), // Agrega un margen superior de 10 unidades
+                    child: Text(mensajeConexion, style: TextStyle(
+                        color: (mensajeConexion == 'Conexión exitosa' || mensajeConexion == 'Se guardo la configuración') ? Colors.green : Colors.red
+                    )),
+                  ),
                 ],
               ),
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 25.0), // Agrega un margen superior de 10 unidades
-                  child: Text(mensajeConexion,
-                      style: TextStyle(
-                          color: (mensajeConexion == 'Conexión exitosa' ||
-                                  mensajeConexion ==
-                                      'Se guardo la configuración')
-                              ? Colors.green
-                              : Colors.red)),
-                ),
-              ],
-            ),
-            Align(
+              Align(
               alignment: Alignment.bottomCenter,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -350,8 +329,12 @@ class _ConfiguracionState extends State<Configuracion> {
 
                         try {
                           var verificon = await verificarConexion(
-                                  textoIngresado, textTokenIngresado, setState)
-                              .timeout(const Duration(seconds: 2));
+                              textoIngresado,
+                              textTokenIngresado,
+                              setState
+                          ).timeout(const Duration(seconds: 2));
+
+                          print('verificado: $verificon');
 
                           if (verificon) {
                             setState(() {
@@ -388,9 +371,10 @@ class _ConfiguracionState extends State<Configuracion> {
                             Text(
                               'Realizar Test',
                               style: TextStyle(
-                                fontFamily:
-                                    'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
-                                fontSize: 12.0, // Tamaño de la fuente
+                                fontFamily: 'Poppins Regular',
+                                // Reemplaza con el nombre definido en pubspec.yaml
+                                fontSize: 12.0,
+                                // Tamaño de la fuente
                                 // Peso de la fuente (por ejemplo, bold)
                                 color: Color(0xFF7531FF), // Color del texto
                               ), // Puedes ajustar el color del texto
@@ -441,18 +425,20 @@ class _ConfiguracionState extends State<Configuracion> {
                               }
                             },
                       style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              8.0), // Ajusta el radio de las esquinas
-                        ),
-                        backgroundColor: const Color(0xFF7531FF) // Ajusta el color de fondo del botón
-                      ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Ajusta el radio de las esquinas
+                          ),
+                          backgroundColor: const Color(
+                              0xFF7531FF) // Ajusta el color de fondo del botón
+                          ),
                       child: const Text(
                         'Guardar',
                         style: TextStyle(
-                          fontFamily:
-                              'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
-                          fontSize: 15.0, // Tamaño de la fuente
+                          fontFamily: 'OpenSans',
+                          // Reemplaza con el nombre definido en pubspec.yaml
+                          fontSize: 15.0,
+                          // Tamaño de la fuente
                           // Peso de la fuente (por ejemplo, bold)
                           color: Color.fromARGB(
                               255, 255, 254, 254), // Color del texto
@@ -476,8 +462,3 @@ class _ConfiguracionState extends State<Configuracion> {
     return urlRegExp.hasMatch(url);
   }
 }
-
-
-
-
-

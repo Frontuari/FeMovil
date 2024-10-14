@@ -1,5 +1,6 @@
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/create_database.dart';
+import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/database/update_database.dart';
 import 'package:femovil/presentation/screen/proveedores/add_proveedor.dart';
@@ -22,51 +23,61 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
   final _telefonoController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _provinceController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
   final TextEditingController _codePostalController = TextEditingController();
 
   // List
   final List<Map<String, dynamic>> _groupVendorList = [];
-  final List<Map<String, dynamic>> _taxTypeVendorList = [];
+  final List<Map<String, dynamic>> _idTypeVendorList = [];
   final List<Map<String, dynamic>> _countryVendorList = [];
   final List<Map<String, dynamic>> _taxPayerList = [];
   final List<Map<String, dynamic>> _typePersonList = [];
+  final List<Map<String, dynamic>> _ciiuActivitiesList = [];
 
   //SELECTED
   int _selectedGroupIndex = 0;
-  int _selectedTaxIndexType = 0;
+  int _selectedIdTypeIndex = 0;
   int _selectedCountryIndex = 0;
   int _selectedTaxPayerIndex = 0;
   int _selectedPersonTypeIndex = 0;
+  int _selectedCiiuCode = 0;
 
   //Text o String
 
   String _groupTextVendor = '';
-  String _taxTypeText = '';
+  String _idTypeText = '';
   String _countryTex = '';
   String _taxPayerText = '';
   String _personTypeText = '';
+  String _ciiuActivitiesText = '';
+  int? _idMaxlength;
 
   loadList() async {
     List<Map<String, dynamic>> getGroupVendor = await listarTypeGroupVendor();
-    List<Map<String, dynamic>> getTaxTypeVendor = await listarTypeTaxVendor();
+    List<Map<String, dynamic>> getIdTypeVendor = await listarTypeTaxVendor();
     List<Map<String, dynamic>> getCountryVendor = await listarCountryVendor();
     List<Map<String, dynamic>> getTaxPayerVendor =
         await listarTaxPayerVendors();
     List<Map<String, dynamic>> getTypePerson = await listarPersonTypeVendors();
+    List<Map<String, dynamic>> getCiiuActivitesCodes = await getCiiuActivities();
 
     print('Value de getGroupVendor $getGroupVendor ');
-    print('Value de getTaxTypeVendor $getTaxTypeVendor');
+    print('Value de getIdTypeVendor $getIdTypeVendor');
 
-    _groupVendorList
-        .add({'c_bp_group_id': 0, 'groupbpname': 'Selecciona un Grupo'});
-    _taxTypeVendorList.add({
-      'lco_tax_id_type_id': 0,
-      'tax_id_type_name': 'Selecciona un tipo de impuesto'
+    _groupVendorList.add({
+      'c_bp_group_id': 0, 
+      'groupbpname': 'Selecciona un Grupo'
     });
-    _countryVendorList
-        .add({'c_country_id': 0, 'country_name': 'Selecciona un Pais'});
+    _idTypeVendorList.add({
+      'lco_tax_id_type_id': 0,
+      'tax_id_type_name': 'Selecciona un tipo de identificación'
+    });
+    _countryVendorList.add({
+      'c_country_id': 0, 
+      'country_name': 'Selecciona un Pais'
+    });
     _taxPayerList.add({
       'lco_taxt_payer_type_id': 0,
       'tax_payer_type_name': 'Selecciona un tipo de contribuyente'
@@ -75,13 +86,18 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
       'lve_person_type_id': 0,
       'person_type_name': 'Selecciona un tipo de persona'
     });
+    _ciiuActivitiesList.add({
+      'lco_isic_id': 0, 
+      'name': 'Selecciona un CIIU'
+    });
 
     setState(() {
       _groupVendorList.addAll(getGroupVendor);
-      _taxTypeVendorList.addAll(getTaxTypeVendor);
+      _idTypeVendorList.addAll(getIdTypeVendor);
       _countryVendorList.addAll(getCountryVendor);
       _taxPayerList.addAll(getTaxPayerVendor);
       _typePersonList.addAll(getTypePerson);
+      _ciiuActivitiesList.addAll(getCiiuActivitesCodes);
     });
   }
 
@@ -105,11 +121,11 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
             : '';
     _groupTextVendor = widget.provider['groupbpname'].toString();
     _taxPayerText = widget.provider['tax_payer_type_name'].toString();
-    _taxTypeText = widget.provider['tax_id_type_name'].toString();
+    _idTypeText = widget.provider['tax_id_type_name'].toString();
     // _personTypeText = widget.provider['person_type_name'].toString();
     _countryTex = widget.provider['country_name'].toString();
     _selectedGroupIndex = widget.provider['c_bp_group_id'];
-    _selectedTaxIndexType =
+    _selectedIdTypeIndex =
         widget.provider['lco_tax_id_type_id'] != '{@nil=true}'
             ? widget.provider['lco_tax_id_type_id']
             : 0;
@@ -122,17 +138,23 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
         widget.provider['c_country_id'].toString() != '{@nil=true}'
             ? widget.provider['c_country_id']
             : 0;
-    _addressController.text =
-        widget.provider['address'].toString() != '{@nil=true}'
-            ? widget.provider['address'].toString()
+    _provinceController.text =
+        widget.provider['province'].toString() != '{@nil=true}'
+            ? widget.provider['province'].toString()
             : '';
     _cityController.text = widget.provider['city'].toString() != '{@nil=true}'
         ? widget.provider['city']
         : '';
+    _addressController.text =
+        widget.provider['address'].toString() != '{@nil=true}'
+            ? widget.provider['address'].toString()
+            : '';
     _codePostalController.text =
         widget.provider['postal'].toString() != '{@nil=true}'
             ? widget.provider['postal'].toString()
             : '';
+    _ciiuActivitiesText = widget.provider['ciiu_tagname'].toString();
+    _selectedCiiuCode = widget.provider['ciiu_id'] ?? 0;
   }
 
   @override
@@ -160,19 +182,37 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                   children: [
                     const SizedBox(height: 5),
                     ContainerBlue(label: 'Detalles', mediaScreen: mediaScreen),
-                    const SizedBox(
-                      height: 10,
+                    const SizedBox(height: 10),
+
+                    // TIPO DE IDENTIFICACION
+                    CustomDropdownButtonFormFieldVendor(
+                      identifier: 'idTypeVendor',
+                      selectedIndex: _selectedIdTypeIndex,
+                      dataList: _idTypeVendorList,
+                      text: _idTypeText,
+                      onSelected: (newValue, idTypeText) {
+                        setState(() {
+                          _selectedIdTypeIndex = newValue ?? 0;
+                          _idTypeText = (newValue != 0) ? idTypeText : "";
+
+                          if (idTypeText == 'C CEDULA' || idTypeText == 'P PASAPORTE') {
+                            _idMaxlength = 10;
+                          } else if (idTypeText == 'R RUC PERSONAL' || idTypeText == 'R RUC JURIDICO') {
+                            _idMaxlength = 12;
+                          }
+                        });
+                      },
+                      readOnly: true,
                     ),
-                    _buildTextFormField(
-                        'Nombre', _nameController, 1, mediaScreen),
-                    _buildTextFormField('Ruc', _rucController, 1, mediaScreen),
-                    _buildTextFormField(
-                        'Correo', _correoController, 1, mediaScreen),
-                    _buildTextFormField(
-                        'Telefono', _telefonoController, 1, mediaScreen),
-                    SizedBox(
-                      height: mediaHeight * 0.010,
-                    ),
+                    SizedBox(height: mediaHeight * 0.020),
+
+                    _buildTextFormField('Identificador', _rucController, 1, mediaScreen, _idMaxlength, true),
+                    _buildTextFormField('Razón Social o Nombre Completo', _nameController, 1, mediaScreen),
+                    _buildTextFormField('Correo', _correoController, 1, mediaScreen),
+                    _buildTextFormField('Telefono', _telefonoController, 1, mediaScreen),
+                    SizedBox(height: mediaHeight * 0.010),
+
+                    // GRUPO
                     CustomDropdownButtonFormFieldVendor(
                       identifier: 'groupTypeVendor',
                       selectedIndex: _selectedGroupIndex,
@@ -181,28 +221,28 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                       onSelected: (newValue, groupText) {
                         setState(() {
                           _selectedGroupIndex = newValue ?? 0;
-                          _groupTextVendor = groupText;
+                          _groupTextVendor = (newValue != 0) ? groupText : "";
                         });
                       },
                     ),
-                    SizedBox(
-                      height: mediaHeight * 0.020,
-                    ),
+                    SizedBox(height: mediaHeight * 0.020),   
+
+                    // CIIU
                     CustomDropdownButtonFormFieldVendor(
-                      identifier: 'taxTypeVendor',
-                      selectedIndex: _selectedTaxIndexType,
-                      dataList: _taxTypeVendorList,
-                      text: _taxTypeText,
-                      onSelected: (newValue, taxTex) {
+                      identifier: 'ciiuTypeActivities',
+                      selectedIndex: _selectedCiiuCode,
+                      dataList: _ciiuActivitiesList,
+                      text: _ciiuActivitiesText,
+                      onSelected: (newValue, ciiuText) {
                         setState(() {
-                          _selectedTaxIndexType = newValue ?? 0;
-                          _taxTypeText = taxTex;
+                          _selectedCiiuCode = newValue ?? 0;
+                          _ciiuActivitiesText = (newValue != 0) ? ciiuText : "";
                         });
                       },
                     ),
-                    SizedBox(
-                      height: mediaHeight * 0.020,
-                    ),
+                    SizedBox(height: mediaHeight * 0.020),                  
+
+                    // TIPO DE CONTRIBUYENTE
                     CustomDropdownButtonFormFieldVendor(
                       identifier: 'taxPayerVendor',
                       selectedIndex: _selectedTaxPayerIndex,
@@ -211,10 +251,12 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                       onSelected: (newValue, taxPayerText) {
                         setState(() {
                           _selectedTaxPayerIndex = newValue ?? 0;
-                          _taxPayerText = taxPayerText;
+                          _taxPayerText = (newValue != 0) ? taxPayerText : "";
                         });
                       },
                     ),
+                    SizedBox(height: mediaHeight * 0.02),
+
                     //  const SizedBox(height: 10,),
                     // CustomDropdownButtonFormFieldVendor(identifier: 'typePersonVendor', selectedIndex: _selectedPersonTypeIndex, dataList:_typePersonList, text: _personTypeText, onSelected: (newValue, personTypeText) {
 
@@ -226,16 +268,13 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                     //     });
 
                     // },),
-                    SizedBox(
-                      height: mediaHeight * 0.02,
-                    ),
+                    
                     ContainerBlue(
                       label: 'Domicilio Fiscal',
                       mediaScreen: mediaScreen,
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
+
                     CustomDropdownButtonFormFieldVendor(
                       identifier: 'countryVendor',
                       selectedIndex: _selectedCountryIndex,
@@ -244,19 +283,16 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                       onSelected: (newValue, countryText) {
                         setState(() {
                           _selectedCountryIndex = newValue ?? 0;
-                          _countryTex = countryText;
+                          _countryTex = (newValue != 0) ? countryText : "";
                         });
                       },
                     ),
-                    SizedBox(
-                      height: mediaHeight * 0.01,
-                    ),
-                    _buildTextFormField(
-                        'Ciudad', _cityController, 1, mediaScreen),
-                    _buildTextFormField(
-                        'Direccion', _addressController, 2, mediaScreen),
-                    _buildTextFormField(
-                        'Codigo Postal', _codePostalController, 1, mediaScreen),
+                    SizedBox(height: mediaHeight * 0.01),
+
+                    _buildTextFormField('Provincia', _provinceController, 1, mediaScreen),
+                    _buildTextFormField('Ciudad', _cityController, 1, mediaScreen),
+                    _buildTextFormField('Direccion', _addressController, 2, mediaScreen),
+                    _buildTextFormField('Codigo Postal', _codePostalController, 1, mediaScreen),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -280,21 +316,24 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                               String newCorreo = _correoController.text;
                               String newTelefono = _telefonoController.text;
                               String addressD = _addressController.text;
+                              String provincia = _provinceController.text;
                               String ciudad = _cityController.text;
                               String codigoPostal = _codePostalController.text;
 
                               //Selected Id
                               int selectGroupId = _selectedGroupIndex;
-                              int selectTaxId = _selectedTaxIndexType;
+                              int selectTaxId = _selectedIdTypeIndex;
                               int selectCountry = _selectedCountryIndex;
                               int selectTaxPayerId = _selectedTaxPayerIndex;
                               int selectTypePerson = _selectedPersonTypeIndex;
+                              int selectCiiuId = _selectedCiiuCode;
                               //Strings
                               String groupText = _groupTextVendor;
-                              String typeTaxText = _taxTypeText;
+                              String typeTaxText = _idTypeText;
                               String countryText = _countryTex;
                               String taxPayerText = _taxPayerText;
                               String typePersonText = _personTypeText;
+                              String ciiuText = _ciiuActivitiesText;
 
                               // Crear un mapa con los datos actualizados del producto
                               Map<String, dynamic> updatedprovider = {
@@ -317,7 +356,7 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                                 'phone': newTelefono,
                                 'c_location_id':
                                     widget.provider['c_location_id'],
-                                'address': addressD,
+                                'address': addressD,                                
                                 'city': ciudad,
                                 'country_name': countryText,
                                 'postal': codigoPostal,
@@ -327,6 +366,9 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                                 'tax_payer_type_name': taxPayerText,
                                 'lve_person_type_id': selectTypePerson,
                                 'person_type_name': typePersonText,
+                                'province': provincia,
+                                'ciiu_id': selectCiiuId,
+                                'ciiu_tagname': ciiuText,
                               };
 
                               // Actualizar el producto en la base de datos
@@ -336,24 +378,15 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 24, vertical: 20),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                                     backgroundColor: Colors.white,
                                     // Center the title, content, and actions using a Column
                                     content: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize
-                                          .min, // Wrap content vertically
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min, // Wrap content vertically
                                       children: [
-                                        Image.asset('lib/assets/Check@2x.png',
-                                            width: 50,
-                                            height:
-                                                50), // Adjust width and height
-                                        const Text(
-                                            'Proveedor Editado correctamente',
-                                            style: TextStyle(
-                                                fontFamily: 'Poppins Bold')),
+                                        Image.asset('lib/assets/Check@2x.png', width: 50, height: 50), // Adjust width and height
+                                        const Text('Proveedor editado correctamente', style: TextStyle(fontFamily: 'Poppins Bold')),
                                         TextButton(
                                           onPressed: () => {
                                             Navigator.pop(context),
@@ -393,15 +426,14 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
     );
   }
 
-  Widget _buildTextFormField(String label, TextEditingController controller,
-      int lines, double mediaScreen) {
+  Widget _buildTextFormField(String label, TextEditingController controller, int lines, double mediaScreen, [int? maxLength, bool readOnly = false]) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
         width: mediaScreen,
         height: lines == 2 ? mediaScreen * 0.35 : mediaScreen * 0.20,
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: readOnly ? Colors.grey.shade300 : Colors.white,
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
@@ -411,35 +443,24 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
             ]),
         child: TextFormField(
           controller: controller,
+          maxLength: maxLength,
+          readOnly: readOnly,
           decoration: InputDecoration(
-            border: const OutlineInputBorder(
+            border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(15.0)),
-              borderSide: BorderSide.none, // Color del borde
+              borderSide: BorderSide(color: readOnly ? Colors.grey.shade300 : Colors.white, width: 25), // Color del borde cuando está enfocado
             ),
-            focusedBorder: const OutlineInputBorder(
+            enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(15.0)),
-              borderSide: BorderSide(
-                color: Colors.white,
-                width: 25,
-              ), // Color del borde cuando está enfocado
+              borderSide: BorderSide(color: readOnly ? Colors.grey.shade300 : Colors.white, width: 25), // Color del borde cuando no está enfocado
             ),
-            enabledBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(15.0)),
-              borderSide: BorderSide(
-                color: Colors.white,
-                width: 25,
-              ), // Color del borde cuando no está enfocado
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.red),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: const BorderSide(width: 1, color: Colors.red)),
+            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.red)),
+            focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(width: 1, color: Colors.red)),
             labelText: label,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
+            filled: readOnly,
+            fillColor: readOnly ? Colors.grey.shade300 : Colors.white,
           ),
           maxLines: lines,
           validator: (value) {

@@ -7,6 +7,7 @@ class CustomDropdownButtonFormField extends StatelessWidget {
   final String text;
   final List<Map<String, dynamic>> dataList;
   final Function(int?, String) onSelected;
+  final bool readOnly;
 
   const CustomDropdownButtonFormField(
       {super.key,
@@ -14,7 +15,8 @@ class CustomDropdownButtonFormField extends StatelessWidget {
       required this.selectedIndex,
       required this.dataList,
       required this.text,
-      required this.onSelected});
+      required this.onSelected,
+      this.readOnly = false});
 
   @override
   Widget build(BuildContext context) {
@@ -75,28 +77,23 @@ class CustomDropdownButtonFormField extends StatelessWidget {
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none)),
-            validator: (value) {
-              if (value == null || value == 0) {
-                return 'Por favor selecciona un grupo';
-              }
-              return null;
-            },
           ),
         );
-
-      case 'taxType':
+      case 'idType':
         return Container(
           height: mediaScreen * 0.22,
           width: mediaScreen * 0.95,
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: readOnly ? Colors.grey.shade300 : Colors.white,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 7,
-                    spreadRadius: 2)
-              ]),
+                  color: Colors.grey.withOpacity(0.5), 
+                  blurRadius: 7, 
+                  spreadRadius: 2
+                )
+              ]
+          ),
           child: DropdownButtonFormField<int>(
             icon: Image.asset('lib/assets/Abajo.png'),
             value: selectedIndex,
@@ -114,11 +111,12 @@ class CustomDropdownButtonFormField extends StatelessWidget {
                       taxType['tax_id_type_name'] as String,
                       style: const TextStyle(
                         fontFamily: 'Poppins Regular',
+                        color: Colors.black
                       ),
                     )),
               );
             }).toList(),
-            onChanged: (newValue) {
+            onChanged: readOnly ? null : (newValue) {
               print('esto es el taxList ${dataList}');
               String nameTax = invoke('obtenerNombreTax', newValue, dataList);
               print("esto es el nombre del tipo de impuesto $nameTax");
@@ -126,17 +124,14 @@ class CustomDropdownButtonFormField extends StatelessWidget {
               onSelected(newValue, nameTax);
             },
             decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none),
+              fillColor: readOnly ? Colors.grey.shade300 : Colors.white,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
             validator: (value) {
               if (value == null || value == 0) {
-                return 'Por favor selecciona un tipo de impuesto';
+                return 'Por favor, selecciona un tipo de identificación';
               }
               return null;
             },
@@ -192,15 +187,8 @@ class CustomDropdownButtonFormField extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
                 )),
-            validator: (value) {
-              if (value == null || value == 0) {
-                return 'Por favor selecciona un tipo de contribuyente';
-              }
-              return null;
-            },
           ),
         );
-
       case 'typePerson':
         return DropdownButtonFormField<int>(
           value: selectedIndex,
@@ -296,7 +284,6 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             },
           ),
         );
-
       case 'selectTypeAccountBank':
         return Container(
             height: mediaScreen * 0.22,
@@ -354,7 +341,6 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             },
           ),
         );
-
       case 'selectTypeCoins':
         return Container(
            height: mediaScreen * 0.22,
@@ -411,8 +397,6 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             },
           ),
         );
-        
-
       default:
         return DropdownButtonFormField<int>(
           value: selectedIndex,

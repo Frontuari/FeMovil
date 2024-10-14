@@ -423,7 +423,7 @@ class _VentasDetailsState extends State<VentasDetails> {
                                        style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
                                      ),
                                      Text(
-                                       'Precio',
+                                       'Subtotal',
                                                    style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
                                                  ),
                                                  
@@ -573,44 +573,32 @@ class _VentasDetailsState extends State<VentasDetails> {
                                         .grey, // Color verde para el fondo del botón
                               ),
                               child: ElevatedButton(
-                                onPressed: ventaData['status_sincronized'] ==
-                                            'Borrador' &&
-                                        bottonEnable == true
+                                onPressed: ventaData['status_sincronized'] == 'Borrador' && bottonEnable == true
                                     ? () async {
                                         setState(() {
                                           bottonEnable = false;
                                         });
-
                                           
-                                        dynamic isTrue =
-                                            await _updateAndCreateOrders();
+                                        dynamic isTrue = await _updateAndCreateOrders();
 
                                         if (isTrue != false) {
                                            setState(() {
-                                            bottonEnable = true;
-                                          
-                                          });
-                                         
-                                        
+                                            bottonEnable = true;                                          
+                                          });                                 
 
                                           String newValue = 'Enviado';
-                                         await updateOrdereSalesForStatusSincronzed(
-                                              ventaData['id'], newValue);
-
-
+                                          await updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue);
                                         } else {
                                           String newValue = 'Por Enviar';
                                            setState(() {
                                             bottonEnable = true;
                                           });
-                                          updateOrdereSalesForStatusSincronzed(
-                                              ventaData['id'], newValue);
+                                          updateOrdereSalesForStatusSincronzed(ventaData['id'], newValue);
                                         }
 
                                         if (mounted) {
                                           setState(() {
-                                            _ventaData = _loadVentasForId(
-                                                widget.ventaId);
+                                            _ventaData = _loadVentasForId(widget.ventaId);
                                           });
                                         }
                                       }

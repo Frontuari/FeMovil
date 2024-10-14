@@ -13,6 +13,7 @@ import 'package:femovil/presentation/screen/login/progress_indicator.dart';
 import 'package:femovil/presentation/screen/proveedores/providers_screen.dart';
 import 'package:femovil/presentation/screen/ventas/ventas.dart';
 import 'package:femovil/sincronization/sincronization_screen.dart';
+import 'package:femovil/presentation/print_settings/print_settings.dart';
 import 'package:flutter/material.dart';
 
 bool flag = false;
@@ -121,18 +122,17 @@ class HomeState extends State<Home> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 45,),
+                  const SizedBox(height: 20),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 50),
+                      
+                      // PRODUCTOS
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Products(),
-                              ));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Products()));
                         },
                         child: Column(
                           children: [
@@ -144,27 +144,20 @@ class HomeState extends State<Home> {
                                 borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
                               ),
                             child: Center( // Centra la imagen dentro del contenedor
-                              child: Image.asset(
-                                'lib/assets/Productos@3x.png',
-                                width: 45,
-                                height: 45,
-                                fit: BoxFit.contain, // Ajusta la imagen para que quepa dentro del contenedor
-                              ),
+                              child: Image.asset('lib/assets/Productos@3x.png', width: 45, height: 45, fit: BoxFit.contain) // Ajusta la imagen para que quepa dentro del contenedor
                             ),
                           ),
-                            const SizedBox(height: 5,),
-                            const Text("Productos", style:  TextStyle(fontFamily: 'Poppins SemiBold'),),
+                          const SizedBox(height: 5),
+                          const Text("Productos", style:  TextStyle(fontFamily: 'Poppins SemiBold'),),
                           ],
                         ),
                       ),
                       const SizedBox(width: 10),
+
+                      // CLIENTES
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Clients(),
-                              ));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Clients()));
                         },
                         child: Column(
                           children: [
@@ -176,226 +169,222 @@ class HomeState extends State<Home> {
                                 borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
                               ),
                               child: Center(
-                                child: Image.asset('lib/assets/clientes@3x.png', width: 45, height: 45,
-                                fit: BoxFit.contain
-                                ),
-                              )),
+                                child: Image.asset('lib/assets/clientes@3x.png', width: 45, height: 45, fit: BoxFit.contain),
+                              )
+                            ),
                             const SizedBox(height: 5,),
                             const Text("Clientes", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
                        
                           ],
                         ),
                       ),
-                      const SizedBox(width: 10,),
-                       GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const Precios(),
-                                  ));
-                            },
-                            child: Column(
-                              children: [
-                               
-                                Container(
-                                   width: 100,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 253, 238, 192), // Establece el color de fondo verde
-                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
-                                    ),
-                                  child: Center(
-                                    child: Image.asset('lib/assets/Precios@3x.png', width: 45, height: 45,
-                                    fit: BoxFit.contain,
-                                    ),
-                                  )),
-                                const SizedBox(height: 5,),
-                                const Text("Precios", style: TextStyle(fontFamily: 'Poppins SemiBold') ,),
-                              
-                            ],
-                          ),
+                      const SizedBox(width: 10),
+
+                      // PRECIOS
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Precios()));
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 253, 238, 192), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(
+                                child: Image.asset('lib/assets/Precios@3x.png', width: 45, height: 45, fit: BoxFit.contain),
+                              )
+                            ),
+                            const SizedBox(height: 5),
+                            const Text("Precios", style: TextStyle(fontFamily: 'Poppins SemiBold')),  
+                          ],
                         ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 25,),
+                  const SizedBox(height: 20),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 120),
                      
+                      // VENTAS
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Ventas(),
-                              ));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Ventas()));
                         },
                         child: Column(
                           children: [
-
                             Container(
-                               width: 100,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 224, 211, 249), // Establece el color de fondo verde
-                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
-                                    ),
-                              child: Center(child: Image.asset('lib/assets/Ventas@3x.png', width: 45, height: 45, fit: BoxFit.contain, ))),
-                            const SizedBox(height:  5,),
-                            const Text("Ventas", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
-                           
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 224, 211, 249), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(child: Image.asset('lib/assets/Ventas@3x.png', width: 45, height: 45, fit: BoxFit.contain, ))
+                            ),
+                            const SizedBox(height:  5),
+                            const Text("Ventas", style: TextStyle(fontFamily: 'Poppins SemiBold')),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 10,),
+                      const SizedBox(width: 10),
+
+                      // PROVEEDORES
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Providers(),
-                              ));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Providers()));
                         },
                         child: Column(
                           children: [
                             Container(  
-                               width: 100,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 245, 208, 171), // Establece el color de fondo verde
-                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
-                                    ),
-                              child: Center(child: Image.asset("lib/assets/proveedores.png", width: 45, height: 45, fit: BoxFit.contain,))),
-                            const SizedBox(height: 5,),
-                            const Text("Proveedores", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
-                        
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 245, 208, 171), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(child: Image.asset("lib/assets/proveedores.png", width: 45, height: 45, fit: BoxFit.contain))
+                            ),
+                            const SizedBox(height: 5),
+                            const Text("Proveedores", style: TextStyle(fontFamily: 'Poppins SemiBold')),                        
                           ],
                         ),
                       ),
-                        const SizedBox(width: 10,),
-                        GestureDetector(
+                      const SizedBox(width: 10),
+                      
+                      // COMPRAS
+                      GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Compras(),
-                              ));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Compras()));
                         },
-                        child:  Column(
+                        child: Column(
                           children: [
-
                             Container(
-                                width: 100,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 212, 245, 246), // Establece el color de fondo verde
-                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 212, 245, 246), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
                               ),
-                              child: Center(child: Image.asset('lib/assets/Compras@3x.png', width: 45, height: 45,))),
-                            const SizedBox(height: 5,),
-                            const Text("Compras", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
-                          
+                              child: Center(child: Image.asset('lib/assets/Compras@3x.png', width: 45, height: 45,))
+                            ),
+                            const SizedBox(height: 5),
+                            const Text("Compras", style: TextStyle(fontFamily: 'Poppins SemiBold')),                          
                           ],
                         ),
                       ),
                     ],
                   ),
-                 const SizedBox(height: 25,),
-                   Row(
+                  const SizedBox(height: 20),
+
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
-                       GestureDetector(
+                      // COBRANZAS
+                      GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Cobranzas(),
-                              ));
-                        },
-                        child:  Column(
-                          children: [
-
-                            Container(
-                                width: 100,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 246, 205, 205), // Establece el color de fondo verde
-                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
-                              ),
-                              child: Center(
-                                
-                                child: Image.asset('lib/assets/Cobranzas@3x.png', width: 45, height: 45, fit: BoxFit.contain,))),
-                              const SizedBox(height: 5,),
-                              const Text("Cobranzas", style: TextStyle(fontFamily: 'Poppins SemiBold'), ),
-                           
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10,),
-
-                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Retenciones(),
-                              ));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Cobranzas()));
                         },
                         child: Column(
                           children: [
-                            
                             Container(
-                                width: 100,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 250, 201, 249), // Establece el color de fondo verde
-                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 246, 205, 205), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
                               ),
-                              child: Center(child: Image.asset('lib/assets/Retenciones@3x.png', width: 45, height: 45, fit: BoxFit.contain,))),
-                            const SizedBox(height: 5,),
-                            const Text("Retenciones", style: TextStyle(fontFamily: 'Poppins SemiBold' ), ),
-                         
+                              child: Center(child: Image.asset('lib/assets/Cobranzas@3x.png', width: 45, height: 45, fit: BoxFit.contain))
+                            ),
+                            const SizedBox(height: 5),
+                            const Text("Cobranzas", style: TextStyle(fontFamily: 'Poppins SemiBold')),
                           ],
                         ),
                       ),
+                      const SizedBox(width: 10),
 
-                      const SizedBox(height: 25, width: 10,),
-                    
+                      // RETENCIONES
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const SynchronizationScreen(),
-                              ));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Retenciones()));
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 250, 201, 249), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(child: Image.asset('lib/assets/Retenciones@3x.png', width: 45, height: 45, fit: BoxFit.contain))
+                            ),
+                            const SizedBox(height: 5,),
+                            const Text("Retenciones", style: TextStyle(fontFamily: 'Poppins SemiBold')),                         
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 25, width: 10),
+                    
+                      // SINCRONIZACION
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const SynchronizationScreen()));
                         },
                         child:  Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-
                             Container(
-                               width: 100,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(255, 217, 247, 255), // Establece el color de fondo verde
-                                      borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 217, 247, 255), // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
                               ),
-                              child: Center(child: Image.asset('lib/assets/Sincro@3x.png', width: 45, height:  45, fit: BoxFit.contain , ))),
-                            const SizedBox(height: 5,)
-,                            const Text("Sincronización", style: TextStyle(fontFamily: 'Poppins SemiBold'),),
-                        
+                              child: Center(child: Image.asset('lib/assets/Sincro@3x.png', width: 45, height:  45, fit: BoxFit.contain))
+                            ),
+                            const SizedBox(height: 5)
+,                           const Text("Sincronización", style: TextStyle(fontFamily: 'Poppins SemiBold')),                        
                           ],
                         ),
                       ),
-                      
-                   
                     ],
                   ),
-           
+                  const SizedBox(height: 20),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // AJUSTES
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const PrintSettings()));
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300, // Establece el color de fondo verde
+                                borderRadius: BorderRadius.circular(20), // Establece bordes redondeados
+                              ),
+                              child: Center(child: Image.asset('lib/assets/Ajustes.png', width: 45, height: 45, fit: BoxFit.contain))
+                            ),
+                            const SizedBox(height: 5),
+                            const Text("Ajustes Impresión", style: TextStyle(fontFamily: 'Poppins SemiBold')),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             )),

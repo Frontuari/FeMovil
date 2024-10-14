@@ -131,14 +131,10 @@ Future<bool> checkInternetConnectivity() async {
 // Esta funcion nos ayudara a crear una nueva orden
 
 createOrdenSalesIdempiere(orderSalesList) async {
-
   dynamic resOrdenSales = orderSalesList;
 
-  if (resOrdenSales is Future) {
-    
+  if (resOrdenSales is Future) {    
     resOrdenSales = await resOrdenSales;
-  
-  
   }
 
   print('esto resOrdenSales $resOrdenSales');
@@ -149,8 +145,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
     return false;
   }
 
-  if (resOrdenSales['order']['c_bpartner_id'] == 0 &&
-      resOrdenSales['order']['c_bpartner_location_id'] == 0) {
+  if (resOrdenSales['order']['c_bpartner_id'] == 0 && resOrdenSales['order']['c_bpartner_location_id'] == 0) {
     resOrdenSales = await updateAndCreateTercero(resOrdenSales);
   }
 
@@ -163,40 +158,38 @@ createOrdenSalesIdempiere(orderSalesList) async {
     initV() async {
       if (variablesG.isEmpty) {
         List<Map<String, dynamic>> response = await getPosPropertiesV();
-        print('variables Entre aqui');
+        print('variables globales: $response');
         variablesG = response;
       }
     }
 
-    await initV();
+    print('variables globales: $variablesG');
 
-    print('variables globales $variablesG');
+    await initV();
 
     var map = await getRuta();
     var variablesLogin = await getLogin();
-    final uri = Uri.parse(
-        '${map['URL']}ADInterface/services/rest/composite_service/composite_operation');
+    final uri = Uri.parse('${map['URL']}ADInterface/services/rest/composite_service/composite_operation');
+    // https://demo.aapresolution.com/ADInterface/services/rest/composite_service/composite_operation
 
     final request = await httpClient.postUrl(uri);
-
     final info = await getApplicationSupportDirectory();
-    print("esta es la ruta ${info.path}");
 
     final String filePathEnv = '${info.path}/.env';
     final File archivo = File(filePathEnv);
     String contenidoActual = await archivo.readAsString();
-    print('Contenido actual del archivo:\n$contenidoActual');
 
     // Convierte el contenido JSON a un mapa
     dynamic requestBody = {};
     Map<String, dynamic> jsonData = jsonDecode(contenidoActual);
+
+    print('jsonData: $jsonData');
 
     var role = jsonData["RoleID"];
     var orgId = jsonData["OrgID"];
     var clientId = jsonData["ClientID"];
     var wareHouseId = jsonData["WarehouseID"];
     var language = jsonData["Language"];
-    print("Esto es orderSales List nuevo $orderSalesList");
 
     requestBody = {
       "CompositeRequest": {
@@ -224,71 +217,24 @@ createOrdenSalesIdempiere(orderSalesList) async {
                 "Action": "CreateUpdate",
                 "DataRow": {
                   "field": [
-                    {
-                      "@column": "AD_Client_ID",
-                      "val": resOrdenSales['order']['ad_client_id']
-                    },
-                    {
-                      "@column": "AD_Org_ID",
-                      "val": resOrdenSales['order']['ad_org_id']
-                    },
-                    {
-                      "@column": "C_BPartner_ID",
-                      "val": resOrdenSales['order']['c_bpartner_id'],
-                    },
-                    {
-                      "@column": "C_BPartner_Location_ID",
-                      "val": resOrdenSales['order']['c_bpartner_location_id'],
-                    },
-                    {
-                      "@column": "C_Currency_ID",
-                      "val": variablesG[0]['c_currency_id'],
-                    },
-                    {
-                      "@column": "Description",
-                      "val": resOrdenSales['order']['descripcion'],
-                    },
-                    // {
-                    //   "@column": "C_ConversionType_ID",
-                    //   "val": variablesG[0]['c_conversion_type_id']
-                    // },
-                    {
-                      "@column": "C_DocTypeTarget_ID",
-                      "val": resOrdenSales['order']['c_doctypetarget_id']
-                    },
-                    {
-                      "@column": "C_PaymentTerm_ID",
-                      "val": variablesG[0]['c_paymentterm_id']
-                    },
-                    {
-                      "@column": "DateOrdered",
-                      "val": resOrdenSales['order']['date_ordered']
-                    },
-                    {"@column": "IsTransferred", "val": 'Y'},
-                    {
-                      "@column": "M_PriceList_ID",
-                      "val": variablesG[0]['m_price_saleslist_id']
-                    },
-                    {
-                      "@column": "M_Warehouse_ID",
-                      "val": resOrdenSales['order']['m_warehouse_id']
-                    },
-                    {"@column": "PaymentRule", "val": 'P'},
-                    {
-                      "@column": "SalesRep_ID",
-                      "val": resOrdenSales['order']['usuario_id']
-                    },
-                    {
-                      "@column": "AD_User_ID",
-                      "val": resOrdenSales['order']['usuario_id']
-                    },
-                    {
-                      "@column": "Bill_User_ID",
-                      "val": resOrdenSales['order']['usuario_id']
-                    },
-
-                    // {"@column": "LVE_PayAgreement_ID", "val": '1000001'},
-                    {"@column": "IsSOTrx", "val": 'Y'}
+                    {"@column": "AD_Client_ID", "val": resOrdenSales['order']['ad_client_id']},
+                    {"@column": "AD_Org_ID", "val": resOrdenSales['order']['ad_org_id']},
+                    {"@column": "C_BPartner_ID", "val": resOrdenSales['order']['c_bpartner_id']},
+                    {"@column": "C_BPartner_Location_ID", "val": resOrdenSales['order']['c_bpartner_location_id']},
+                    {"@column": "C_Currency_ID", "val": variablesG[0]['c_currency_id']},
+                    {"@column": "Description", "val": resOrdenSales['order']['descripcion']},                    
+                    {"@column": "C_DocTypeTarget_ID", "val": resOrdenSales['order']['c_doctypetarget_id']},
+                    {"@column": "C_PaymentTerm_ID", "val": variablesG[0]['c_paymentterm_id']},
+                    {"@column": "DateOrdered", "val": resOrdenSales['order']['date_ordered']},
+                    {"@column": "IsTransferred", "val": "Y"},
+                    {"@column": "M_PriceList_ID", "val": variablesG[0]['m_price_saleslist_id']},
+                    {"@column": "M_Warehouse_ID", "val": resOrdenSales['order']['m_warehouse_id']},
+                    {"@column": "PaymentRule", "val": "P"},
+                    {"@column": "SalesRep_ID", "val": resOrdenSales['order']['usuario_id']},
+                    {"@column": "AD_User_ID", "val": resOrdenSales['order']['usuario_id']},
+                    {"@column": "Bill_User_ID", "val": resOrdenSales['order']['usuario_id']},                    
+                    {"@column": "IsSOTrx", "val": "Y"},
+                    {"@column": "C_ConversionType_ID", "val": variablesG[0]['c_conversion_type_id'] != 'null' ? variablesG[0]['c_conversion_type_id'] : "114"},
                   ]
                 }
               }
@@ -297,12 +243,11 @@ createOrdenSalesIdempiere(orderSalesList) async {
         }
       }
     };
+    // {"@column": "C_ConversionType_ID", "val": variablesG[0]['c_conversion_type_id']},
+    // {"@column": "LVE_PayAgreement_ID", "val": '1000001'},
 
-    print('llegue auqi');
     // Crear las líneas de la orden
-    final lines =
-        createLines(resOrdenSales['products'], resOrdenSales['order']);
-    print('llegue auqi 2');
+    final lines = createLines(resOrdenSales['products'], resOrdenSales['order']);
     // Agregar las líneas de la orden al JSON de la orden
     for (var line in lines) {
       requestBody['CompositeRequest']['operations']['operation'].add(line);
@@ -326,6 +271,8 @@ createOrdenSalesIdempiere(orderSalesList) async {
 
     final jsonBody = jsonEncode(requestBody);
 
+    print('jsonBody: $jsonBody');
+
     request.headers.set('Content-Type', 'application/json; charset=utf-8');
     request.headers.set('Accept', 'application/json');
 
@@ -336,7 +283,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
 
     final parsedJson = jsonDecode(responseBody);
 
-    print("esta es la respuesta $parsedJson on");
+    print("esta es la respuesta json parsed $parsedJson");
 
     // dynamic isErrorTwo = parsedJson['CompositeResponses']['CompositeResponse']['StandardResponse']['@IsError'] ?? 0;
     //   if(isErrorTwo == 0){
@@ -345,33 +292,25 @@ createOrdenSalesIdempiere(orderSalesList) async {
     //     return false;
     //   }
 
-    dynamic documentNo = parsedJson['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
-
-    dynamic cOrderId = parsedJson['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][0]['outputFields']['outputField'][0]['@value'];
-
-    dynamic isError = parsedJson['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][2]['@IsError'];
+    dynamic documentNo = parsedJson['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
+    dynamic cOrderId = parsedJson['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][0]['@value'];
+    dynamic isError = parsedJson['CompositeResponses']['CompositeResponse']['StandardResponse'][2]['@IsError'];
 
     if (isError == true) {
       return false;
     }
-    print('LLegue aqui');
+
     Map<String, dynamic> nuevoDocumentNoAndCOrderId = {
       'documentno': documentNo,
       'c_order_id': cOrderId
     };
 
-
-
     String newStatus = 'Enviado';
-    await updateOrdereSalesForStatusSincronzed(
-        resOrdenSales['order']['id'], newStatus);
-    await actualizarDocumentNo(
-        resOrdenSales['order']['id'], nuevoDocumentNoAndCOrderId);
+    await updateOrdereSalesForStatusSincronzed(resOrdenSales['order']['id'], newStatus);
+    await actualizarDocumentNo(resOrdenSales['order']['id'], nuevoDocumentNoAndCOrderId);
+    await sincronizationSearchIdInvoiceOrderSales(cOrderId,resOrdenSales['order']['id']);
 
-     await sincronizationSearchIdInvoiceOrderSales(cOrderId,resOrdenSales['order']['id']);
+    print('finalizo request');
 
     return parsedJson;
   } catch (e) {
@@ -382,10 +321,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
 createLines(lines, order) {
   List linea = [];
 
-  print('llegue aqui en las lineas');
-
   lines.forEach((line) => {
-        print("line $line"),
         linea.add({
           "@preCommit": "false",
           "@postCommit": "false",
@@ -404,15 +340,13 @@ createLines(lines, order) {
                 {"@column": "PriceActual", "val": line['price_actual'] ?? line['price']},
                 {"@column": "M_Product_ID", "val": line['m_product_id']},
                 {"@column": "QtyOrdered", "val": line['qty_entered'] ?? line['quantity']},
-                {"@column": "QtyEntered", "val": line['qty_entered'] ?? line['quantity'] },
+                {"@column": "QtyEntered", "val": line['qty_entered'] ?? line['quantity']},
                 {"@column": "SalesRep_ID", "val": order['salesrep_id']}
               ]
             }
           }
         })
       });
-
-  print("estas son las lineas $linea");
 
   return linea;
 }

@@ -48,7 +48,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
       key: synchronizationScreenKey,
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(170),
-        child: AppBars(labelText: 'Sincronización')),
+        child: AppBars(labelText: 'Sincronización')
+      ),
       body: Column(
         children: [
           
@@ -446,11 +447,9 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                 
                 onPressed: _enableButtons ? () async {
                   // Llamada a la función de sincronización
-                      setState(() {
-
-                      _enableButtons = false;
-                      
-                      });
+                  setState(() {
+                    _enableButtons = false;           
+                  });
                       
                   if (setearValoresEnCero == false) {
         
@@ -473,14 +472,11 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
               
                   await getPosPropertiesInit();
               
-                    List<Map<String, dynamic>> response =
-                        await getPosPropertiesV();
+                  List<Map<String, dynamic>> response = await getPosPropertiesV();
               
-                    setState(() {
-                      variablesG = response;
-                    });
-                    
-                  
+                  setState(() {
+                    variablesG = response;
+                  });                
               
                   sincronizationSearchIdInvoice(setState);  
                   sincronizationCiuActivities(setState);
@@ -499,7 +495,14 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                     setearValoresEnCero = false;
                   });
                 }: null,
-                child:  Text('Sincronizar', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 17, color: _enableButtons ? const Color(0XFF7531FF): const Color.fromARGB(255, 82, 78, 78)),),
+                child:  Text(
+                  !_enableButtons ? 'Sincronizando...' : 'Sincronizar', 
+                  style: TextStyle(
+                    fontFamily: 'Poppins Bold', 
+                    fontSize: 17, 
+                    color: _enableButtons ? const Color(0XFF7531FF) : const Color.fromARGB(255, 82, 78, 78)
+                  )
+                ),
               ),
             ),
           ),
