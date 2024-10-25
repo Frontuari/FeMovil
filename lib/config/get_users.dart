@@ -17,9 +17,9 @@ getUsers(username, password) async {
     };
   var map = await getRuta();
 
-  final uri = Uri.parse(
-      '${map['URL']}ADInterface/services/rest/model_adservice/query_data');
-
+  final uri = Uri.parse('${map['URL']}ADInterface/services/rest/model_adservice/query_data');
+  print('esta es la uri: ${uri}');
+  
   final request = await httpClient.postUrl(uri);
       final info = await getApplicationSupportDirectory();
     

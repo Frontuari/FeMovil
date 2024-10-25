@@ -1,9 +1,32 @@
 import 'package:femovil/config/app_bar_femovil.dart';
+import 'package:femovil/config/getOrgInfo.dart';
 import 'package:femovil/database/gets_database.dart';
+import 'package:femovil/presentation/perfil/perfil_http.dart';
 import 'package:femovil/presentation/screen/ventas/ventas_details.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:open_file/open_file.dart';
+
+
+class Product {
+  dynamic name;
+  int quantity;
+  double price;
+  double subtotal;
+
+  Product({
+    required this.name,
+    required this.quantity,
+    required this.price,
+    required this.subtotal
+  });
+}
 
 class Ventas extends StatefulWidget {
   const Ventas({super.key});
@@ -20,23 +43,22 @@ class _VentasState extends State<Ventas> {
   List<Map<String, dynamic>> filteredVentas = [];
   TextEditingController searchController = TextEditingController();
   TextEditingController inputValue = TextEditingController();
+  Map userInfo = {};
+  Map orgInfo = {};
 
   String input = "";
   int? searchValue;
 
-  
-
   Future<void> _loadVentas() async {
-    final ventasData =
-        await getAllOrdersWithClientNames(); // Cambiar a la función de obtener ventas
-
-    print("Esto es la venta Data $ventasData");
+    final ventasData  = await getAllOrdersWithClientNames(); // Cambiar a la función de obtener ventas
+    final userData    = await getLogin();
+    final orgData     = await getOrgInfo();
 
     setState(() {
-
       ventas = ventasData;
       filteredVentas = ventasData;
-
+      userInfo = userData;
+      orgInfo = orgData;
     });
   }
 
@@ -425,7 +447,7 @@ class _VentasState extends State<Ventas> {
                         itemBuilder: (context, index) {
                           final venta = filteredVentas[index];
       
-                          print('Estas son las venta $venta');
+                          print('Esta es la venta: $venta');
       
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -451,8 +473,7 @@ class _VentasState extends State<Ventas> {
                                       Container(
                                         height: 160,
                                         decoration: BoxDecoration(
-                                          color: const Color.fromARGB(
-                                              255, 255, 255, 255),
+                                          color: const Color.fromARGB(255, 255, 255, 255),
                                           borderRadius: BorderRadius.circular(10),
                                           boxShadow: [
                                             BoxShadow(
@@ -474,12 +495,10 @@ class _VentasState extends State<Ventas> {
                                                 width: screenMax,
                                                 decoration: BoxDecoration(
                                                   color: const Color(0xFFF0EBFC),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.2),
+                                                      color: Colors.grey.withOpacity(0.2),
                                                       spreadRadius: 2,
                                                       blurRadius: 5,
                                                       offset: const Offset(0, 3),
@@ -487,129 +506,422 @@ class _VentasState extends State<Ventas> {
                                                   ],
                                                 ),
                                                 child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(15.0),
-                                                  child: Text(
-                                                    venta['documentno'] == ''
-                                                        ? 'N° ${venta['ruc'].toString()}'
-                                                        : 'N° ${venta['documentno'].toString()}',
-                                                    style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontFamily: 'Poppins Bold',
-                                                      fontSize: 18,
-                                                      color: Colors.black,
-                                                    ),
-                                                    textAlign: TextAlign.start,
-                                                  ),
+                                                  padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                                  child: Row( 
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      Text(
+                                                        venta['documentno'] == '' ? 'N° ${venta['ruc'].toString()}' : 'N° ${venta['documentno'].toString()}',
+                                                        style: const TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily: 'Poppins Bold',
+                                                          fontSize: 18,
+                                                          color: Colors.black,
+                                                        ),
+                                                        textAlign: TextAlign.start,
+                                                      ),
+                                                      PopupMenuButton(
+                                                        onSelected: (value) async {
+                                                          if (value == 'PREVIEW') {
+                                                            final pdf = pw.Document();
+
+                                                            dynamic orderData = await getOrderWithProducts(venta["id"]);
+                                                            var orderClient   = orderData["client"][0];
+                                                            var orderInfo     = orderData["order"];
+                                                            var orderProducts = orderData["products"];
+
+                                                            DateTime orderDateParsed = DateTime.parse(orderData["order"]["date_ordered"]);
+                                                            String orderDate = DateFormat('dd/MM/yyyy').format(orderDateParsed);
+                                                            String orderTime = DateFormat('HH:mm').format(orderDateParsed);
+
+                                                            List<List<dynamic>> productList = [];
+                                                            orderProducts.map((product) {
+                                                              dynamic productQty      = product['qty_entered'];
+                                                              dynamic productName     = product['name'];
+                                                              dynamic productPrice    = product['price_actual'];
+                                                              dynamic productSubtotal = double.parse(product['price_actual'].toString()) * int.parse(product['qty_entered'].toString());
+
+                                                              productList.add([
+                                                                productQty, 
+                                                                productName,
+                                                                productPrice, 
+                                                                productSubtotal
+                                                              ]);
+                                                            }).toList();
+
+                                                            pdf.addPage(
+                                                              pw.Page(
+                                                                pageFormat: PdfPageFormat.roll57,
+                                                                margin: pw.EdgeInsets.all(5),
+                                                                orientation: pw.PageOrientation.portrait,
+                                                                build: (pw.Context context) {
+                                                                  return pw.ListView(
+                                                                    children: [
+                                                                      // NOMBRE ORGANIZACION
+                                                                      orgInfo.isNotEmpty && orgInfo["name"].toString() != 'null' ? pw.Text(
+                                                                        orgInfo["name"].toString(), 
+                                                                        style: pw.TextStyle(fontSize: 6.0, fontWeight: pw.FontWeight.bold), 
+                                                                        textAlign: pw.TextAlign.center
+                                                                      ) : pw.SizedBox(),
+                                                                      orgInfo.isNotEmpty && orgInfo["name"].toString() != 'null' 
+                                                                        ? pw.SizedBox(height: 3) 
+                                                                        : pw.SizedBox(),
+
+                                                                      // RUC ORGANIZACION
+                                                                      orgInfo.isNotEmpty && orgInfo["ruc"].toString() != 'null' ? pw.Text( 
+                                                                        orgInfo["ruc"].toString(), 
+                                                                        style: pw.TextStyle(fontSize: 6.0, fontWeight: pw.FontWeight.bold), 
+                                                                        textAlign: pw.TextAlign.center
+                                                                      ) : pw.SizedBox(),
+                                                                      orgInfo.isNotEmpty && orgInfo["ruc"].toString() != 'null' 
+                                                                        ? pw.SizedBox(height: 3) 
+                                                                        : pw.SizedBox(),
+
+                                                                      // DIRECCION ORGANIZACION
+                                                                      orgInfo.isNotEmpty && orgInfo["address"].toString() != 'null' ? pw.Text(
+                                                                        orgInfo["address"].toString(), 
+                                                                        style: pw.TextStyle(fontSize: 6.0), textAlign: pw.TextAlign.center
+                                                                      ) : pw.SizedBox(),
+                                                                      orgInfo.isNotEmpty && orgInfo["address"].toString() != 'null' 
+                                                                        ? pw.SizedBox(height: 10) 
+                                                                        : pw.SizedBox(),
+
+
+                                                                      pw.Text('OBLIGADO A LLEVAR CONTABILIDAD: SI', style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.center),
+                                                                      pw.SizedBox(height: 3),
+                                                                      pw.Text('AGENTE DE RETENCION', style: pw.TextStyle(fontSize: 5.5)),
+                                                                      pw.SizedBox(height: 3),
+                                                                      pw.Text('Resolucion No.: 1', style: pw.TextStyle(fontSize: 5.5)),
+                                                                      pw.SizedBox(height: 8),
+
+
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Text('NO. FACTURA ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                          pw.Text(orderInfo["documentno_factura"], style: pw.TextStyle(fontSize: 5.5)),
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 12),
+
+
+                                                                      // VA UN CAMPO MAS AQUI (**PREGUNTAR**) aparece null en factura: autenticacion
+
+
+                                                                      pw.Row(
+                                                                        children: [                                                                          
+                                                                          pw.Expanded(
+                                                                            child: pw.Row(
+                                                                              children: [
+                                                                                pw.Text('AMBIENTE: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                                pw.Text('PRODUCCION', style: pw.TextStyle(fontSize: 5.5)),
+                                                                              ]
+                                                                            )
+                                                                          ),
+                                                                          pw.Expanded(
+                                                                            child: pw.Row(
+                                                                              children: [
+                                                                                pw.Text('EMISION: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                                pw.Text('NORMAL', style: pw.TextStyle(fontSize: 5.5)),
+                                                                              ]
+                                                                            )
+                                                                          ),
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3), 
+                                                                      pw.Row(
+                                                                        children: [                                                                          
+                                                                          pw.Expanded(
+                                                                            child: pw.Row(
+                                                                              children: [
+                                                                                pw.Text('FECHA: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                                pw.Text(orderDate, style: pw.TextStyle(fontSize: 5.5)),
+                                                                              ]
+                                                                            )
+                                                                          ),
+                                                                          pw.Expanded(
+                                                                            child: pw.Row(
+                                                                              children: [
+                                                                                pw.Text('HORA: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                                pw.Text(orderTime, style: pw.TextStyle(fontSize: 5.5)),
+                                                                              ]
+                                                                            )
+                                                                          ),
+                                                                        ]
+                                                                      ), 
+                                                                      pw.SizedBox(height: 3),  
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Text('CLIENTE: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                          pw.Text(orderClient["bp_name"], style: pw.TextStyle(fontSize: 5.5)),
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3),  
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Text('RUC/CI: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                          pw.Text(orderClient["ruc"], style: pw.TextStyle(fontSize: 5.5)),
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3),    
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Text('DIRECCION: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                          pw.Text(
+                                                                            orderClient["address"].toString(), 
+                                                                            style: pw.TextStyle(fontSize: 5.5)
+                                                                          ),
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 20), 
+
+
+                                                                      // LISTADO DE PRODUCTOS
+                                                                      pw.TableHelper.fromTextArray(
+                                                                        headers: ['CANT.', 'PRODUCTO', 'P. U.', 'P. TOT.'],
+                                                                        border: null,
+                                                                        //cellHeight: 5.0,
+                                                                        data: productList,
+                                                                        headerStyle: pw.TextStyle(fontSize: 5.0, fontWeight: pw.FontWeight.bold),
+                                                                        cellStyle: pw.TextStyle(fontSize: 6.0),
+                                                                        headerAlignments: {
+                                                                          0: pw.Alignment.centerLeft,
+                                                                          1: pw.Alignment.centerLeft,
+                                                                          2: pw.Alignment.centerLeft,
+                                                                          3: pw.Alignment.centerLeft,
+                                                                        },
+                                                                        cellAlignments: {
+                                                                          0: pw.Alignment.centerLeft,
+                                                                          1: pw.Alignment.centerLeft,
+                                                                          2: pw.Alignment.centerRight,
+                                                                          3: pw.Alignment.centerRight,
+                                                                        },
+                                                                      ),
+                                                                      pw.SizedBox(height: 5),
+
+
+                                                                      // SUBTOTAL 12%
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Expanded(
+                                                                            flex: 2,
+                                                                            child: pw.Text('SUBTOTAL 12%: ', style: pw.TextStyle(
+                                                                              fontSize: 5.5, 
+                                                                              fontWeight: pw.FontWeight.bold
+                                                                            ), textAlign: pw.TextAlign.right)
+                                                                          ),
+                                                                          pw.Expanded(child: pw.Text('0.00', style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.right))                                                                          
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3.0),
+                                                                      // SUBTOTAL 0%
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Expanded(
+                                                                            flex: 2,
+                                                                            child: pw.Text('SUBTOTAL 0%: ', style: pw.TextStyle(
+                                                                              fontSize: 5.5, 
+                                                                              fontWeight: pw.FontWeight.bold
+                                                                            ), textAlign: pw.TextAlign.right)
+                                                                          ),
+                                                                          pw.Expanded(child: pw.Text('0.00', style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.right))                                                                          
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3.0),
+                                                                      // DESCUENTO
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Expanded(
+                                                                            flex: 2,
+                                                                            child: pw.Text('DESCUENTO: ', style: pw.TextStyle(
+                                                                              fontSize: 5.5, 
+                                                                              fontWeight: pw.FontWeight.bold
+                                                                            ), textAlign: pw.TextAlign.right)
+                                                                          ),
+                                                                          pw.Expanded(child: pw.Text('0.00', style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.right))
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3.0),
+                                                                      // SUBTOTAL
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Expanded(
+                                                                            flex: 2,
+                                                                            child: pw.Text('SUBTOTAL: ', style: pw.TextStyle(
+                                                                              fontSize: 5.5, 
+                                                                              fontWeight: pw.FontWeight.bold
+                                                                            ), textAlign: pw.TextAlign.right)
+                                                                          ),
+                                                                          pw.Expanded(child: pw.Text(orderInfo["saldo_neto"], style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.right))
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3.0),
+                                                                      // CE
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Expanded(
+                                                                            flex: 2,
+                                                                            child: pw.Text('CE: ', style: pw.TextStyle(
+                                                                              fontSize: 5.5, 
+                                                                              fontWeight: pw.FontWeight.bold
+                                                                            ), textAlign: pw.TextAlign.right)
+                                                                          ),
+                                                                          pw.Expanded(child: pw.Text(orderInfo["saldo_exento"], style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.right))
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3.0),
+                                                                      // IVA 12
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Expanded(
+                                                                            flex: 2,
+                                                                            child: pw.Text('IVA 12: ', style: pw.TextStyle(
+                                                                              fontSize: 5.5, 
+                                                                              fontWeight: pw.FontWeight.bold
+                                                                            ), textAlign: pw.TextAlign.right)
+                                                                          ),
+                                                                          pw.Expanded(child: pw.Text(orderInfo["saldo_impuesto"], style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.right))
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 3.0),
+                                                                      // TOTAL
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Expanded(
+                                                                            flex: 2,
+                                                                            child: pw.Text('TOTAL: ', style: pw.TextStyle(
+                                                                              fontSize: 5.5, 
+                                                                              fontWeight: pw.FontWeight.bold
+                                                                            ), textAlign: pw.TextAlign.right)
+                                                                          ),
+                                                                          pw.Expanded(child: pw.Text(orderInfo["saldo_total_formatted"], style: pw.TextStyle(fontSize: 5.5), textAlign: pw.TextAlign.right))
+                                                                        ]
+                                                                      ),
+                                                                      pw.SizedBox(height: 20),
+
+
+                                                                      pw.SizedBox(
+                                                                        child: pw.Text(
+                                                                          'SU COMPROBANTE SERA ENVIADO A: ${orderClient["email"]} PARA CONSULTAR SU FACTURA INGRESE A WWW.SRI.GOB.EC SRI EN LINEA',
+                                                                          style: pw.TextStyle(fontSize: 5.5)
+                                                                        )
+                                                                      ),
+                                                                      pw.SizedBox(height: 3),
+                                                                      pw.Row(
+                                                                        children: [
+                                                                          pw.Text('Usuario: ', style: pw.TextStyle(fontSize: 5.5)),
+                                                                          pw.Text(userInfo["user"], style: pw.TextStyle(fontSize: 5.5)),
+                                                                        ]
+                                                                      ), 
+                                                                    ]
+                                                                  );
+                                                                }
+                                                              )
+                                                            );
+
+                                                            final root = Platform.isAndroid 
+                                                              ? await getExternalStorageDirectory() 
+                                                              : await getApplicationDocumentsDirectory();
+
+                                                            final filePath  = '${root!.path}/reporte.pdf';
+                                                            final file      = File('$filePath');
+
+                                                            await file.writeAsBytes(
+                                                              await pdf.save()
+                                                            );
+
+                                                            OpenFile.open(filePath);
+                                                          }
+                                                        },
+                                                        itemBuilder: (BuildContext bc) {
+                                                          return const [
+                                                            PopupMenuItem(child: Text("Editar"), value: 'EDIT'),
+                                                            PopupMenuItem(child: Text("Eliminar"), value: 'DELETE'),
+                                                            PopupMenuItem(child: Text("Vista Previa"), value: 'PREVIEW'),
+                                                            PopupMenuItem(child: Text("Imprimir"), value: 'PRINT'),                                                            
+                                                          ];
+                                                        },
+                                                      )
+                                                    ]
+                                                  )
                                                 ),
                                               ),
                                             ),
                                             Positioned(
                                               top: 55,
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
+                                                padding: const EdgeInsets.all(8.0),
                                                 child: SizedBox(
                                                   width: screenMax * 1,
                                                   child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.start,
                                                     children: [
                                                       Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
+                                                          // NOMBRE
+                                                          /*Row(
+                                                            children: [
+                                                              const Text('Nombre: ', style: TextStyle(fontFamily: 'Poppins SemiBold'),                                                          ),
+                                                              SizedBox(width: screenMax * 0.40,
+                                                                child: Text(
+                                                                  '${venta['nombre_cliente']}',
+                                                                  style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                )
+                                                              )
+                                                            ],
+                                                          )*/
                                                           Row(
                                                             children: [
-                                                              const Text(
-                                                                'Nombre: ',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'Poppins SemiBold'),
-                                                              ),
-                                                              SizedBox(
-                                                                  width:
-                                                                      screenMax *
-                                                                          0.40,
-                                                                  child: Text(
-                                                                    '${venta['nombre_cliente']}',
-                                                                    style: const TextStyle(
-                                                                        fontFamily:
-                                                                            'Poppins Regular'),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ))
+                                                              const Text('Nombre: ', style: TextStyle(fontFamily: 'Poppins SemiBold'),                                                          ),
+                                                              SizedBox(width: screenMax * 0.40,
+                                                                child: Text(
+                                                                  '${venta['nombre_cliente']}',
+                                                                  style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                )                                                                  
+                                                              )
                                                             ],
                                                           ),
+                                                          // FECHA
                                                           Row(
                                                             children: [
-                                                              const Text(
-                                                                'Fecha: ',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'Poppins SemiBold'),
-                                                              ),
+                                                              const Text('Fecha: ', style: TextStyle(fontFamily: 'Poppins SemiBold')),
                                                               SizedBox(
-                                                                  width:
-                                                                      screenMax *
-                                                                          0.40,
-                                                                  child: Text(
-                                                                    '${venta['fecha']}',
-                                                                    style: const TextStyle(
-                                                                        fontFamily:
-                                                                            'Poppins Regular'),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  )),
+                                                                width: screenMax * 0.40,
+                                                                child: Text(
+                                                                  '${venta['fecha']}',
+                                                                  style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                )
+                                                              ),
                                                             ],
                                                           ),
+                                                          // MONTO
                                                           Row(
                                                             children: [
-                                                              const Text(
-                                                                'Monto: ',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'Poppins SemiBold'),
-                                                              ),
+                                                              const Text('Monto: ', style: TextStyle(fontFamily: 'Poppins SemiBold')),
                                                               SizedBox(
-                                                                  width:
-                                                                      screenMax *
-                                                                          0.40,
-                                                                  child: Text(
-                                                                    '${venta['monto']}\$',
-                                                                    style: const TextStyle(
-                                                                        fontFamily:
-                                                                            'Poppins Regular'),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ))
+                                                                width: screenMax * 0.40,
+                                                                child: Text(
+                                                                  '${venta['monto']}\$',
+                                                                  style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                )
+                                                              )
                                                             ],
                                                           ),
+                                                          // DESCRIPCION
                                                           Row(
                                                             children: [
-                                                              const Text(
-                                                                'Descripción: ',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'Poppins SemiBold'),
-                                                              ),
+                                                              const Text('Descripción: ', style: TextStyle(fontFamily: 'Poppins SemiBold')),
                                                               SizedBox(
-                                                                  width:
-                                                                      screenMax *
-                                                                          0.40,
+                                                                  width: screenMax * 0.40,
                                                                   child: Text(
-                                                                    venta['descripcion']
-                                                                        .toString(),
-                                                                    style: const TextStyle(
-                                                                        fontFamily:
-                                                                            'Poppins Regular'),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
+                                                                    venta['descripcion'].toString(),
+                                                                    style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                                                    overflow: TextOverflow.ellipsis,
                                                                   ))
                                                             ],
                                                           ),
@@ -617,46 +929,26 @@ class _VentasState extends State<Ventas> {
                                                       ),
                                                       GestureDetector(
                                                         onTap: () {
-                                                          Navigator.of(context)
-                                                              .push(
+                                                          Navigator.of(context).push(
                                                             MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  VentasDetails(
-                                                                      ventaId:
-                                                                          venta[
-                                                                              'id'],
-                                                                      nameClient:
-                                                                          venta[
-                                                                              'nombre_cliente'],
-                                                                      saldoTotal:
-                                                                          venta[
-                                                                              'saldo_total'],
-                                                                      rucClient:
-                                                                          venta['ruc'],
-                                                                      emailClient:
-                                                                          venta['email'],
-                                                                      phoneClient:
-                                                                          venta['phone'].toString()
-      
-                                                                      ),
+                                                                VentasDetails(
+                                                                  ventaId: venta['id'],
+                                                                  nameClient: venta['nombre_cliente'],
+                                                                  saldoTotal: venta['saldo_total'],
+                                                                  rucClient: venta['ruc'],
+                                                                  emailClient: venta['email'],
+                                                                  phoneClient: venta['phone'].toString()      
+                                                                ),
                                                             ),
                                                           );
                                                         },
                                                         child: Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
                                                           children: [
-                                                            const Text('Ver',
-                                                                style: TextStyle(
-                                                                    color: Color(
-                                                                        0xFF7531FF))),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Image.asset(
-                                                                'lib/assets/Lupa-2@2x.png',
-                                                                width: 25),
+                                                            const Text('Ver', style: TextStyle(color: Color(0xFF7531FF))),
+                                                            const SizedBox(width: 10),
+                                                            Image.asset('lib/assets/Lupa-2@2x.png', width: 25),
                                                           ],
                                                         ),
                                                       )

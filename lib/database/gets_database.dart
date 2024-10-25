@@ -181,11 +181,17 @@ Future<List<Map<String, dynamic>>> getAllOrdersWithClientNames() async {
   if (db != null) {
     // Consultar todas las órdenes de venta con el nombre del cliente asociado
     List<Map<String, dynamic>> orders = await db.rawQuery('''
-        SELECT o.*, c.bp_name AS nombre_cliente, c.ruc AS ruc, c.email AS email, c.phone AS phone,
+      SELECT 
+        o.*, 
+        c.bp_name AS nombre_cliente, 
+        c.ruc AS ruc, 
+        c.email AS email, 
+        c.phone AS phone,
+        c.address AS address,
         ROUND((CAST(REPLACE(o.monto, ',', '.') AS REAL) - COALESCE((SELECT SUM(pay_amt) FROM cobros WHERE sale_order_id = o.id), 0)),2) AS saldo_total
-        FROM orden_venta o
-        INNER JOIN clients c ON o.cliente_id = c.id
-      ''');
+      FROM orden_venta o
+      INNER JOIN clients c ON o.cliente_id = c.id
+    ''');
 
     // Formateador para el saldo total
 
@@ -203,7 +209,9 @@ Future<List<Map<String, dynamic>>> getAllOrdersWithClientNames() async {
     }).toList();
 
     return ordersNew;
-  } else {
+  } 
+  else 
+  {
     // Manejar el caso en el que db sea null
     print('Error: db is null');
     return [];
@@ -276,7 +284,7 @@ Future<Map<String, dynamic>> getOrderWithProducts(int orderId) async {
       int clienteId = orderResult[0]['cliente_id'];
 
       List<Map<String, dynamic>> clientsResult = await db.rawQuery('''
-          SELECT c.bp_name, c.ruc, c.email, c.id, c.phone
+          SELECT c.bp_name, c.ruc, c.email, c.id, c.phone, c.address
           FROM clients c
           WHERE  c.id = ?
         ''', [clienteId]);

@@ -751,15 +751,30 @@ class _VentasDetailsState extends State<VentasDetails> {
                             padding: EdgeInsets.all(15.0),
                             child: Text(
                               'Cobrar',
-                              style: TextStyle(
-                                color: Colors
-                                    .white, // Texto blanco para que se destaque sobre el fondo verde
-                                fontFamily: 'Poppins Bold',
-                              ),
+                              style: TextStyle(color: Colors.white, fontFamily: 'Poppins Bold'),
                             ),
                           ),
                         ),
                       ),
+                      SizedBox(height: 5),
+                      Container(
+                        width: screenMax,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Color(0xFF7531FF)
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                            backgroundColor:  WidgetStateProperty.all<Color>(Colors.transparent),
+                            shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Text('Imprimir', style: TextStyle(color: Colors.white, fontFamily: 'Poppins Bold'))
+                          )
+                        )
+                      )                      
                     ],
                   ),
                 ),

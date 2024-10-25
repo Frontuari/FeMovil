@@ -84,5 +84,26 @@
       ]
     }
   }
+},
+{
+  "ModelCRUDRequest": {
+      "ModelCRUD": {
+          "serviceType": "getOrgInfo",
+          "DataRow": {
+              "field": [
+                  {"@column": "AD_Org_ID_Organization", "val": 1000000}
+              ]
+          }
+      },
+      "ADLoginRequest": {
+          "user":"Admin",
+          "pass":"07@ng3l3s",
+          "lang":"es_CO",
+          "ClientID":1000000,
+          "RoleID":1000000,
+          "OrgID":1000000,
+          "WarehouseID":1000000,
+          "stage":"9"
+      }
+  }
 }
-    
