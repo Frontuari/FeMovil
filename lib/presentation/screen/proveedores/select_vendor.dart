@@ -165,15 +165,15 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
             items: dataList
                 .where((groupList) =>
                     groupList['c_country_id'] is int &&
-                    groupList['country_name'] != '')
+                    groupList['country'].toString() != 'null')
                 .map<DropdownMenuItem<int>>((group) {
-              print('tax $group');
+              print('country ... ${group['country'].toString()}');
               return DropdownMenuItem<int>(
                 value: group['c_country_id'] as int,
                 child: SizedBox(
                     width: mediaScreen * 0.70,
                     child: Text(
-                      group['country_name'] as String,
+                      group['country'].toString(),
                       style: const TextStyle(fontFamily: 'Poppins Regular'),
                     )),
               );
@@ -226,13 +226,13 @@ class CustomDropdownButtonFormFieldVendor extends StatelessWidget {
             value: selectedIndex,
             items: dataList
                 .where((groupList) =>
-                    groupList['lco_taxt_payer_type_id'] is int &&
+                    groupList['lco_tax_payer_type_id'] is int &&
                     groupList['tax_payer_type_name'] != '')
                 .toSet()
                 .map<DropdownMenuItem<int>>((group) {
               print('tax $group');
               return DropdownMenuItem<int>(
-                value: group['lco_taxt_payer_type_id'] as int,
+                value: group['lco_tax_payer_type_id'] as int,
                 child: SizedBox(
                     width: mediaScreen * 0.70,
                     child: Text(

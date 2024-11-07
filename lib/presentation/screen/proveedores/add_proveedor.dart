@@ -40,7 +40,7 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
   //SELECTED
   int _selectedGroupIndex = 0;
   int _selectedIdTypeIndex = 0;
-  int _selectedCountryIndex = 171;
+  int _selectedCountryIndex = 0;
   int _selectedTaxPayerIndex = 0;
   int _selectedPersonTypeIndex = 0;
   int _selectedCiiuCode = 0;
@@ -53,20 +53,17 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
   String _taxPayerText = '';
   String _personTypeText = '';
   String _ciiuActivitiesText = '';
-  int _idMaxlength = 10;
+  int _idMaxlength = 20;
 
   loadList() async {
     List<Map<String, dynamic>> getGroupVendor = await listarTypeGroupVendor();
-    List<Map<String, dynamic>> getTaxTypeVendor = await listarTypeTaxVendor();
-    List<Map<String, dynamic>> getCountryVendor = await listarCountryVendor();
-    List<Map<String, dynamic>> getTaxPayerVendor =
-        await listarTaxPayerVendors();
+    List<Map<String, dynamic>> getTaxTypeVendor = await listarTaxType();
+    List<Map<String, dynamic>> getCountryVendor = await listarCountries();
+    List<Map<String, dynamic>> getTaxPayerVendor = await listarTaxPayer();
     List<Map<String, dynamic>> getTypePerson = await listarPersonTypeVendors();
-    List<Map<String, dynamic>> getCiiuActivitesCodes =
-        await getCiiuActivities();
+    List<Map<String, dynamic>> getCiiuActivitesCodes = await getCiiuActivities();
 
     print('Value de ciuu $getCiiuActivitesCodes');
-
     print('Value de getGroupVendor $getGroupVendor ');
     print('Value de getTaxTypeVendor $getTaxTypeVendor');
 
@@ -80,15 +77,15 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     });
     _idTypeVendorList.add({
       'lco_tax_id_type_id': 0,
-      'tax_id_type_name': 'Selecciona un tipo de identificación'
+      'tax_id_type_name'  : 'Selecciona un tipo de identificación'
     });
     _countryVendorList.add({
       'c_country_id': 0, 
       'country_name': 'Selecciona un Pais'
     });
     _taxPayerList.add({
-      'lco_taxt_payer_type_id': 0,
-      'tax_payer_type_name': 'Selecciona un tipo de contribuyente'
+      'lco_tax_payer_type_id': 0,
+      'tax_payer_type_name'  : 'Selecciona un tipo de contribuyente'
     });
     _typePersonList.add({
       'lve_person_type_id': 0,
@@ -103,6 +100,12 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
       _taxPayerList.addAll(getTaxPayerVendor);
       _typePersonList.addAll(getTypePerson);
     });
+
+    if (getCountryVendor.isNotEmpty) {
+      setState(() {
+        _selectedCountryIndex = 171;
+      });
+    }
   }
 
   @override

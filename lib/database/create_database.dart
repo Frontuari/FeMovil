@@ -414,8 +414,29 @@ class DatabaseHelper {
           )
         ''');
 
+        await db.execute('''
+          CREATE TABLE tax_id_types(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            tax_id_type_id INTEGER,
+            name TEXT
+          )
+        ''');
 
+        await db.execute('''
+          CREATE TABLE tax_payer_types(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            tax_payer_type_id INTEGER,
+            name TEXT
+          )
+        ''');
 
+        await db.execute('''
+          CREATE TABLE countries(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            c_country_id INTEGER,
+            name TEXT
+          )
+        ''');
       },
     );
 

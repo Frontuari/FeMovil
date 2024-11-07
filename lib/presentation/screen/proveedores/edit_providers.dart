@@ -56,10 +56,9 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
 
   loadList() async {
     List<Map<String, dynamic>> getGroupVendor = await listarTypeGroupVendor();
-    List<Map<String, dynamic>> getIdTypeVendor = await listarTypeTaxVendor();
+    List<Map<String, dynamic>> getIdTypeVendor = await listarTaxType();
     List<Map<String, dynamic>> getCountryVendor = await listarCountryVendor();
-    List<Map<String, dynamic>> getTaxPayerVendor =
-        await listarTaxPayerVendors();
+    List<Map<String, dynamic>> getTaxPayerVendor = await listarTaxPayerVendors();
     List<Map<String, dynamic>> getTypePerson = await listarPersonTypeVendors();
     List<Map<String, dynamic>> getCiiuActivitesCodes = await getCiiuActivities();
 

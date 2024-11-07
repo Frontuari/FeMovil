@@ -37,7 +37,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
   final List<Map<String, dynamic>> _typePersonList = [];
 
   // SELECTED
-  int _selectedCountryIndex = 171;
+  int _selectedCountryIndex = 0; // 171
   int _selectedGroupIndex = 0;
   int _selectedIdType = 0;
   int _selectedTaxPayer = 0;
@@ -49,10 +49,10 @@ class _AddClientsFormState extends State<AddClientsForm> {
   String _idTypeText = '';
   String _taxPayerText = '';
   String _typePersonText = '';
-  int _idMaxlength = 10;
+  int _idMaxlength = 20;
 
   loadList() async {
-    List<Map<String, dynamic>> getCountryGroup = await listarCountryGroup();
+    List<Map<String, dynamic>> getCountryGroup = await listarCountries();
     List<Map<String, dynamic>> getGroupTercero = await listarGroupTercero();
     List<Map<String, dynamic>> getIdType = await listarTaxType();
     List<Map<String, dynamic>> getTaxPayer = await listarTaxPayer();
@@ -71,11 +71,11 @@ class _AddClientsFormState extends State<AddClientsForm> {
       'group_bp_name': 'Selecciona un Grupo'
     });
     _idTypeList.add({
-      'lco_tax_id_typeid': 0,
-      'tax_id_type_name': 'Selecciona un tipo de identificación'
+      'lco_tax_id_type_id': 0,
+      'tax_id_type_name'  : 'Selecciona un tipo de identificación'
     });
     _taxPayerList.add({
-      'lco_tax_payer_typeid': 0,
+      'lco_tax_payer_type_id': 0,
       'tax_payer_type_name': 'Selecciona un tipo de contribuyente'
     });
     _typePersonList.add({
@@ -90,6 +90,14 @@ class _AddClientsFormState extends State<AddClientsForm> {
       _taxPayerList.addAll(getTaxPayer);
       _typePersonList.addAll(getTypePerson);
     });
+
+
+
+    if (getCountryGroup.isNotEmpty) {
+      setState(() {
+        _selectedCountryIndex = 171;
+      });
+    }
   }
 
   @override
@@ -320,7 +328,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
 
                           if (idTypeText == 'C CEDULA' || idTypeText == 'P PASAPORTE') {
                             _idMaxlength = 10;
-                          } else if (idTypeText == 'R RUC PERSONAL') {
+                          } else if (idTypeText == 'R RUC PERSONAL' || idTypeText == 'R RUC JURIDICO') {
                             _idMaxlength = 13;
                           }
 
@@ -622,7 +630,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
                     CustomDropdownButtonFormField(
                       identifier: 'selectCountry',
                       selectedIndex: _selectedCountryIndex,
-                      dataList: _countryList,
+                      dataList: _countryList ?? [],
                       text: _countryText,
                       onSelected: (newValue, countryTex) {
                         setState(() {

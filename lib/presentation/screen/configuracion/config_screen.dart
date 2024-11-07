@@ -283,7 +283,7 @@ class _ConfiguracionState extends State<Configuracion> {
                           onChanged: (value) async {
                             print('VERIFICAR CONEXION');
                             bool resp = await verificarConexion(textUrlController.text, textTokenController.text, setState);
-                            //print(resp);
+                            print(resp);
 
                             if (resp == true) {
                               setState(() {

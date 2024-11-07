@@ -99,12 +99,12 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             value: selectedIndex,
             items: dataList
                 .where((taxType) =>
-                    taxType['lco_tax_id_typeid'] is int &&
+                    taxType['lco_tax_id_type_id'] is int &&
                     taxType['tax_id_type_name'] != '')
                 .map<DropdownMenuItem<int>>((taxType) {
               print('tax $taxType');
               return DropdownMenuItem<int>(
-                value: taxType['lco_tax_id_typeid'] as int,
+                value: taxType['lco_tax_id_type_id'] as int,
                 child: SizedBox(
                     width: 200,
                     child: Text(
@@ -155,11 +155,11 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             value: selectedIndex,
             items: dataList
                 .where((taxPayer) =>
-                    taxPayer['lco_tax_payer_typeid'] is int &&
+                    taxPayer['lco_tax_payer_type_id'] is int &&
                     taxPayer['tax_payer_type_name'] != '')
                 .map<DropdownMenuItem<int>>((taxPayer) {
               return DropdownMenuItem<int>(
-                value: taxPayer['lco_tax_payer_typeid'],
+                value: taxPayer['lco_tax_payer_type_id'],
                 child: SizedBox(
                     width: 200,
                     child: Text(
@@ -170,10 +170,8 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             }).toList(),
             onChanged: (newValue) {
               print('esto es el taxList ${dataList}');
-              String nameTaxPayer =
-                  invoke('obtenerNombreTaxPayer', newValue, dataList);
-              print(
-                  "esto es el nombre del tipo de constribuyente $nameTaxPayer");
+              String nameTaxPayer = invoke('obtenerNombreTaxPayer', newValue, dataList);
+              print("esto es el nombre del tipo de constribuyente $nameTaxPayer");
 
               onSelected(newValue, nameTaxPayer);
             },
@@ -242,7 +240,7 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             value: selectedIndex,
             items: dataList
                 .where((country) =>
-                    country['c_country_id'] is int && country['country'] != '')
+                    country['c_country_id'] is int && country['country'].toString() != 'null')
                 .map<DropdownMenuItem<int>>((country) {
               print('tax $country');
               return DropdownMenuItem<int>(
@@ -250,7 +248,7 @@ class CustomDropdownButtonFormField extends StatelessWidget {
                 child: Container(
                     width: mediaScreen * 0.5,
                     child: Text(
-                      country['country'] as String,
+                      country['country'].toString(),
                       overflow: TextOverflow.clip,
                       style: const TextStyle(
                           fontFamily: 'Poppins Regular', color: Colors.black),
