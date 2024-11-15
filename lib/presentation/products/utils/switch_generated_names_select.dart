@@ -150,7 +150,6 @@ invoke(option, newValue, data){
           return nombreBankAccount != null ? nombreBankAccount['bank_name'] : '';
 
 
-
       default:
     }
 

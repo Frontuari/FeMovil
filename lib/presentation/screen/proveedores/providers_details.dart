@@ -196,7 +196,7 @@ class ProvidersDetailsScreen extends StatelessWidget {
                                 const Text('País: ', style: TextStyle(fontFamily: 'Poppins Bold')),
                                 Flexible(
                                   child: Text(
-                                    provider['country_name'] != '{@nil=true}' ? provider['country_name'].toString() : '',
+                                    provider['country'].toString() != 'null' ? provider['country'].toString() : '',
                                     style: const TextStyle(fontFamily: 'Poppins Regular'),
                                     overflow: TextOverflow.clip,
                                   )
@@ -209,7 +209,7 @@ class ProvidersDetailsScreen extends StatelessWidget {
                                 const Text('Provincia: ', style: TextStyle(fontFamily: 'Poppins Bold')),
                                 Flexible(
                                   child: Text(
-                                    provider['province'] != '{@nil=true}' ? provider['province'].toString() : '',
+                                    provider['region'].toString() != 'null' ? provider['region'].toString() : '',
                                     style: const TextStyle(fontFamily: 'Poppins Regular'),
                                     overflow: TextOverflow.clip,
                                   )
@@ -222,7 +222,7 @@ class ProvidersDetailsScreen extends StatelessWidget {
                                 const Text('Ciudad: ', style: TextStyle(fontFamily: 'Poppins Bold')),
                                 Flexible(
                                   child: Text(
-                                    provider['city'] != '{@nil=true}' ? provider['city'].toString() : '',
+                                    provider['city'].toString() != 'null' ? provider['city'].toString() : '',
                                     style: const TextStyle(fontFamily: 'Poppins Regular'),
                                     overflow: TextOverflow.clip,
                                   )

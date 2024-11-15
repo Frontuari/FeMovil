@@ -1,11 +1,4 @@
-
-
-
-
-
-
-
- class Vendor {
+class Vendor {
 
     final dynamic id;
     final dynamic cBPartnerId;
@@ -35,6 +28,7 @@
     final dynamic province; 
     final dynamic ciiuId;
     final dynamic ciiuTagName;
+    final dynamic cRegionId;
 
   Vendor({
    this.id,
@@ -53,8 +47,8 @@
    required this.phone,
    required this.cLocationId,
    required this.address,
-   required this.city, 
-   required this.countryName,
+   this.city = '', 
+   this.countryName = '',
    required this.postal,
    required this.cCityId,
    required this.cCountryId,
@@ -64,8 +58,8 @@
    required this.personTypeName,
    required this.ciiuId,
    required this.ciiuTagName,
-   required this.province
-
+   this.province = '',
+   this.cRegionId = 0
    });
 
 
@@ -101,7 +95,8 @@
           'person_type_name': personTypeName,
           'ciiu_id' : ciiuId,
           'ciiu_tagname': ciiuTagName,
-          'province': province
+          'province': province, 
+          'c_region_id': cRegionId
       };
 
   }

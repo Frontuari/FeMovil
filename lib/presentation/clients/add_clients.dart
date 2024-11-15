@@ -30,26 +30,33 @@ class _AddClientsFormState extends State<AddClientsForm> {
   final FocusNode _rucFocusNode = FocusNode();
 
 //List
-  final List<Map<String, dynamic>> _countryList = [];
-  final List<Map<String, dynamic>> _groupList = [];
-  final List<Map<String, dynamic>> _idTypeList = [];
-  final List<Map<String, dynamic>> _taxPayerList = [];
-  final List<Map<String, dynamic>> _typePersonList = [];
+  final List<Map<String, dynamic>> _countryList     = [];
+  final List<Map<String, dynamic>> _groupList       = [];
+  final List<Map<String, dynamic>> _idTypeList      = [];
+  final List<Map<String, dynamic>> _taxPayerList    = [];
+  final List<Map<String, dynamic>> _typePersonList  = [];
+  List<Map<String, dynamic>> _provinceList          = [];
+  List<Map<String, dynamic>> _cityList              = [];
 
   // SELECTED
-  int _selectedCountryIndex = 0; // 171
-  int _selectedGroupIndex = 0;
-  int _selectedIdType = 0;
-  int _selectedTaxPayer = 0;
-  int _seletectedTypePerson = 0;
+  int _selectedCountryIndex   = 0; // 171
+  int _selectedGroupIndex     = 0;
+  int _selectedIdType         = 0;
+  int _selectedTaxPayer       = 0;
+  int _seletectedTypePerson   = 0;
+  int _selectedProvinceIndex  = 0;
+  int _selectedCityIndex      = 0;
 // Text
 
-  String _countryText = 'Ecuador';
-  String _groupText = '';
-  String _idTypeText = '';
-  String _taxPayerText = '';
-  String _typePersonText = '';
-  int _idMaxlength = 20;
+  String _countryText     = 'Ecuador';
+  String _groupText       = '';
+  String _idTypeText      = '';
+  String _taxPayerText    = '';
+  String _typePersonText  = '';
+  String _cityText        = '';
+  String _provinceText    = '';
+  
+  int _idMaxlength        = 20;
 
   loadList() async {
     List<Map<String, dynamic>> getCountryGroup = await listarCountries();
@@ -62,10 +69,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
     print('Esto es getIdType $getIdType');
     print('Estos son los taxPayers $getTaxPayer');
     print('Estos son los type person $getTypePerson');
-    _countryList.add({
-      'c_country_id': 0, 
-      'country': 'Selecciona un País'
-    });
+    
     _groupList.add({
       'c_bp_group_id': 0, 
       'group_bp_name': 'Selecciona un Grupo'
@@ -82,6 +86,18 @@ class _AddClientsFormState extends State<AddClientsForm> {
       'lve_person_type_id': 0,
       'person_type_name': 'Selecciona un tipo de Persona'
     });
+    _countryList.add({
+      'c_country_id': 0, 
+      'country'     : 'Selecciona un país'
+    });
+    _provinceList.add({
+      'c_region_id': 0,
+      'region'     : 'Selecciona una provincia'
+    });
+    _cityList.add({
+      'c_city_id': 0,
+      'city'     : 'Selecciona una ciudad'
+    });
 
     setState(() {
       _countryList.addAll(getCountryGroup);
@@ -91,11 +107,13 @@ class _AddClientsFormState extends State<AddClientsForm> {
       _typePersonList.addAll(getTypePerson);
     });
 
-
-
     if (getCountryGroup.isNotEmpty) {
+      var defaultCountry = 171;
+      List<Map<String, dynamic>> provinceListByCountry = await listarRegions(defaultCountry);
+
       setState(() {
-        _selectedCountryIndex = 171;
+        _selectedCountryIndex = defaultCountry;
+        _provinceList.addAll(provinceListByCountry);
       });
     }
   }
@@ -632,17 +650,42 @@ class _AddClientsFormState extends State<AddClientsForm> {
                       selectedIndex: _selectedCountryIndex,
                       dataList: _countryList ?? [],
                       text: _countryText,
-                      onSelected: (newValue, countryTex) {
+                      onSelected: (newValue, newText)  async {
+                        var countryIndex = newValue ?? 0;
+                        var countryName  = (newValue != 0) ? newText : ""; 
+
+                        List<Map<String, dynamic>> newProvinceList = [];
+                        newProvinceList.add({
+                          'c_region_id': 0,
+                          'region'     : 'Selecciona una provincia'
+                        });
+                        List<Map<String, dynamic>> newCityList = [];
+                        newCityList.add({
+                          'c_city_id': 0,
+                          'city'     : 'Selecciona una ciudad'
+                        });
+                        if (countryName != "") {
+                          dynamic provinceListByCountry = await listarRegions(countryIndex);
+
+                          newProvinceList.addAll(provinceListByCountry);
+                        }
+
+                        print('provinces by country: $newProvinceList');
+
                         setState(() {
-                          _selectedCountryIndex = newValue ?? 0;
-                          _countryText = (newValue != 0) ? countryTex : "";
+                          _selectedCountryIndex   = countryIndex;
+                          _countryText            = countryName;
+                          _provinceList           = newProvinceList;      
+                          _selectedProvinceIndex  = 0;   
+                          _cityList               = newCityList;      
+                          _selectedCityIndex      = 0;                  
                         });
                       },
                     ),
                     const SizedBox(height: 10),
 
                     // PROVINCIA
-                    Container(
+                    /*Container(
                       height: mediaScreen * 0.20,
                       width: mediaScreen * 0.95,
                       decoration: BoxDecoration(
@@ -676,16 +719,46 @@ class _AddClientsFormState extends State<AddClientsForm> {
                         },
                         keyboardType: TextInputType.text,
                       ),
+                    )*/
+                    CustomDropdownButtonFormField(
+                      identifier: 'selectProvince',
+                      selectedIndex: _selectedProvinceIndex,
+                      dataList: _provinceList,
+                      text: _provinceText,
+                      onSelected: (newValue, newText) async {
+                        var provinceIndex = newValue ?? 0;
+                        var provinceName  = (newValue != 0) ? newText : ""; 
+
+                        List<Map<String, dynamic>> newCityList = [];
+                        newCityList.add({
+                          'c_city_id': 0,
+                          'city'     : 'Selecciona una ciudad'
+                        });
+                        if (provinceName != "") {
+                          dynamic citiesListByRegion = await listarCities(provinceIndex);
+
+                          newCityList.addAll(citiesListByRegion);
+                        }
+
+                        print('cities by province: $newCityList');
+
+                        setState(() {
+                          _selectedProvinceIndex  = provinceIndex;
+                          _provinceText           = provinceName;
+                          _cityList               = newCityList;
+                          _selectedCityIndex      = 0;
+                        });
+                      },
                     ),
                     const SizedBox(height: 10),
 
                     // CIUDAD
-                    Container(
+                    /*Container(
                       height: mediaScreen * 0.20,
                       width: mediaScreen * 0.95,
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
                                 blurRadius: 7,
@@ -733,6 +806,18 @@ class _AddClientsFormState extends State<AddClientsForm> {
                         },
                         keyboardType: TextInputType.text,
                       ),
+                    )*/
+                    CustomDropdownButtonFormField(
+                      identifier: 'selectCity',
+                      selectedIndex: _selectedCityIndex,
+                      dataList: _cityList,
+                      text: _cityText,
+                      onSelected: (newValue, newText) {
+                        setState(() {
+                          _selectedCityIndex  = newValue ?? 0;
+                          _cityText           = newValue != 0 ? newText : "";
+                        });
+                      },
                     ),
                     const SizedBox(height: 10),
 
@@ -907,10 +992,12 @@ class _AddClientsFormState extends State<AddClientsForm> {
     // Selected DropdownButtonFormField
 
     int selectlcoTaxPayerTypeId = _selectedTaxPayer;
-    int selectlveTypePerson = _seletectedTypePerson;
-    int selectGoupBp = _selectedGroupIndex;
-    int selectCountryId = _selectedCountryIndex;
-    int selectIdType = _selectedIdType; // _selectedTaxType;
+    int selectlveTypePerson     = _seletectedTypePerson;
+    int selectGoupBp            = _selectedGroupIndex;
+    int selectCountryId         = _selectedCountryIndex;
+    int selectProvinceId        = _selectedProvinceIndex;
+    int selectCityId            = _selectedCityIndex;
+    int selectIdType            = _selectedIdType; // _selectedTaxType;
 
     // Text Selected
     String personTypeText = _typePersonText;
@@ -962,7 +1049,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
     }
 
     // Crea una instancia del producto
-    Customer client = Customer(
+    /*Customer client = Customer(
       bpName: name,
       ruc: ruc,
       address: address,
@@ -988,6 +1075,30 @@ class _AddClientsFormState extends State<AddClientsForm> {
       phone: telefono,
       cBpGroupName: groupBpName,
       region: province
+    );*/
+    Customer client = Customer(
+      bpName: name,
+      ruc: ruc,
+      address: address,
+      cBpGroupId: selectGoupBp,
+      cBparnetLocationId: 0,
+      lcoTaxPayerTypeId: selectlcoTaxPayerTypeId,
+      lvePersonTypeId: selectlveTypePerson,
+      personTypeName: personTypeText,
+      taxPayerTypeName: payerTypeName,
+      cCityId: selectCityId,
+      cCountryId: selectCountryId,
+      cLocationId: 0,
+      cRegionId: selectProvinceId,
+      cbPartnerId: 0,
+      codClient: 0,
+      codePostal: codePostal,
+      isBillTo: 'Y',
+      lcoTaxIdTypeId: selectIdType,
+      taxIdTypeName: idTypeName,
+      email: correo,
+      phone: telefono,
+      cBpGroupName: groupBpName,
     );
 
     // Llama a un método para guardar el producto en Sqflite

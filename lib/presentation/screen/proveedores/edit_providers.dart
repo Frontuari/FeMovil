@@ -29,36 +29,42 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
   final TextEditingController _codePostalController = TextEditingController();
 
   // List
-  final List<Map<String, dynamic>> _groupVendorList = [];
-  final List<Map<String, dynamic>> _idTypeVendorList = [];
-  final List<Map<String, dynamic>> _countryVendorList = [];
-  final List<Map<String, dynamic>> _taxPayerList = [];
-  final List<Map<String, dynamic>> _typePersonList = [];
-  final List<Map<String, dynamic>> _ciiuActivitiesList = [];
+  final List<Map<String, dynamic>> _groupVendorList     = [];
+  final List<Map<String, dynamic>> _idTypeVendorList    = [];
+  final List<Map<String, dynamic>> _countryVendorList   = [];
+  final List<Map<String, dynamic>> _taxPayerList        = [];
+  final List<Map<String, dynamic>> _typePersonList      = [];
+  final List<Map<String, dynamic>> _ciiuActivitiesList  = [];
+  List<Map<String, dynamic>> _provinceList              = [];
+  List<Map<String, dynamic>> _cityList                  = [];
 
   //SELECTED
-  int _selectedGroupIndex = 0;
-  int _selectedIdTypeIndex = 0;
-  int _selectedCountryIndex = 0;
-  int _selectedTaxPayerIndex = 0;
-  int _selectedPersonTypeIndex = 0;
-  int _selectedCiiuCode = 0;
+  int _selectedGroupIndex       = 0;
+  int _selectedIdTypeIndex      = 0;
+  int _selectedCountryIndex     = 0;
+  int _selectedTaxPayerIndex    = 0;
+  int _selectedPersonTypeIndex  = 0;
+  int _selectedCiiuCode         = 0;
+  int _selectedProvinceIndex    = 0;
+  int _selectedCityIndex        = 0;
 
   //Text o String
 
-  String _groupTextVendor = '';
-  String _idTypeText = '';
-  String _countryTex = '';
-  String _taxPayerText = '';
-  String _personTypeText = '';
-  String _ciiuActivitiesText = '';
+  String _groupTextVendor     = '';
+  String _idTypeText          = '';
+  String _countryTex          = '';
+  String _taxPayerText        = '';
+  String _personTypeText      = '';
+  String _ciiuActivitiesText  = '';
+  String _provinceText        = '';
+  String _cityText            = '';
   int? _idMaxlength;
 
   loadList() async {
     List<Map<String, dynamic>> getGroupVendor = await listarTypeGroupVendor();
     List<Map<String, dynamic>> getIdTypeVendor = await listarTaxType();
-    List<Map<String, dynamic>> getCountryVendor = await listarCountryVendor();
-    List<Map<String, dynamic>> getTaxPayerVendor = await listarTaxPayerVendors();
+    List<Map<String, dynamic>> getCountryVendor = await listarCountries();
+    List<Map<String, dynamic>> getTaxPayerVendor = await listarTaxPayer();
     List<Map<String, dynamic>> getTypePerson = await listarPersonTypeVendors();
     List<Map<String, dynamic>> getCiiuActivitesCodes = await getCiiuActivities();
 
@@ -73,13 +79,9 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
       'lco_tax_id_type_id': 0,
       'tax_id_type_name': 'Selecciona un tipo de identificación'
     });
-    _countryVendorList.add({
-      'c_country_id': 0, 
-      'country_name': 'Selecciona un Pais'
-    });
     _taxPayerList.add({
-      'lco_taxt_payer_type_id': 0,
-      'tax_payer_type_name': 'Selecciona un tipo de contribuyente'
+      'lco_tax_payer_type_id': 0,
+      'tax_payer_type_name'  : 'Selecciona un tipo de contribuyente'
     });
     _typePersonList.add({
       'lve_person_type_id': 0,
@@ -88,6 +90,18 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
     _ciiuActivitiesList.add({
       'lco_isic_id': 0, 
       'name': 'Selecciona un CIIU'
+    });
+    _countryVendorList.add({
+      'c_country_id': 0, 
+      'country'     : 'Selecciona un país'
+    });
+    _provinceList.add({
+      'c_region_id': 0, 
+      'region'     : 'Selecciona una provincia'
+    });
+    _cityList.add({
+      'c_city_id': 0, 
+      'city'     : 'Selecciona una ciudad'
     });
 
     setState(() {
@@ -98,6 +112,22 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
       _typePersonList.addAll(getTypePerson);
       _ciiuActivitiesList.addAll(getCiiuActivitesCodes);
     });
+    
+    if (getCountryVendor.isNotEmpty && widget.provider['c_country_id'] != 0) {
+      List<Map<String, dynamic>> provinceListByCountry = await listarRegions(widget.provider['c_country_id']);
+      List<Map<String, dynamic>> cityListByProvince = await listarCities(widget.provider['c_region_id']);
+
+      setState(() {
+        _provinceList.addAll(provinceListByCountry);
+        _selectedProvinceIndex  = widget.provider['c_region_id'].toString() != '{@nil=true}' && widget.provider['c_region_id'].toString() != 'null' 
+          ? widget.provider['c_region_id'] 
+          : '';
+        _cityList.addAll(cityListByProvince);
+        _selectedCityIndex      = widget.provider['c_city_id'].toString() != '{@nil=true}' && widget.provider['c_city_id'].toString() != 'null'
+          ? widget.provider['c_city_id'] 
+          : '';
+      });
+    }
   }
 
   @override
@@ -108,52 +138,26 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
         'Esto es el provider tax payer ${widget.provider['lco_taxt_payer_type_id']}');
     print('Esto es el country de provider ${widget.provider['c_country_id']}');
     // Initialize controllers with existing product details
-    _nameController.text = widget.provider['bpname'].toString();
-    _rucController.text = widget.provider['tax_id'].toString();
-    _correoController.text =
-        widget.provider['email'].toString() != '{@nil=true}'
-            ? widget.provider['email'].toString()
-            : '';
-    _telefonoController.text =
-        widget.provider['phone'].toString() != '{@nil=true}'
-            ? widget.provider['phone'].toString()
-            : '';
-    _groupTextVendor = widget.provider['groupbpname'].toString();
-    _taxPayerText = widget.provider['tax_payer_type_name'].toString();
-    _idTypeText = widget.provider['tax_id_type_name'].toString();
+    _nameController.text        = widget.provider['bpname'].toString();
+    _rucController.text         = widget.provider['tax_id'].toString();
+    _correoController.text      = widget.provider['email'].toString() != '{@nil=true}' ? widget.provider['email'].toString() : '';
+    _telefonoController.text    = widget.provider['phone'].toString() != '{@nil=true}' ? widget.provider['phone'].toString() : '';
+    _groupTextVendor            = widget.provider['groupbpname'].toString();
+    _taxPayerText               = widget.provider['tax_payer_type_name'].toString();
+    _idTypeText                 = widget.provider['tax_id_type_name'].toString();
     // _personTypeText = widget.provider['person_type_name'].toString();
-    _countryTex = widget.provider['country_name'].toString();
-    _selectedGroupIndex = widget.provider['c_bp_group_id'];
-    _selectedIdTypeIndex =
-        widget.provider['lco_tax_id_type_id'] != '{@nil=true}'
-            ? widget.provider['lco_tax_id_type_id']
-            : 0;
-    _selectedTaxPayerIndex =
-        widget.provider['lco_taxt_payer_type_id'] != '{@nil=true}'
-            ? widget.provider['lco_taxt_payer_type_id']
-            : 0;
+    _countryTex                 = widget.provider['country_name'].toString();
+    _selectedGroupIndex         = widget.provider['c_bp_group_id'];
+    _selectedIdTypeIndex        = widget.provider['lco_tax_id_type_id'] != '{@nil=true}' ? widget.provider['lco_tax_id_type_id'] : 0;
+    _selectedTaxPayerIndex      = widget.provider['lco_taxt_payer_type_id'] != '{@nil=true}' ? widget.provider['lco_taxt_payer_type_id'] : 0;
     // _selectedPersonTypeIndex = widget.provider['lve_person_type_id'];
-    _selectedCountryIndex =
-        widget.provider['c_country_id'].toString() != '{@nil=true}'
-            ? widget.provider['c_country_id']
-            : 0;
-    _provinceController.text =
-        widget.provider['province'].toString() != '{@nil=true}'
-            ? widget.provider['province'].toString()
-            : '';
-    _cityController.text = widget.provider['city'].toString() != '{@nil=true}'
-        ? widget.provider['city']
-        : '';
-    _addressController.text =
-        widget.provider['address'].toString() != '{@nil=true}'
-            ? widget.provider['address'].toString()
-            : '';
-    _codePostalController.text =
-        widget.provider['postal'].toString() != '{@nil=true}'
-            ? widget.provider['postal'].toString()
-            : '';
-    _ciiuActivitiesText = widget.provider['ciiu_tagname'].toString();
-    _selectedCiiuCode = widget.provider['ciiu_id'] ?? 0;
+    _selectedCountryIndex       = widget.provider['c_country_id'].toString() != 'null' ? widget.provider['c_country_id'] : 0;
+    // _provinceController.text    = widget.provider['province'].toString() != '{@nil=true}' ? widget.provider['province'].toString() : '';
+    // _cityController.text = widget.provider['city'].toString() != '{@nil=true}' ? widget.provider['city'] : '';
+    _addressController.text     = widget.provider['address'].toString() != '{@nil=true}' ? widget.provider['address'].toString() : '';
+    _codePostalController.text  = widget.provider['postal'].toString() != '{@nil=true}' ? widget.provider['postal'].toString() : '';
+    _ciiuActivitiesText         = widget.provider['ciiu_tagname'].toString();
+    _selectedCiiuCode           = widget.provider['ciiu_id'] ?? 0;
   }
 
   @override
@@ -274,22 +278,95 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                     ),
                     const SizedBox(height: 10),
 
+                    // PAIS
                     CustomDropdownButtonFormFieldVendor(
                       identifier: 'countryVendor',
                       selectedIndex: _selectedCountryIndex,
                       dataList: _countryVendorList,
                       text: _countryTex,
-                      onSelected: (newValue, countryText) {
+                      onSelected: (newValue, newText) async {
+                        var countryIndex = newValue ?? 0;
+                        var countryName  = (newValue != 0) ? newText : ""; 
+
+                        List<Map<String, dynamic>> newProvinceList = [];
+                        newProvinceList.add({
+                          'c_region_id': 0,
+                          'region'     : 'Selecciona una provincia'
+                        });
+                        List<Map<String, dynamic>> newCityList = [];
+                        newCityList.add({
+                          'c_city_id': 0,
+                          'city'     : 'Selecciona una ciudad'
+                        });
+                        if (countryName != "") {
+                          dynamic provinceListByCountry = await listarRegions(countryIndex);
+                          newProvinceList.addAll(provinceListByCountry);
+                        }
+
+                        print('provinces by country: $newProvinceList');
+
                         setState(() {
-                          _selectedCountryIndex = newValue ?? 0;
-                          _countryTex = (newValue != 0) ? countryText : "";
+                          _selectedCountryIndex   = countryIndex;
+                          _countryTex             = countryName;
+                          _provinceList           = newProvinceList;                          
+                          _selectedProvinceIndex  = 0;
+                          _cityList               = newCityList;                          
+                          _selectedCityIndex      = 0;
                         });
                       },
                     ),
+                    SizedBox(height: mediaHeight * 0.02),
+
+                    // PROVINCIA
+                    CustomDropdownButtonFormFieldVendor(
+                        identifier: 'provinceVendor',
+                        selectedIndex: _selectedProvinceIndex,
+                        dataList: _provinceList,
+                        text: _provinceText,
+                        onSelected: (newValue, newText) async {
+                          var provinceIndex = newValue ?? 0;
+                          var provinceName  = (newValue != 0) ? newText : ""; 
+
+                          List<Map<String, dynamic>> newCitiesList = [];
+                          newCitiesList.add({
+                            'c_city_id': 0,
+                            'city'     : 'Selecciona una ciudad'
+                          });
+                          if (provinceName != "") {
+                            dynamic citiesListByRegion = await listarCities(provinceIndex);
+
+                            newCitiesList.addAll(citiesListByRegion);
+                          }
+
+                          print('cities by province: $newCitiesList');
+
+                          setState(() {
+                            _selectedProvinceIndex  = provinceIndex;
+                            _provinceText           = provinceName;
+                            _cityList               = newCitiesList;
+                            _selectedCityIndex      = 0;
+                          });
+                        },
+                      ),
+                    SizedBox(height: mediaHeight * 0.02),
+
+                    // CIUDAD
+                    CustomDropdownButtonFormFieldVendor(
+                        identifier: 'cityVendor',
+                        selectedIndex: _selectedCityIndex,
+                        dataList: _cityList,
+                        text: _cityText,
+                        onSelected: (newValue, newText) {
+                          setState(() {
+                            _selectedCityIndex  = newValue ?? 0;
+                            _cityText           = newText;
+                          });
+                        },
+                    ),
                     SizedBox(height: mediaHeight * 0.01),
 
-                    _buildTextFormField('Provincia', _provinceController, 1, mediaScreen),
-                    _buildTextFormField('Ciudad', _cityController, 1, mediaScreen),
+                    // _buildTextFormField('Provincia', _provinceController, 1, mediaScreen),
+                    // _buildTextFormField('Ciudad', _cityController, 1, mediaScreen),
                     _buildTextFormField('Direccion', _addressController, 2, mediaScreen),
                     _buildTextFormField('Codigo Postal', _codePostalController, 1, mediaScreen),
 
@@ -323,6 +400,8 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                               int selectGroupId = _selectedGroupIndex;
                               int selectTaxId = _selectedIdTypeIndex;
                               int selectCountry = _selectedCountryIndex;
+                              int selectProvince = _selectedProvinceIndex;
+                              int selectCity = _selectedCityIndex;
                               int selectTaxPayerId = _selectedTaxPayerIndex;
                               int selectTypePerson = _selectedPersonTypeIndex;
                               int selectCiiuId = _selectedCiiuCode;
@@ -359,8 +438,9 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
                                 'city': ciudad,
                                 'country_name': countryText,
                                 'postal': codigoPostal,
-                                'c_city_id': widget.provider['c_city_id'],
                                 'c_country_id': selectCountry,
+                                'c_region_id': selectProvince,
+                                'c_city_id': selectCity,
                                 'lco_taxt_payer_type_id': selectTaxPayerId,
                                 'tax_payer_type_name': taxPayerText,
                                 'lve_person_type_id': selectTypePerson,

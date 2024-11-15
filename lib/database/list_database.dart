@@ -83,6 +83,40 @@ Future<List<Map<String, dynamic>>> listarCategorias() async {
           return [];
         }
 
+        Future<List<Map<String, dynamic>>> listarRegions(countryId) async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+              SELECT 
+                c_region_id, 
+                name AS region,
+                c_country_id
+              FROM regions
+              WHERE c_country_id = ?
+              ORDER BY 
+                name ASC
+            ''', [countryId]);
+          }
+          return [];
+        }
+
+        Future<List<Map<String, dynamic>>> listarCities(regionId) async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+              SELECT 
+                c_city_id, 
+                name AS city,
+                c_region_id
+              FROM cities
+              WHERE c_region_id = ?
+              ORDER BY 
+                name ASC
+            ''', [regionId]);
+          }
+          return [];
+        }
+
          Future<List<Map<String, dynamic>>> listarGroupTercero() async {
           final db = await DatabaseHelper.instance.database;
           if(db != null) {

@@ -30,30 +30,36 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
   final FocusNode _rucFocusNode = FocusNode();
 
   // List
-  final List<Map<String, dynamic>> _groupVendorList = [];
-  final List<Map<String, dynamic>> _idTypeVendorList = [];
-  final List<Map<String, dynamic>> _countryVendorList = [];
-  final List<Map<String, dynamic>> _taxPayerList = [];
-  final List<Map<String, dynamic>> _typePersonList = [];
-  final List<Map<String, dynamic>> _ciiuActivitiesList = [];
+  final List<Map<String, dynamic>> _groupVendorList     = [];
+  final List<Map<String, dynamic>> _idTypeVendorList    = [];
+  final List<Map<String, dynamic>> _countryVendorList   = [];
+  final List<Map<String, dynamic>> _taxPayerList        = [];
+  final List<Map<String, dynamic>> _typePersonList      = [];
+  final List<Map<String, dynamic>> _ciiuActivitiesList  = [];
+  List<Map<String, dynamic>> _provinceList              = [];
+  List<Map<String, dynamic>> _cityList                  = [];
 
   //SELECTED
-  int _selectedGroupIndex = 0;
-  int _selectedIdTypeIndex = 0;
-  int _selectedCountryIndex = 0;
-  int _selectedTaxPayerIndex = 0;
-  int _selectedPersonTypeIndex = 0;
-  int _selectedCiiuCode = 0;
+  int _selectedGroupIndex       = 0;
+  int _selectedIdTypeIndex      = 0;
+  int _selectedCountryIndex     = 0;
+  int _selectedTaxPayerIndex    = 0;
+  int _selectedPersonTypeIndex  = 0;
+  int _selectedCiiuCode         = 0;
+  int _selectedProvinceIndex    = 0;
+  int _selectedCityIndex        = 0;
 
   //Text o String
 
-  String _groupTextVendor = '';
-  String _idTypeText = '';
-  String _countryText = 'Ecuador';
-  String _taxPayerText = '';
-  String _personTypeText = '';
-  String _ciiuActivitiesText = '';
-  int _idMaxlength = 20;
+  String _groupTextVendor     = '';
+  String _idTypeText          = '';
+  String _countryText         = 'Ecuador';
+  String _taxPayerText        = '';
+  String _personTypeText      = '';
+  String _ciiuActivitiesText  = '';
+  String _provinceText        = '';
+  String _cityText            = '';
+  int _idMaxlength            = 20;
 
   loadList() async {
     List<Map<String, dynamic>> getGroupVendor = await listarTypeGroupVendor();
@@ -79,10 +85,6 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
       'lco_tax_id_type_id': 0,
       'tax_id_type_name'  : 'Selecciona un tipo de identificación'
     });
-    _countryVendorList.add({
-      'c_country_id': 0, 
-      'country_name': 'Selecciona un Pais'
-    });
     _taxPayerList.add({
       'lco_tax_payer_type_id': 0,
       'tax_payer_type_name'  : 'Selecciona un tipo de contribuyente'
@@ -90,6 +92,18 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     _typePersonList.add({
       'lve_person_type_id': 0,
       'person_type_name': 'Selecciona un tipo de persona'
+    });
+    _countryVendorList.add({
+      'c_country_id': 0, 
+      'country'     : 'Selecciona un país'
+    });
+    _provinceList.add({
+      'c_region_id': 0, 
+      'region'     : 'Selecciona una provincia'
+    });
+    _cityList.add({
+      'c_city_id': 0, 
+      'city'     : 'Selecciona una ciudad'
     });
 
     setState(() {
@@ -102,8 +116,12 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     });
 
     if (getCountryVendor.isNotEmpty) {
+      var defaultCountry = 171;
+      List<Map<String, dynamic>> provinceListByCountry = await listarRegions(defaultCountry);
+
       setState(() {
-        _selectedCountryIndex = 171;
+        _selectedCountryIndex = defaultCountry;
+        _provinceList.addAll(provinceListByCountry);
       });
     }
   }
@@ -613,22 +631,79 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                       const SizedBox(
                         height: 15,
                       ),
+
+                      // PAIS
                       CustomDropdownButtonFormFieldVendor(
                         identifier: 'countryVendor',
                         selectedIndex: _selectedCountryIndex,
                         dataList: _countryVendorList,
                         text: _countryText,
-                        onSelected: (newValue, countryTex) {
+                        onSelected: (newValue, newText) async {
+                          var countryIndex = newValue ?? 0;
+                          var countryName  = (newValue != 0) ? newText : ""; 
+
+                          List<Map<String, dynamic>> newProvinceList = [];
+                          newProvinceList.add({
+                            'c_region_id': 0,
+                            'region'     : 'Selecciona una provincia'
+                          });
+                          List<Map<String, dynamic>> newCityList = [];
+                          newCityList.add({
+                            'c_city_id': 0,
+                            'city'     : 'Selecciona una ciudad'
+                          });
+                          if (countryName != "") {
+                            dynamic provinceListByCountry = await listarRegions(countryIndex);
+
+                            newProvinceList.addAll(provinceListByCountry);
+                          }
+
+                          print('provinces by country: $newProvinceList');
+
                           setState(() {
-                            _selectedCountryIndex = newValue ?? 0;
-                            _countryText = countryTex;
+                            _selectedCountryIndex   = countryIndex;
+                            _countryText            = countryName;
+                            _provinceList           = newProvinceList;                          
+                            _selectedProvinceIndex  = 0;
+                            _cityList               = newCityList;                          
+                            _selectedCityIndex      = 0;
                           });
                         },
                       ),
-                      const SizedBox(
-                        height: 10,
+                      const SizedBox(height: 10),
+                      
+                      // PROVINCIA
+                      CustomDropdownButtonFormFieldVendor(
+                        identifier: 'provinceVendor',
+                        selectedIndex: _selectedProvinceIndex,
+                        dataList: _provinceList,
+                        text: _provinceText,
+                        onSelected: (newValue, newText) async {
+                          var provinceIndex = newValue ?? 0;
+                          var provinceName  = (newValue != 0) ? newText : ""; 
+
+                          List<Map<String, dynamic>> newCitiesList = [];
+                          newCitiesList.add({
+                            'c_city_id': 0,
+                            'city'     : 'Selecciona una ciudad'
+                          });
+                          if (provinceName != "") {
+                            dynamic citiesListByRegion = await listarCities(provinceIndex);
+
+                            newCitiesList.addAll(citiesListByRegion);
+                          }
+
+                          print('cities by province: $newCitiesList');
+
+                          setState(() {
+                            _selectedProvinceIndex  = provinceIndex;
+                            _provinceText           = provinceName;
+                            _cityList               = newCitiesList;
+                            _selectedCityIndex      = 0;
+                          });
+                        },
                       ),
-                      Container(
+                      /*Container(
                         width: mediaScreen * 0.88,
                         height: mediaScreen * 0.20,
                         decoration: BoxDecoration(
@@ -643,35 +718,28 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                         child: TextFormField(
                           controller: _provinceContoller,
                           decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 25, vertical: 20),
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide(
-                                      width: 25, color: Colors.white)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide(
-                                      width: 25, color: Colors.white)),
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide.none),
-                              focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  borderSide:
-                                      BorderSide(width: 1, color: Colors.red)),
-                              errorBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  borderSide:
-                                      BorderSide(width: 1, color: Colors.red)),
-                              labelText: 'Provincia',
-                              filled: true,
-                              fillColor: Colors.white),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderSide: BorderSide(width: 25, color: Colors.white)
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderSide: BorderSide(width: 25, color: Colors.white)
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15)), borderSide: BorderSide.none),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderSide: BorderSide(width: 1, color: Colors.red)
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderSide:  BorderSide(width: 1, color: Colors.red)
+                            ),
+                            labelText: 'Provincia',
+                            filled: true,
+                            fillColor: Colors.white
+                          ),
                           keyboardType: TextInputType.text,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -680,13 +748,23 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                             return null;
                           },
                         ),
-                      ),
+                      )*/
+                      const SizedBox(height: 10),
 
-                      const SizedBox(
-                        height: 10,
+                      // CIUDAD
+                      CustomDropdownButtonFormFieldVendor(
+                        identifier: 'cityVendor',
+                        selectedIndex: _selectedCityIndex,
+                        dataList: _cityList,
+                        text: _cityText,
+                        onSelected: (newValue, newText) {
+                          setState(() {
+                            _selectedCityIndex  = newValue ?? 0;
+                            _cityText           = newText;
+                          });
+                        },
                       ),
-
-                      Container(
+                      /*Container(
                         width: mediaScreen * 0.88,
                         height: mediaScreen * 0.20,
                         decoration: BoxDecoration(
@@ -738,11 +816,10 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                             return null;
                           },
                         ),
-                      ),
+                      ),*/
+                      const SizedBox(height: 10),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      // DIRECCION
                       Container(
                         width: mediaScreen * 0.88,
                         height: mediaScreen * 0.30,
@@ -797,9 +874,9 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
                           maxLines: 2,
                         ),
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
+                       
+                      // CODIGO POSTAL
                       Container(
                         width: mediaScreen * 0.88,
                         height: mediaScreen * 0.20,
@@ -909,12 +986,15 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     String codePostal = _codePostalController.text;
     String province = _provinceContoller.text;
     // ID
-    int idGroup = _selectedGroupIndex;
-    int taxTypeId = _selectedIdTypeIndex;
-    int countryId = _selectedCountryIndex;
-    int taxPayerVendorId = _selectedTaxPayerIndex;
-    int personTypeId = _selectedPersonTypeIndex;
-    int ciiuId = _selectedCiiuCode;
+    int idGroup           = _selectedGroupIndex;
+    int taxTypeId         = _selectedIdTypeIndex;
+    int taxPayerVendorId  = _selectedTaxPayerIndex;
+    int personTypeId      = _selectedPersonTypeIndex;
+    int ciiuId            = _selectedCiiuCode;
+    int countryId         = _selectedCountryIndex;
+    int provinceId        = _selectedProvinceIndex;
+    int cityId            = _selectedCityIndex;
+    
     // Strings
     String groupText = _groupTextVendor;
     String taxIdText = _idTypeText;
@@ -984,16 +1064,18 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
         address: address,
         city: city,
         countryName: countryName,
-        postal: codePostal,
-        cCityId: 0,
-        cCountryId: countryId,
+        postal: codePostal,        
         lcoTaxtPayerTypeId: taxPayerVendorId,
         taxPayerTypeName: taxPayerName,
         lvePersonTypeId: personTypeId,
         personTypeName: personTypeName,
         ciiuId: ciiuId,
         ciiuTagName: ciiuTagText,
-        province: province);
+        province: province,
+        cCountryId: countryId,
+        cRegionId: provinceId,
+        cCityId: cityId,        
+    );
 
     // Llama a un método para guardar el producto en Sqflite
     await saveProviderToDatabase(provider);

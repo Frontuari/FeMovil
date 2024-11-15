@@ -444,6 +444,8 @@ synchronizeTaxPayerTypes() async {
 
 synchronizeCountries() async {
   print('synchronizing... countries');
+  print('synchronizing... regions');
+  print('synchronizing... cities');
 
   await getCountries();
 }

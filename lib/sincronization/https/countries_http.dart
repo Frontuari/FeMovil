@@ -37,7 +37,7 @@ getCountries() async {
   final requestBody = {
     "ModelCRUDRequest": {
       "ModelCRUD": {
-        "serviceType": "getCountriesTrl"
+        "serviceType": "getLocations"
       },
       "ADLoginRequest": {
         "user": userInfo["user"],
@@ -77,8 +77,9 @@ getCountries() async {
 
       for (var row in dataRows) {
         Map<String, dynamic> rowMap = {
-          "c_country_id": row["field"].firstWhere((field) => field['@column'] == 'C_Country_ID', orElse: () => {})["val"],
-          "name"        : row["field"].firstWhere((field) => field['@column'] == 'Name', orElse: () => {})["val"]
+          "c_country_id": row["field"].firstWhere((field) => field['@column'] == 'FTU_RV_Locations_ID', orElse: () => {})["val"],
+          "name"        : row["field"].firstWhere((field) => field['@column'] == 'CountryName', orElse: () => {})["val"],
+          "regions"     : row["field"].firstWhere((field) => field['@column'] == 'regions', orElse: () => {})["val"]
         };
 
         result.add(rowMap);

@@ -39,9 +39,9 @@ class Customer {
     required this.isBillTo,
     required this.phone,
     required this.cLocationId,
-    required this.city,
-    required this.region,
-    required this.country,
+    this.city,
+    this.region,
+    this.country,
     required this.codePostal,
     required this.cCityId,
     required this.cRegionId,
@@ -52,8 +52,6 @@ class Customer {
     required this.taxPayerTypeName,
     required this.lvePersonTypeId,
     required this.personTypeName
-
-
   });
 
   // Método para convertir un producto a un mapa para ser almacenado en la base de datos
@@ -84,7 +82,6 @@ class Customer {
       'tax_payer_type_name': taxPayerTypeName,
       'lve_person_type_id':lvePersonTypeId,
       'person_type_name': personTypeName
-
     };
   }
 }

@@ -126,7 +126,7 @@ class ClientDetailsScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Text('País: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
-                                    Flexible(child: Text(client['country'] != '{@nil: true}' ? client['country'] : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
+                                    Flexible(child: Text(client['country'].toString() != 'null' ? client['country'] : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
                                   ],
                                 ),
                                 // PROVINCIA
@@ -134,7 +134,7 @@ class ClientDetailsScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Text('Provincia: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
-                                    Flexible(child: Text(client['region'] != '{@nil: true}' ? client['region'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular')))
+                                    Flexible(child: Text(client['region'].toString() != 'null' ? client['region'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular')))
                                   ],
                                 ),
                                 // CIUDAD
@@ -142,7 +142,7 @@ class ClientDetailsScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Text('Ciudad: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
-                                    Flexible(child: Text(client['city'] != '{@nil: true}' ? client['city'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
+                                    Flexible(child: Text(client['city'].toString() != 'null' ? client['city'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
                                   ],
                                 ),
                                 // DIRECCION

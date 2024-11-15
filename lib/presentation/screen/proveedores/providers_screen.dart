@@ -487,10 +487,20 @@ class _ProvidersState extends State<Providers> {
   void _verMasprovider(String providerId) async {
     final db = await DatabaseHelper.instance.database;
     if (db != null) {
-      final provider = await db.query(
-        'providers',
-        where: 'id = ?',
-        whereArgs: [int.parse(providerId)],
+      final provider = await db.rawQuery(
+        '''
+          SELECT 
+            pro.*,
+            c.name country,
+            r.name region, 
+            cty.name city
+          FROM providers pro
+          LEFT JOIN countries c USING(c_country_id)
+          LEFT JOIN regions r USING(c_region_id)
+          LEFT JOIN cities cty USING(c_city_id)
+          WHERE pro.id = ?
+        ''',
+        [int.parse(providerId)],
       );
       Navigator.push(
         context,

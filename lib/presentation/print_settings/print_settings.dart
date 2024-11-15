@@ -1,6 +1,4 @@
 import 'package:femovil/config/app_bar_femovil.dart';
-import 'package:bluetooth_print/bluetooth_print.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:femovil/presentation/print_settings/device_finder.dart';
 import 'package:flutter/material.dart';
 
@@ -12,52 +10,12 @@ class PrintSettings extends StatefulWidget {
 }
 
 class _PrintSettingsState extends State<PrintSettings> {
-  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
-
-  bool _connected = false;
   String tips = '';
 
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
   } 
-
-  Future<void> initBluetooth() async {
-    bluetoothPrint.startScan(timeout: Duration(seconds: 4));
-
-    bool isConnected=await bluetoothPrint.isConnected??false;
-
-    bluetoothPrint.state.listen((state) {
-      print('******************* cur device status: $state');
-
-      switch (state) {
-        case BluetoothPrint.CONNECTED:
-          setState(() {
-            _connected = true;
-            tips = 'connect success';
-          });
-          break;
-        case BluetoothPrint.DISCONNECTED:
-          setState(() {
-            _connected = false;
-            tips = 'disconnect success';
-          });
-          break;
-        default:
-          break;
-      }
-    });
-
-    if (!mounted) return;
-
-    if(isConnected) {
-      setState(() {
-        _connected=true;
-      });
-    }
-  }
   
   @override
   Widget build(BuildContext context) {

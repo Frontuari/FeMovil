@@ -147,9 +147,10 @@ class DatabaseHelper {
             ciiu_tagname STRING,
             province STRING,
             country_name STRING,
-            postal STRING,
-            c_city_id INTEGER,
+            postal STRING,            
             c_country_id INTEGER,
+            c_region_id INTEGER,
+            c_city_id INTEGER,
             lco_taxt_payer_type_id INTEGER, 
             tax_payer_type_name STRING, 
             lve_person_type_id INTEGER,
@@ -435,6 +436,24 @@ class DatabaseHelper {
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             c_country_id INTEGER,
             name TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE regions(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            c_region_id INTEGER,
+            name TEXT,
+            c_country_id INTEGER
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE cities(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            c_city_id INTEGER,
+            name TEXT,
+            c_region_id INTEGER
           )
         ''');
       },

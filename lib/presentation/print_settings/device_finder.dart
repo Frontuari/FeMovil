@@ -13,8 +13,10 @@ class DeviceFinder extends StatefulWidget {
 class _DeviceFinderState extends State<DeviceFinder> {
   BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
 
+  List<BluetoothDevice> _devices = [];
   BluetoothDevice? _device;
   bool _connected = false;
+  bool _connecting = false;
   String _message = 'No hay dispositivos disponibles';
    
   @override
@@ -24,8 +26,27 @@ class _DeviceFinderState extends State<DeviceFinder> {
     WidgetsBinding.instance.addPostFrameCallback((_) => searchDevices());
   }
 
-  void searchDevices() {
-    bluetoothPrint.startScan(timeout: Duration(seconds: 2));
+  void searchDevices() async {
+    setState(() {
+      _connecting = true;
+    });    
+    
+    await bluetoothPrint.startScan(timeout: Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    bluetoothPrint.scanResults.listen((result) {
+      if (!mounted) return;
+      
+      setState(() {
+        _devices = result;
+      });
+      print('found devices $_devices');
+    });
+    
+    setState(() {
+      _connecting = false;
+    }); 
   }
 
   @override
@@ -48,13 +69,44 @@ class _DeviceFinderState extends State<DeviceFinder> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Estatus: ', style: TextStyle(fontFamily: 'Poppins Semibold')),
-                  Flexible(child: Text(_connected ? 'Conectado' : 'Desconectado', style: TextStyle(fontFamily: 'Poppins Regular')))
+                  !_connecting ? const Text('Estatus: ', style: TextStyle(fontFamily: 'Poppins Semibold')) : SizedBox(),
+                  Flexible(child: Text(
+                    _connecting ? 'Buscando dispositivos...' : (_connected ? 'Conectado' : 'Desconectado'),
+                    style: TextStyle(fontFamily: 'Poppins Regular')
+                  ))
                 ],
               ),
               const SizedBox(height: 20),
 
-              StreamBuilder<List<BluetoothDevice>>(
+              _devices.isNotEmpty ? SizedBox(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: _devices.length,
+                  itemBuilder: (BuildContext c, int i) {
+                    return ListTile(
+                      title: Text(_devices[i].name ?? '', style: TextStyle(fontFamily: 'Poppins Semibold')),
+                      subtitle: Text(_devices[i].address ?? '', style: TextStyle(fontFamily: 'Poppins Regular')),
+                      onTap: () async {
+                        await bluetoothPrint.connect(_devices[i]);
+
+                        bool isConnected = await bluetoothPrint.isConnected ?? false;
+
+                        if (isConnected) {
+                          setState(() {
+                            _connected  = true;
+                            _message    = 'Se conecto exitosamente';
+                            _device     = _devices[i];
+                          });
+                        }
+                      },
+                    );
+                  }
+                )
+              ) : Text(!_connecting ? 'No se encontraron dispositivos' : ''),
+
+              
+
+              /*StreamBuilder<List<BluetoothDevice>>(
                 stream: bluetoothPrint.scanResults,
                 initialData: const [],
                 builder: (c, snapshot) => Column(
@@ -77,7 +129,7 @@ class _DeviceFinderState extends State<DeviceFinder> {
                     trailing: _device!=null && _device!.address == d.address ? Icon(Icons.check, color: Colors.green) : null,
                   )).toList(),
                 ),
-              ),
+              ),*/
             ]
           )
         ),
