@@ -40,9 +40,15 @@ dependencies:
   shared_preferences: ^2.2.2
   sqflite: ^2.3.2
   url_launcher: ^6.2.5
+  #flutter_blue_plus: ^1.32.12
+  bluetooth_print: ^4.3.0
+  pdf: ^3.11.1
+  open_file: ^3.5.8 
+
+
 
 dev_dependencies:
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
 
@@ -99,6 +105,7 @@ flutter:
     - lib/assets/Eliminar.png
     - lib/assets/Más.png
     - lib/assets/Más@3x.png
+    - lib/assets/printer.png
 
     # - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see

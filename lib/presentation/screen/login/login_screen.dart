@@ -455,6 +455,7 @@ class _LoginState extends State<Login> {
     authService
         .login(username: usuario, password: password)
         .then((loginExitoso) {
+          print('login exitoso: $loginExitoso');
       if (loginExitoso == "hay problemas con el internet") {
         setState(() {
           isLoading = false;

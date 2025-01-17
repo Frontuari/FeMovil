@@ -7,6 +7,7 @@ class CustomDropdownButtonFormField extends StatelessWidget {
   final String text;
   final List<Map<String, dynamic>> dataList;
   final Function(int?, String) onSelected;
+  final bool readOnly;
 
   const CustomDropdownButtonFormField(
       {super.key,
@@ -14,7 +15,8 @@ class CustomDropdownButtonFormField extends StatelessWidget {
       required this.selectedIndex,
       required this.dataList,
       required this.text,
-      required this.onSelected});
+      required this.onSelected,
+      this.readOnly = false});
 
   @override
   Widget build(BuildContext context) {
@@ -75,50 +77,46 @@ class CustomDropdownButtonFormField extends StatelessWidget {
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none)),
-            validator: (value) {
-              if (value == null || value == 0) {
-                return 'Por favor selecciona un grupo';
-              }
-              return null;
-            },
           ),
         );
-
-      case 'taxType':
+      case 'idType':
         return Container(
           height: mediaScreen * 0.22,
           width: mediaScreen * 0.95,
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: readOnly ? Colors.grey.shade300 : Colors.white,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 7,
-                    spreadRadius: 2)
-              ]),
+                  color: Colors.grey.withOpacity(0.5), 
+                  blurRadius: 7, 
+                  spreadRadius: 2
+                )
+              ]
+          ),
           child: DropdownButtonFormField<int>(
             icon: Image.asset('lib/assets/Abajo.png'),
             value: selectedIndex,
             items: dataList
                 .where((taxType) =>
-                    taxType['lco_tax_id_typeid'] is int &&
+                    taxType['lco_tax_id_type_id'] is int &&
                     taxType['tax_id_type_name'] != '')
                 .map<DropdownMenuItem<int>>((taxType) {
               print('tax $taxType');
               return DropdownMenuItem<int>(
-                value: taxType['lco_tax_id_typeid'] as int,
+                value: taxType['lco_tax_id_type_id'] as int,
                 child: SizedBox(
                     width: 200,
                     child: Text(
                       taxType['tax_id_type_name'] as String,
                       style: const TextStyle(
                         fontFamily: 'Poppins Regular',
+                        color: Colors.black
                       ),
                     )),
               );
             }).toList(),
-            onChanged: (newValue) {
+            onChanged: readOnly ? null : (newValue) {
               print('esto es el taxList ${dataList}');
               String nameTax = invoke('obtenerNombreTax', newValue, dataList);
               print("esto es el nombre del tipo de impuesto $nameTax");
@@ -126,17 +124,14 @@ class CustomDropdownButtonFormField extends StatelessWidget {
               onSelected(newValue, nameTax);
             },
             decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none),
+              fillColor: readOnly ? Colors.grey.shade300 : Colors.white,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
             validator: (value) {
               if (value == null || value == 0) {
-                return 'Por favor selecciona un tipo de impuesto';
+                return 'Por favor, selecciona un tipo de identificación';
               }
               return null;
             },
@@ -160,11 +155,11 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             value: selectedIndex,
             items: dataList
                 .where((taxPayer) =>
-                    taxPayer['lco_tax_payer_typeid'] is int &&
+                    taxPayer['lco_tax_payer_type_id'] is int &&
                     taxPayer['tax_payer_type_name'] != '')
                 .map<DropdownMenuItem<int>>((taxPayer) {
               return DropdownMenuItem<int>(
-                value: taxPayer['lco_tax_payer_typeid'],
+                value: taxPayer['lco_tax_payer_type_id'],
                 child: SizedBox(
                     width: 200,
                     child: Text(
@@ -175,10 +170,8 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             }).toList(),
             onChanged: (newValue) {
               print('esto es el taxList ${dataList}');
-              String nameTaxPayer =
-                  invoke('obtenerNombreTaxPayer', newValue, dataList);
-              print(
-                  "esto es el nombre del tipo de constribuyente $nameTaxPayer");
+              String nameTaxPayer = invoke('obtenerNombreTaxPayer', newValue, dataList);
+              print("esto es el nombre del tipo de constribuyente $nameTaxPayer");
 
               onSelected(newValue, nameTaxPayer);
             },
@@ -192,15 +185,8 @@ class CustomDropdownButtonFormField extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
                 )),
-            validator: (value) {
-              if (value == null || value == 0) {
-                return 'Por favor selecciona un tipo de contribuyente';
-              }
-              return null;
-            },
           ),
         );
-
       case 'typePerson':
         return DropdownButtonFormField<int>(
           value: selectedIndex,
@@ -253,34 +239,31 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             icon: Image.asset('lib/assets/Abajo.png'),
             value: selectedIndex,
             items: dataList
-                .where((country) =>
-                    country['c_country_id'] is int && country['country'] != '')
-                .map<DropdownMenuItem<int>>((country) {
-              print('tax $country');
-              return DropdownMenuItem<int>(
-                value: country['c_country_id'] as int,
-                child: Container(
+              .where((country) => country['c_country_id'] is int && country['country'].toString() != 'null')
+              .map<DropdownMenuItem<int>>((country) {
+                // print('tax $country');
+                return DropdownMenuItem<int>(
+                  value: country['c_country_id'] as int,
+                  child: Container(
                     width: mediaScreen * 0.5,
                     child: Text(
-                      country['country'] as String,
+                      country['country'].toString(),
                       overflow: TextOverflow.clip,
-                      style: const TextStyle(
-                          fontFamily: 'Poppins Regular', color: Colors.black),
-                    )),
-              );
+                      style: const TextStyle(fontFamily: 'Poppins Regular', color: Colors.black),
+                    )
+                  ),
+                );
             }).toList(),
             onChanged: (newValue) {
-              print('esto es el countryList ${dataList}');
-              String nameCountry =
-                  invoke('obtenerNombreCountry', newValue, dataList);
+              print('esto es el Listado de country ${dataList}');
+              String nameCountry = invoke('obtenerNombreCountry', newValue, dataList);
               print("esto es el nombre del Pais $nameCountry");
 
               onSelected(newValue, nameCountry);
             },
             decoration: InputDecoration(
               errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               border: OutlineInputBorder(
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(15),
@@ -290,13 +273,12 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             ),
             validator: (value) {
               if (value == null || value == 0) {
-                return 'Por favor selecciona un Pais';
+                return 'Por favor, selecciona un país';
               }
               return null;
             },
           ),
         );
-
       case 'selectTypeAccountBank':
         return Container(
             height: mediaScreen * 0.22,
@@ -354,7 +336,6 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             },
           ),
         );
-
       case 'selectTypeCoins':
         return Container(
            height: mediaScreen * 0.22,
@@ -411,8 +392,115 @@ class CustomDropdownButtonFormField extends StatelessWidget {
             },
           ),
         );
-        
-
+      case 'selectProvince':
+        return Container(
+          height: mediaScreen * 0.22,
+          width: mediaScreen * 0.95,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 7,
+                spreadRadius: 2,
+                color: Colors.grey.withOpacity(0.5)
+              )
+            ],
+          ),
+          child: DropdownButtonFormField<int>(
+            icon: Image.asset('lib/assets/Abajo.png'),
+            value: selectedIndex,
+            items: dataList
+              .where((item) => item['c_region_id'] is int && item['region'].toString() != '')
+              .map<DropdownMenuItem<int>>((itemRegion) {
+                return DropdownMenuItem<int>(
+                  value: itemRegion['c_region_id'] as int,
+                  child: SizedBox(
+                    width: mediaScreen * 0.7,
+                    child: Text(itemRegion['region'].toString(), style: const TextStyle(fontFamily: 'Poppins Regular'))
+                  ),
+                );
+            }).toList(),
+            onChanged: (newValue) {
+              print('Este es el listado de region: ${dataList}');
+              String regionName = dataList.firstWhere((item) => item['c_region_id'] == newValue, orElse: () => {})["region"];
+              print("Este es el nombre que tiene la region $regionName y el id $newValue");
+          
+              onSelected(newValue, regionName);
+            },
+            decoration:  InputDecoration(
+              errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (dataList.length > 1) {
+                if (value == null || value == 0) {
+                  return 'Por favor, selecciona una provincia';
+                }
+              }
+              
+              return null;
+            },
+          ),
+        );
+      case 'selectCity':
+        return Container(
+          height: mediaScreen * 0.22,
+          width: mediaScreen * 0.95,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 7,
+                spreadRadius: 2,
+                color: Colors.grey.withOpacity(0.5)
+              )
+            ],
+          ),
+          child: DropdownButtonFormField<int>(
+            icon: Image.asset('lib/assets/Abajo.png'),
+            value: selectedIndex,
+            items: dataList
+              .where((item) => item['c_city_id'] is int && item['city'].toString() != '')
+              .map<DropdownMenuItem<int>>((itemRegion) {
+                return DropdownMenuItem<int>(
+                  value: itemRegion['c_city_id'] as int,
+                  child: SizedBox(
+                    width: mediaScreen * 0.7,
+                    child: Text(itemRegion['city'].toString(), style: const TextStyle(fontFamily: 'Poppins Regular'))
+                  ),
+                );
+            }).toList(),
+            onChanged: (newValue) {
+              print('Este es el listado de city: ${dataList}');
+              String cityName = dataList.firstWhere((item) => item['c_city_id'] == newValue, orElse: () => {})["city"];
+              print("Este es el nombre que tiene la city $cityName y el id $newValue");
+          
+              onSelected(newValue, cityName);
+            },
+            decoration:  InputDecoration(
+              errorStyle: const TextStyle(fontFamily: 'Poppins Regular'),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (dataList.length > 1) {
+                if (value == null || value == 0) {
+                  return 'Por favor, selecciona una ciudad';
+                }
+              }
+              
+              return null;
+            },
+          ),
+        );
+      
       default:
         return DropdownButtonFormField<int>(
           value: selectedIndex,

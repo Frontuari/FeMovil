@@ -156,18 +156,18 @@ Future<void> verificarDatosDeAcceso() async {
 
 
 verificarConexion(url, token, setState) async {
-  print("esto es la url y el token: $url $token");
+  // print("esto es la url y el token: $url $token");
   HttpClient httpClient = HttpClient()
     ..badCertificateCallback = (X509Certificate cert, String host, int port) {
       return true;
     }
     ..idleTimeout =
-        const Duration(microseconds: 2); // Tiempo de espera de 2 segundos
+        const Duration(microseconds: 2); // Tiempo de espera de 2 segundos*/
+  // print(httpClient);
 
   url.endsWith('/') ? url = url : url = '$url/';
 
-  final urls = Uri.parse(
-      '${url}ADInterface/services/rest/model_adservice/query_data'); // URL a la que quieres realizar la prueba de conexión
+  final urls = Uri.parse('${url}ADInterface/services/rest/model_adservice/query_data'); // URL a la que quieres realizar la prueba de conexión
 
   try {
     final request = await httpClient.postUrl(urls);
@@ -206,9 +206,6 @@ verificarConexion(url, token, setState) async {
     request.write(jsonBody);
     print("esto es la respuesta $json");
 
-       
-
-
     final response = await request.close();
 
     if (response.statusCode == 200) {
@@ -216,8 +213,7 @@ verificarConexion(url, token, setState) async {
       final parsedJson = jsonDecode(responseBody);
 
       print("esto es la respuesta $parsedJson");
-
-     
+      print('respuesta detallada: ${parsedJson['WindowTabData']['DataSet']['DataRow']['field']}');
       
       if (parsedJson['WindowTabData']['@TotalRows'] > 0) {
         return true;

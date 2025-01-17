@@ -155,7 +155,8 @@ Future<void> updateCBPartnerIdAndCodVendor(
 
 
 Future updateOrdereSalesForStatusSincronzed(int orderId, String newStatus) async {
-    final db = await DatabaseHelper.instance.database;
+  final db = await DatabaseHelper.instance.database;
+
   if (db != null) {
     await db.update(
       'orden_venta',

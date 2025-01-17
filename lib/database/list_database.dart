@@ -57,13 +57,62 @@ Future<List<Map<String, dynamic>>> listarCategorias() async {
           return [];
         }
 
-           Future<List<Map<String, dynamic>>> listarCountryGroup() async {
+        Future<List<Map<String, dynamic>>> listarCountryGroup() async {
           final db = await DatabaseHelper.instance.database;
           if(db != null) {
             return await db.rawQuery('''
-            SELECT DISTINCT c_country_id, country
-               FROM clients
+              SELECT DISTINCT c_country_id, country
+              FROM clients
             ''');
+          }
+          return [];
+        }
+
+        Future<List<Map<String, dynamic>>> listarCountries() async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+              SELECT 
+                c_country_id, 
+                name AS country
+              FROM countries
+              ORDER BY 
+                name ASC
+            ''');
+          }
+          return [];
+        }
+
+        Future<List<Map<String, dynamic>>> listarRegions(countryId) async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+              SELECT 
+                c_region_id, 
+                name AS region,
+                c_country_id
+              FROM regions
+              WHERE c_country_id = ?
+              ORDER BY 
+                name ASC
+            ''', [countryId]);
+          }
+          return [];
+        }
+
+        Future<List<Map<String, dynamic>>> listarCities(regionId) async {
+          final db = await DatabaseHelper.instance.database;
+          if(db != null) {
+            return await db.rawQuery('''
+              SELECT 
+                c_city_id, 
+                name AS city,
+                c_region_id
+              FROM cities
+              WHERE c_region_id = ?
+              ORDER BY 
+                name ASC
+            ''', [regionId]);
           }
           return [];
         }
@@ -85,8 +134,12 @@ Future<List<Map<String, dynamic>>> listarCategorias() async {
           final db = await DatabaseHelper.instance.database;
           if(db != null) {
             return await db.rawQuery('''
-            SELECT DISTINCT lco_tax_id_typeid, tax_id_type_name
-               FROM clients
+              SELECT 
+                tax_id_type_id AS lco_tax_id_type_id, 
+                name AS tax_id_type_name
+              FROM tax_id_types
+              ORDER BY 
+                name ASC
             ''');
           }
           return [];
@@ -99,8 +152,12 @@ Future<List<Map<String, dynamic>>> listarCategorias() async {
           final db = await DatabaseHelper.instance.database;
           if(db != null) {
             return await db.rawQuery('''
-            SELECT DISTINCT lco_tax_payer_typeid, tax_payer_type_name
-               FROM clients
+              SELECT 
+                tax_payer_type_id AS lco_tax_payer_type_id, 
+                name AS tax_payer_type_name
+              FROM tax_payer_types
+              ORDER BY 
+                name ASC
             ''');
           }
           return [];

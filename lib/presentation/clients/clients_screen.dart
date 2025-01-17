@@ -512,10 +512,20 @@ void _applyFilter() {
   void _verMasClient(String clientId) async {
     final db = await DatabaseHelper.instance.database;
     if (db != null) {
-      final client = await db.query(
-        'clients',
-        where: 'id = ?',
-        whereArgs: [int.parse(clientId)],
+      final client = await db.rawQuery(
+        '''
+          SELECT 
+            cli.*,
+            c.name country,
+            r.name region, 
+            cty.name city
+          FROM clients cli
+          LEFT JOIN countries c USING(c_country_id)
+          LEFT JOIN regions r USING(c_region_id)
+          LEFT JOIN cities cty USING(c_city_id)
+          WHERE cli.id = ?
+        ''',
+        [int.parse(clientId)],
       );
       Navigator.push(
         context,

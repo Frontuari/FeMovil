@@ -11,7 +11,10 @@ import 'package:femovil/presentation/products/idempiere/update_product.dart';
 import 'package:femovil/presentation/products/products_http.dart';
 import 'package:femovil/presentation/screen/proveedores/idempiere/create_vendor.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
+import 'package:femovil/sincronization/https/countries_http.dart';
 import 'package:femovil/sincronization/https/customer_http.dart';
+import 'package:femovil/sincronization/https/tax_id_type_http.dart';
+import 'package:femovil/sincronization/https/tax_payer_type_http.dart';
 import 'package:femovil/sincronization/https/vendors_http.dart';
 import 'package:femovil/sincronization/sincronization_screen.dart';
 
@@ -215,8 +218,7 @@ synchronizeCustomersUpdateWithIdempiere(setState) async {
 }
 
 synchronizeCustomersWithIdempiere(setState) async {
-  List<Map<String, dynamic>> customersWithZeroValues =
-      await getCustomersWithZeroValues();
+  List<Map<String, dynamic>> customersWithZeroValues = await getCustomersWithZeroValues();
 
   await sincronizationCustomers(setState);
 
@@ -426,4 +428,24 @@ synchronizeOrderSalesWithIdempiere(setState) async {
   }
 
   
+}
+
+synchronizeTaxIdTypes() async {
+  print('synchronizing... tax id types');
+
+  await getTaxIdType();
+}
+
+synchronizeTaxPayerTypes() async {
+  print('synchronizing... tax payer types');
+
+  await getTaxPayerType();
+}
+
+synchronizeCountries() async {
+  print('synchronizing... countries');
+  print('synchronizing... regions');
+  print('synchronizing... cities');
+
+  await getCountries();
 }

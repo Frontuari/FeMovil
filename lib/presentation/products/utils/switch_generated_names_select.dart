@@ -68,13 +68,14 @@ invoke(option, newValue, data){
           );
 
           return country != null ? country['country'] : '';
-            case  'obtenerNombreCountryVendor':
+          
+          case  'obtenerNombreCountryVendor':
 
             Map<String, dynamic>? country = data.firstWhere(
-          (countryList) => countryList['c_country_id'] == newValue,
-        );
+              (countryList) => countryList['c_country_id'] == newValue,
+            );
 
-          return country != null ? country['country_name'] : '';
+            return country != null ? country['country'] : '';
 
           case 'obtenerNombreGroup': 
                Map<String, dynamic>? groupTercero = data.firstWhere(
@@ -94,7 +95,7 @@ invoke(option, newValue, data){
           case 'obtenerNombreTax':
 
             Map<String, dynamic>? nombreTaxType = data.firstWhere(
-            (taxType) => taxType['lco_tax_id_typeid'] == newValue,
+            (taxType) => taxType['lco_tax_id_type_id'] == newValue,
           );
 
           return nombreTaxType != null ? nombreTaxType['tax_id_type_name'] : '';
@@ -118,7 +119,7 @@ invoke(option, newValue, data){
           
           case 'obtenerNombreTaxPayerVendor':
               Map<String, dynamic>? nombreTaxPayer = data.firstWhere(
-            (taxPayer) => taxPayer['lco_taxt_payer_type_id'] == newValue,
+            (taxPayer) => taxPayer['lco_tax_payer_type_id'] == newValue,
           );
 
           return nombreTaxPayer != null ? nombreTaxPayer['tax_payer_type_name'] : '';
@@ -127,7 +128,7 @@ invoke(option, newValue, data){
 
           case 'obtenerNombreTaxPayer':
               Map<String, dynamic>? nombreTaxPayer = data.firstWhere(
-            (taxPayer) => taxPayer['lco_tax_payer_typeid'] == newValue,
+            (taxPayer) => taxPayer['lco_tax_payer_type_id'] == newValue,
           );
 
           return nombreTaxPayer != null ? nombreTaxPayer['tax_payer_type_name'] : '';
@@ -147,7 +148,6 @@ invoke(option, newValue, data){
           );
 
           return nombreBankAccount != null ? nombreBankAccount['bank_name'] : '';
-
 
 
       default:

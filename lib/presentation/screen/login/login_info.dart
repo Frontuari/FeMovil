@@ -9,6 +9,8 @@ Future infoLogin(username, password) async {
   final String filePath = '${infoLog.path}/.login.json';
   final File configFile = File(filePath);
 
+  print('file path: $filePath');
+
   if (!(await configFile.exists())) {
     await configFile.create();
   }

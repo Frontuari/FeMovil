@@ -11,6 +11,7 @@ class ClientDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('data cliente: $client');
 
     final mediaScreen = MediaQuery.of(context).size.width * 0.8;
 
@@ -54,42 +55,36 @@ class ClientDetailsScreen extends StatelessWidget {
                               children: [
                                 SizedBox(
                                   width: mediaScreen,
-                                  child: const Text(
-                                    "Nombre",
-                                    textAlign: TextAlign.start,
-                                    style:  TextStyle(color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18,),
-                                    
-                                  ),
-                                ),
-                                SizedBox(height: mediaScreen * 0.04 ,),
-                                  SizedBox(
-                                    width: mediaScreen,
-                                    
-                                    child: Text(client['bp_name'], style: const TextStyle(fontFamily: 'Poppins Regular') ,)),
-
-                                  SizedBox(height: mediaScreen * 0.04 ,),
-
-                                 const Text(
-                                  "Ruc/DNI",
-                                  textAlign: TextAlign.start,
-                                  style:  TextStyle(color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18,),
-                                  
+                                  child: const Text("Nombre", textAlign: TextAlign.start, style: TextStyle(
+                                    color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18
+                                  )),
                                 ),
                                 SizedBox(height: mediaScreen * 0.04 ,),
                                 SizedBox(
-                                  width: mediaScreen,
-                                  child: Text(client['ruc'], style: const TextStyle(fontFamily: 'Poppins Regular'),),),
+                                  width: mediaScreen,  
+                                  child: Text(client['bp_name'], style: const TextStyle(fontFamily: 'Poppins Regular'))
+                                ),
+                                SizedBox(height: mediaScreen * 0.04),
+
+                                
+                                const Text("RUC/DNI", textAlign: TextAlign.start, style: TextStyle(
+                                  color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18
+                                )),
                                 SizedBox(height: mediaScreen * 0.04 ,),
-                                 SizedBox(
+                                SizedBox(
                                   width: mediaScreen,
-                                   child: const Text(
-                                    "Detalles",
-                                    textAlign: TextAlign.start,
-                                    style:  TextStyle(color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18,),
-                                    
-                                                                   ),
-                                 ),
-                                SizedBox(height: mediaScreen * 0.05 ,),
+                                  child: Text(client['ruc'], style: const TextStyle(fontFamily: 'Poppins Regular'))
+                                ),                                
+                                SizedBox(height: mediaScreen * 0.04),
+
+
+                                SizedBox(
+                                  width: mediaScreen,
+                                  child: const Text("Detalles", textAlign: TextAlign.start, style: TextStyle(
+                                    color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18
+                                  ))                                                        
+                                ),
+                                SizedBox(height: mediaScreen * 0.05),
                                         
                                 Row(
                                   children: [
@@ -103,70 +98,73 @@ class ClientDetailsScreen extends StatelessWidget {
                                     Flexible(child: Text(client['group_bp_name'] != '{@nil: true}' ? client['group_bp_name'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular'),))
                                   ],
                                 ),
-                                        
                                 Row(
                                   children: [
                                     const Text('Telefono: ', style: TextStyle(color: Colors.black, fontFamily: 'Poppins SemiBold') ,),
                                     Flexible(child: Text(client['phone'] != '{@nil: true}' ? client['phone'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular'),))
                                   ],
                                 ),
-                                  const Text('Tipo de Contribuyente: ', style: TextStyle(color: Colors.black, fontFamily: 'Poppins SemiBold') ,),
-                                    SizedBox(
-                                      width: mediaScreen,
-                                      child: Text(client['tax_payer_type_name'] != '{@nil: true}' ? client['tax_payer_type_name'].toString() : '', style:const TextStyle(fontFamily: 'Poppins Regular') ,overflow: TextOverflow.clip,)),
+                                const Text('Tipo de Contribuyente: ', style: TextStyle(color: Colors.black, fontFamily: 'Poppins SemiBold') ,),
+                                client['tax_payer_type_name'] is String ? SizedBox(
+                                  width: mediaScreen,
+                                  child: Text(client['tax_payer_type_name'] != '{@nil: true}' ? client['tax_payer_type_name'].toString() : '', style:const TextStyle(fontFamily: 'Poppins Regular') ,overflow: TextOverflow.clip,)
+                                ) : SizedBox(),
                                
-                                SizedBox(height: mediaScreen * 0.05 ,),
-                                        
+                                SizedBox(height: mediaScreen * 0.05),
+
+                                // DIRECCION FISCAL                                        
                                 const Text(
                                   "Domicilio Fiscal",
                                   textAlign: TextAlign.start,
                                   style:  TextStyle(color: Colors.black, fontFamily: 'Poppins Bold', fontSize: 18,),
                                   
                                 ),
-                                SizedBox(height: mediaScreen * 0.05 ,),
-                                          Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Dirección: ',
-                                    style: TextStyle(fontFamily: 'Poppins SemiBold'),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                  Text(
-                                    client['address'].toString() != '{@nil: true}' ? 
-                                      (client['address'].toString().length > 50 ?
-                                        '${client['address'].toString().substring(0, 60)}...' :
-                                        client['address'].toString()
-                                      ) : 
-                                      '',
-                                    style: const TextStyle(fontFamily: 'Poppins Regular'),
-                                    textAlign: TextAlign.justify,
-                                  
-                                  ),
-                                ],
-                              ),
+                                SizedBox(height: mediaScreen * 0.05),
+                                
+                                // PAIS
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('País: ', style: TextStyle(fontFamily: 'Poppins SemiBold',),textAlign: TextAlign.start,),
-                                    Flexible(child: Text(client['country'] != '{@nil: true}' ? client['country'] : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
+                                    const Text('País: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
+                                    Flexible(child: Text(client['country'].toString() != 'null' ? client['country'] : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
                                   ],
                                 ),
-                                  Row(
+                                // PROVINCIA
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('Ciudad: ', style: TextStyle(fontFamily: 'Poppins SemiBold',),textAlign: TextAlign.start,),
-                                    Flexible(child: Text(client['city'] != '{@nil: true}' ? client['city'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
+                                    const Text('Provincia: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
+                                    Flexible(child: Text(client['region'].toString() != 'null' ? client['region'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular')))
                                   ],
                                 ),
-                                  Row(
+                                // CIUDAD
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('Codigo Postal: ', style: TextStyle(fontFamily: 'Poppins SemiBold',),textAlign: TextAlign.start,),
+                                    const Text('Ciudad: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
+                                    Flexible(child: Text(client['city'].toString() != 'null' ? client['city'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular') ,))
+                                  ],
+                                ),
+                                // DIRECCION
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Dirección: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
+                                    client['address'].toString() != '{@nil: true}' ? Text(
+                                      (client['address'].toString().length > 50) ? '${client['address'].toString().substring(0, 60)}...' : client['address'].toString(),
+                                      style: const TextStyle(fontFamily: 'Poppins Regular'),
+                                      textAlign: TextAlign.justify,                                  
+                                    ) : SizedBox(),
+                                  ],
+                                ),
+                                // CODIGO POSTAL
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Codigo Postal: ', style: TextStyle(fontFamily: 'Poppins SemiBold'), textAlign: TextAlign.start),
                                     Flexible(child: Text(client['code_postal'] != '{@nil=true}' ? client['code_postal'].toString() : '', style: const TextStyle(fontFamily: 'Poppins Regular') , overflow: TextOverflow.ellipsis,))
                                   ],
-                                ),
-                                        
+                                ),                                        
                               ],
                             ),
                           ),
@@ -191,10 +189,18 @@ class ClientDetailsScreen extends StatelessWidget {
                     onPressed: () {
                       // Aquí puedes manejar la acción de agregar orden
                       // Por ejemplo, puedes navegar a una pantalla de agregar orden
-                     Navigator.push(context,MaterialPageRoute(builder: (context) => OrdenDeVentaScreen(clientId: client["id"] ,clientName: client["bp_name"], cBPartnerId: client['c_bpartner_id'], cBPartnerLocationId: client['c_bpartner_location_id'],rucCbpartner: client['ruc'], emailCustomer: client['email'].toString(), phoneCustomer: client['phone'].toString())),
-                    );
-            
-                    },
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => OrdenDeVentaScreen(
+                        clientId: client["id"], 
+                        clientName: client["bp_name"], 
+                        cBPartnerId: client['c_bpartner_id'], 
+                        cBPartnerLocationId: client['c_bpartner_location_id'].toString() != '{@nil=true}' 
+                          ? int.parse(client['c_bpartner_location_id'].toString()) 
+                          : null, 
+                        rucCbpartner: client['ruc'].toString(), 
+                        emailCustomer: client['email'].toString(), 
+                        phoneCustomer: client['phone'].toString() 
+                      )));
+                    }, 
                     style:  ButtonStyle(
                       
                       backgroundColor: const WidgetStatePropertyAll<Color>(Color(0xFFA5F52B)),
@@ -211,21 +217,17 @@ class ClientDetailsScreen extends StatelessWidget {
                 ),
                 SizedBox(height: mediaScreen * 0.02,),
                 Container(
-                  width: mediaScreen,
-                 
-                  child: ElevatedButton(
-                    
+                  width: mediaScreen,                 
+                  child: ElevatedButton(                    
                     onPressed: () {
                       // Aquí puedes manejar la acción de agregar orden
                       // Por ejemplo, puedes navegar a una pantalla de agregar orden
-                     Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => EditClientScreen(client: client)),
-                      );
-                        
+                      );                        
                     },
-                    style:  ButtonStyle(
-                      
+                    style:  ButtonStyle(                      
                       backgroundColor: const WidgetStatePropertyAll<Color>(Color(0xFF7531FF)),
                       foregroundColor: const WidgetStatePropertyAll<Color>(Colors.white),
                           shape: WidgetStateProperty.all<RoundedRectangleBorder>(

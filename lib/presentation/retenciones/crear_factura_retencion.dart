@@ -7,6 +7,7 @@ import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
 import 'package:femovil/presentation/orden_compra/product_selection.dart';
 import 'package:femovil/presentation/perfil/perfil_http.dart';
+import 'package:femovil/presentation/retenciones/factura_retenciones_screen.dart';
 import 'package:femovil/presentation/retenciones/helpers/search_providers.dart';
 import 'package:femovil/presentation/retenciones/idempiere/create_factura_retencion.dart';
 import 'package:femovil/presentation/screen/home/home_screen.dart';
@@ -51,6 +52,7 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
   String? valorSeleccionado = '';
   String? impuestoValue = '';
   bool _isFocused = false;
+  bool enabledButton = true;
 
   final _formKey = GlobalKey<FormState>();
   final FocusNode _focusNode = FocusNode();
@@ -233,74 +235,38 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                       height: screenMedia * 0.20,
                       width: screenMedia * 0.95,
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                blurRadius: 7,
-                                spreadRadius: 2)
-                          ]),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            blurRadius: 7,
+                            spreadRadius: 2)
+                        ]
+                      ),
                       child: TextFormField(
+                        enabled: false,
                         keyboardType: TextInputType.number,
                         controller: numeroDocumentoController,
                         decoration: InputDecoration(
-                            labelText: 'Numero de documento',
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 25, horizontal: 20),
-                            labelStyle: const TextStyle(
-                              fontFamily:
-                                  'Poppins Regular', // Reemplaza con el nombre definido en pubspec.yaml
-                              fontSize: 15.0, // Tamaño de la fuente
-                              // Peso de la fuente (por ejemplo, bold)
-                              color: Color.fromARGB(
-                                  255, 0, 0, 0), // Color del texto
-                            ),
-                            border: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0)),
-                              borderSide: BorderSide.none, // Color del borde
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0)),
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                                width: 25,
-                              ), // Color del borde cuando está enfocado
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0)),
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                                width: 25,
-                              ), // Color del borde cuando no está enfocado
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.red),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: const BorderSide(
-                                    width: 1, color: Colors.red)),
-                            errorStyle:
-                                TextStyle(fontFamily: 'Poppins Regular')),
+                          labelText: 'Numero de Documento',
+                          filled: true,
+                          fillColor: Colors.grey.shade300,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
+                          labelStyle: const TextStyle(fontFamily: 'Poppins Regular', fontSize: 15.0, color: Color.fromARGB(255, 0, 0, 0)),
+                          border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)), borderSide: BorderSide.none),
+                          focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)), borderSide: BorderSide(color: Colors.white, width: 25)),
+                          enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)), borderSide: BorderSide(color: Colors.white, width: 25)), // Color del borde cuando no está enfocado
+                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.red)),
+                          focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(width: 1, color: Colors.red)),
+                          errorStyle: TextStyle(fontFamily: 'Poppins Regular')
+                        ),
                         onChanged: (value) {
                           if (_hasError == false) {
                             setState(() {});
                           }
 
                           print('Este es el valor $value');
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return "Por favor, proporciona un numero de documento.";
-                          }
-                          return null;
                         },
                       ),
                     ),
@@ -1457,71 +1423,25 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                         RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(8)))),
-                                onPressed: () async {
+                                onPressed: enabledButton ? () async {
                                   if (_formKey.currentState!.validate()) {
-                                    final info =
-                                        await getApplicationSupportDirectory();
+                                    final info = await getApplicationSupportDirectory();
                                     print("esta es la ruta ${info.path}");
 
-                                    final String filePathEnv =
-                                        '${info.path}/.env';
+                                    final String filePathEnv = '${info.path}/.env';
                                     final File archivo = File(filePathEnv);
-                                    String contenidoActual =
-                                        await archivo.readAsString();
-                                    print(
-                                        'Contenido actual del archivo:\n$contenidoActual');
+                                    String contenidoActual = await archivo.readAsString();
+                                    print('Contenido actual del archivo:\n$contenidoActual');
 
                                     // Convierte el contenido JSON a un mapa
-                                    Map<String, dynamic> jsonData =
-                                        jsonDecode(contenidoActual);
-                                    print(
-                                        'Esto es cbpartnerId ${_cbPartnerIdController.text} ');
-                                    print(
-                                        'Esto es provider id ${_providerIdController.text}');
-                                    print(
-                                        'Esto es el cbpartnerlocationid ${_cbPartnerLocationIdController.text}');
+                                    Map<String, dynamic> jsonData = jsonDecode(contenidoActual);
+                                    print('Esto es cbpartnerId ${_cbPartnerIdController.text} ');
+                                    print('Esto es provider id ${_providerIdController.text}');
+                                    print('Esto es el cbpartnerlocationid ${_cbPartnerLocationIdController.text}');
                                     print('Esto es el jsonData $jsonData');
 
                                     dynamic userId = await getLogin();
-
-                                    Map<String, dynamic> nuevaRetencion = {
-                                      'ad_client_id': jsonData['ClientID'],
-                                      'ad_org_id': jsonData['OrgID'],
-                                      'c_bpartner_id':
-                                          _cbPartnerIdController.text,
-                                      'c_bpartner_location_id':
-                                          _cbPartnerLocationIdController.text,
-                                      'c_currency_id': variablesG[0]
-                                          ['c_currency_id'],
-                                      'c_doctypetarget_id': variablesG[0]
-                                          ['c_doc_type_target_fr'],
-                                      'c_paymentterm_id': variablesG[0]
-                                          ['c_paymentterm_id'],
-                                      'description': descripcionController.text,
-                                      'documentno':
-                                          numeroDocumentoController.text,
-                                      'date': fechaFacturacionController.text,
-                                      'is_sotrx': 'N',
-                                      'm_pricelist_id': variablesG[0]
-                                          ['m_pricelist_id'],
-                                      'payment_rule': _selectTypePaymentRule,
-                                      'date_invoiced':
-                                          fechaIdempiereController.text,
-                                      'date_acct':
-                                          fechaIdempiereController.text,
-                                      'sales_rep_id': userId['userId'],
-                                      'sri_authorization_code':
-                                          _sriAuthorizationCodeController.text,
-                                      'ing_establishment':
-                                          _establishmentController.text,
-                                      'ing_emission': _emisionController.text,
-                                      'ing_sequence': _sequenceController.text,
-                                      'ing_taxsustance': _selectTaxSutance,
-                                      'provider_id': _providerIdController.text,
-                                      'monto': double.parse(
-                                          montoController.text.substring(1)),
-                                      'productos': selectedProducts,
-                                    };
+                                    print('user ID: $userId');
 
                                     if (selectedProducts.isEmpty) {
                                       // Mostrar un diálogo o mensaje indicando que la orden debe tener productos adjuntos
@@ -1530,13 +1450,11 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                         builder: (context) {
                                           return AlertDialog(
                                             title: const Text('Error'),
-                                            content: const Text(
-                                                'La orden debe tener productos adjuntos.'),
+                                            content: const Text('La orden debe tener productos adjuntos.'),
                                             actions: [
                                               TextButton(
                                                 onPressed: () {
-                                                  Navigator.pop(
-                                                      context); // Cerrar el diálogo
+                                                  Navigator.pop(context); // Cerrar el diálogo
                                                 },
                                                 child: const Text('OK'),
                                               ),
@@ -1548,35 +1466,69 @@ class _CrearRetencionesState extends State<CrearRetenciones> {
                                       return;
                                     }
 
-                                    print(
-                                        'Esto es la factura con retencion $nuevaRetencion');
-                                    createInvoicedWithholdingIdempiere(
-                                        nuevaRetencion);
+                                    setState(() {
+                                      enabledButton = false;
+                                    });
+
+                                    Map<String, dynamic> nuevaRetencion = {
+                                      'ad_client_id': jsonData['ClientID'],
+                                      'ad_org_id': jsonData['OrgID'],
+                                      'c_bpartner_id': _cbPartnerIdController.text,
+                                      'c_bpartner_location_id': _cbPartnerLocationIdController.text,
+                                      'c_currency_id': variablesG[0]['c_currency_id'],
+                                      'c_doctypetarget_id': variablesG[0]['c_doc_type_target_fr'],
+                                      'c_paymentterm_id': variablesG[0]['c_paymentterm_id'],
+                                      'description': descripcionController.text,
+                                      'documentno': numeroDocumentoController.text,
+                                      'date': fechaFacturacionController.text,
+                                      'is_sotrx': 'N',
+                                      'm_pricelist_id': variablesG[0]['m_pricelist_id'],
+                                      'payment_rule': _selectTypePaymentRule,
+                                      'date_invoiced': fechaIdempiereController.text,
+                                      'date_acct': fechaIdempiereController.text,
+                                      'sales_rep_id': userId['userId'],
+                                      'sri_authorization_code': _sriAuthorizationCodeController.text,
+                                      'ing_establishment': _establishmentController.text,
+                                      'ing_emission': _emisionController.text,
+                                      'ing_sequence': _sequenceController.text,
+                                      'ing_taxsustance': _selectTaxSutance,
+                                      'provider_id': _providerIdController.text,
+                                      'monto': double.parse(montoController.text.substring(1)),
+                                      'productos': selectedProducts,
+                                    };
+                                    
+                                    print('Esto es la factura con retencion $nuevaRetencion');
+                                    createInvoicedWithholdingIdempiere(nuevaRetencion);
                                     insertRetencion(nuevaRetencion);
+                                    
                                     _formKey.currentState?.reset();
 
                                     totalBdi.clear();
                                     numeroDocumentoController.clear();
                                     porcentaje.clear();
 
+                                    setState(() {
+                                      enabledButton = true;
+                                    });
+
                                     // Mostrar un mensaje al usuario
-                                    ScaffoldMessenger.of(currentContext!)
-                                        .showSnackBar(
+                                    ScaffoldMessenger.of(currentContext!).showSnackBar(
                                       const SnackBar(
-                                        content: Text(
-                                            'Retención creada exitosamente'),
+                                        content: Text('Retención creada exitosamente'),
                                         duration: Duration(seconds: 2),
                                       ),
-                                    );
-                                    // Navigator.pop(context);
+                                    );   
+
+                                    Navigator.pop(context);
+                                    // Navigator.push(context, MaterialPageRoute(builder: (context) => Retenciones()));
                                   } else {
                                     setState(() {
                                       _hasError = true;
                                     });
                                   }
-                                },
-                                child: const Text(
-                                  'Crear retención',
+                                } : null,
+                                child: Text(
+                                  !enabledButton ? 'Procesando...' : 'Crear retención',
                                   style: TextStyle(
                                       fontFamily: 'Poppins Bold', fontSize: 17),
                                 ),

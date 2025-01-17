@@ -19,7 +19,7 @@ class OrdenDeVentaScreen extends StatefulWidget {
   final int clientId;
   final String clientName;
   final int cBPartnerId;
-  final int cBPartnerLocationId;
+  final int? cBPartnerLocationId;
   final String rucCbpartner;
   final String emailCustomer;
   final String phoneCustomer;
@@ -244,8 +244,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
     fechaController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
     print("Esto es el id ${widget.clientId}");
     print("Esto es el name ${widget.clientName}");
-    fechaIdempiereController.text =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate);
+    fechaIdempiereController.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate);
     super.initState();
   }
 
@@ -351,12 +350,7 @@ Color getColorBg(Set<WidgetState> states){
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Nombre',
-                                        style: TextStyle(
-                                            fontFamily: 'Poppins Bold',
-                                            fontSize: 18),
-                                      ),
+                                      const Text('Nombre', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18)),
                                       Text(widget.clientName.length > 25
                                           ? widget.clientName.substring(0, 25)
                                           : widget.clientName)
@@ -372,15 +366,8 @@ Color getColorBg(Set<WidgetState> states){
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Ruc/DNI',
-                                        style: TextStyle(
-                                            fontFamily: 'Poppins Bold',
-                                            fontSize: 18),
-                                      ),
-                                      Text(widget.rucCbpartner.length > 15
-                                          ? widget.rucCbpartner.substring(0, 15)
-                                          : widget.rucCbpartner),
+                                      const Text('RUC/DNI', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 18)),
+                                      Text(widget.rucCbpartner.length > 15 ? widget.rucCbpartner.substring(0, 15) : widget.rucCbpartner),
                                     ],
                                   ),
                                 ),
@@ -405,17 +392,9 @@ Color getColorBg(Set<WidgetState> states){
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Correo: ',
-                                style:
-                                    TextStyle(fontFamily: 'Poppins SemiBold'),
-                              ),
-                              Text(
-                                widget.emailCustomer == '{@nil: true}'
-                                    ? ''
-                                    : widget.emailCustomer,
-                                style: const TextStyle(
-                                    fontFamily: 'Poppins Regular'),
+                              const Text('Correo: ', style: TextStyle(fontFamily: 'Poppins SemiBold')),
+                              Text(widget.emailCustomer == '{@nil: true}' ? '' : widget.emailCustomer, style: const TextStyle(
+                                fontFamily: 'Poppins Regular'),
                                 textAlign: TextAlign.start,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -428,17 +407,9 @@ Color getColorBg(Set<WidgetState> states){
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Telefono: ',
-                                style:
-                                    TextStyle(fontFamily: 'Poppins SemiBold'),
-                              ),
-                              Text(
-                                widget.phoneCustomer == '{@nil: true}'
-                                    ? ''
-                                    : widget.phoneCustomer,
-                                style: const TextStyle(
-                                    fontFamily: 'Poppins Regular'),
+                              const Text('Telefono: ', style: TextStyle(fontFamily: 'Poppins SemiBold')),
+                              Text(widget.phoneCustomer == '{@nil: true}' ? '' : widget.phoneCustomer, style: const TextStyle(
+                                fontFamily: 'Poppins Regular'),
                                 textAlign: TextAlign.start,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -477,33 +448,18 @@ Color getColorBg(Set<WidgetState> states){
                               blurRadius: 7,
                               spreadRadius: 2)
                         ]),
-                    child: TextField(
-                      readOnly: true,
+                    child: TextFormField(
+                      enabled: false,
                       controller: numeroReferenciaController,
                       decoration: const InputDecoration(
-                        labelStyle: TextStyle(
-                            fontFamily: 'Poppins Regular', color: Colors.black),
+                        labelStyle: TextStyle(fontFamily: 'Poppins Regular', color: Colors.black),
                         labelText: 'Orden N°',
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                          borderSide: BorderSide.none, // Color del borde
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                            width: 25,
-                          ), // Color del borde cuando está enfocado
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                            width: 25,
-                          ), // Color del borde cuando no está enfocado
-                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 25, horizontal: 20),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)), borderSide: BorderSide(color: Colors.white, width: 25)),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)), borderSide: BorderSide(color: Colors.white, width: 25)),
+                        filled: true,
+                        fillColor: Color(0xFFE0E0E0),
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -660,7 +616,7 @@ Color getColorBg(Set<WidgetState> states){
                                       style: TextStyle(
                                           fontFamily: 'Poppins Bold',
                                           fontSize: 15)),
-                                  Text('Precio',
+                                  Text('Subtotal',
                                       style: TextStyle(
                                           fontFamily: 'Poppins Bold',
                                           fontSize: 15))
@@ -872,27 +828,20 @@ Color getColorBg(Set<WidgetState> states){
                         animationDuration: Duration.zero,
                         elevation: WidgetStateProperty.all(0.5),
                         backgroundColor: WidgetStateProperty.resolveWith(getColorBg)
-                      ) ,
-                      
-                      onPressed: enableButton ? () async{
-                          
-                    
-                        if (infoUserForOrder.isNotEmpty) {
-                                    
-                          if (selectedProducts.isEmpty) {
-                    
+                      ),                      
+                      onPressed: enableButton ? () async{              
+                        if (infoUserForOrder.isNotEmpty) {                                    
+                          if (selectedProducts.isEmpty) {                   
                             showDialog(
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
                                   title: const Text('Error'),
-                                  content: const Text(
-                                      'La orden debe tener productos adjuntos.'),
+                                  content: const Text('La orden debe tener productos adjuntos.'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.pop(
-                                            context); // Cerrar el diálogo
+                                        Navigator.pop(context); // Cerrar el diálogo
                                       },
                                       child: const Text('OK'),
                                     ),
@@ -903,7 +852,11 @@ Color getColorBg(Set<WidgetState> states){
                     
                             return;
                           }
-                    
+
+                          setState(() {
+                            enableButton = false;
+                          });
+
                           final order = {
                             'cliente_id': widget.clientId,
                             'documentno': numeroReferenciaController.text,
@@ -927,95 +880,95 @@ Color getColorBg(Set<WidgetState> states){
                             'status_sincronized': 'Borrador',
                           };
 
-                          setState(() {
-                            enableButton = false;
-                          });
-
                           // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
                           await insertOrder(order).then((orderId) async {
-                            if (orderId is Map<String, dynamic> &&
-                                orderId.containsKey('failure')) {
+                            print('Se guardo la orden: $orderId');
                           
-                            } else {
-                              print(
-                                  'orderId no es un mapa válido o no contiene la propiedad "failure"');
+                            final orderCreateIdempiere = {
+                              'client': [{'id': widget.clientId,}],
+                              'order':{
+                                'id': orderId,
+                                'documentno': numeroReferenciaController.text,
+                                'fecha': fechaController.text,
+                                'descripcion': descripcionController.text,
+                                'monto': montoController.text.substring(2),
+                                'saldo_neto': saldoNetoController.text.substring(2),
+                                'c_bpartner_id': widget.cBPartnerId,
+                                'c_bpartner_location_id': widget.cBPartnerLocationId,
+                                'c_doctypetarget_id': variablesG[0]['c_doc_type_order_id'],
+                                'ad_client_id': infoUserForOrder['clientid'],
+                                'ad_org_id': infoUserForOrder['orgid'],
+                                'm_warehouse_id': infoUserForOrder['warehouseid'],
+                                'paymentrule': 'P',
+                                'date_ordered': fechaIdempiereController.text,
+                                'salesrep_id': infoUserForOrder['userId'],
+                                'usuario_id': infoUserForOrder['userId'],
+                                'saldo_exento': saldoExentoController.text.substring(2),
+                                'saldo_impuesto' : saldoImpuestoController.text.substring(2),
+                                'status_sincronized': 'Borrador'
+                              },
+                              'products': selectedProducts,
+                            };
+    
+                            try {
+                              await createOrdenSalesIdempiere(orderCreateIdempiere).then((res) => print(res));
+                              print('Se guardo la orden de venta Idempiere');
+                            } catch (err) {
+                              print('Error: $err');
                             }
-                          print('Esto es el orderid $orderId');
-                             final orderCreateIdempiere = {
-                            'client': [{'id': widget.clientId,}],
-                            'order':{
-                            'id': orderId,
-                            'documentno': numeroReferenciaController.text,
-                            'fecha': fechaController.text,
-                            'descripcion': descripcionController.text,
-                            'monto': montoController.text.substring(2),
-                            'saldo_neto': saldoNetoController.text.substring(2),
-                            'c_bpartner_id': widget.cBPartnerId,
-                            'c_bpartner_location_id': widget.cBPartnerLocationId,
-                            'c_doctypetarget_id': variablesG[0]['c_doc_type_order_id'],
-                            'ad_client_id': infoUserForOrder['clientid'],
-                            'ad_org_id': infoUserForOrder['orgid'],
-                            'm_warehouse_id': infoUserForOrder['warehouseid'],
-                            'paymentrule': 'P',
-                            'date_ordered': fechaIdempiereController.text,
-                            'salesrep_id': infoUserForOrder['userId'],
-                            'usuario_id': infoUserForOrder['userId'],
-                            'saldo_exento': saldoExentoController.text.substring(2),
-                            'saldo_impuesto' : saldoImpuestoController.text.substring(2),
-                            'status_sincronized': 'Borrador'},
-                            'products': selectedProducts,
-                          };
-
-                        await  createOrdenSalesIdempiere(orderCreateIdempiere);
-
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(
-                                    'Orden de venta guardada correctamente con ID: $orderId'),
+                                content: Text('Orden de venta guardada correctamente con ID: $orderId'),
                               ),
                             );
 
-                          Map<String, dynamic> order = await getOrderWithProducts(orderId);
+                            setState(() {
+                              enableButton = true;
+                            });
 
-                          print('Esto es la order $order');
+                            Navigator.pushNamed(context, '/');
 
-                             double saldoTotal;
-                                  try {
-                                    saldoTotal = double.parse(order['order']['saldo_total'].toString());
-                                  } catch (e) {
-                                    saldoTotal = 0.0; // Valor predeterminado en caso de error
-                                  }
+                            /*Map<String, dynamic> order = await getOrderWithProducts(orderId);
+                            // print('Esto es la order $order');
 
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VentasDetails(ventaId: orderId, emailClient: order['client'][0]['email'],nameClient: order['client'][0]['bp_name'], phoneClient: order['client'][0]!['phone'].toString(), rucClient: order['client'][0]['ruc'].toString(), saldoTotal: saldoTotal , ) ,));
+                            double saldoTotal;
+                            try {
+                              saldoTotal = double.parse(order['order']['saldo_total'].toString());
+                            } catch (e) {
+                              saldoTotal = 0.0; // Valor predeterminado en caso de error
+                            }
+
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VentasDetails(
+                              ventaId: orderId, 
+                              emailClient: order['client'][0]['email'],
+                              nameClient: order['client'][0]['bp_name'], 
+                              phoneClient: order['client'][0]!['phone'].toString(), 
+                              rucClient: order['client'][0]['ruc'].toString(), 
+                              saldoTotal: saldoTotal
+                            )));
                         
                             numeroReferenciaController.clear();
                             descripcionController.clear();
                             montoController.clear();
                             saldoNetoController.clear();
                             saldoExentoController.clear();
-                            saldoImpuestoController.clear();
-
-
-
-                          
+                            saldoImpuestoController.clear();                          
                     
                             // Limpiar la lista de productos seleccionados después de guardar la orden
                             setState(() {
                               selectedProducts.clear();
                               enableButton = true;
-                            });
+                            });*/
                     
                             // Notificar al usuario que la orden se ha guardado exitosamente
                           });
                         }
-                      }: null,
-                      child: const Text('Agregar Orden'),
-
+                      } : null,
+                      child: Text(!enableButton ? 'Procesando...' : 'Agregar Orden'),
                     ),
-                  ),
-                
-                 SizedBox(height: mediaScreen * 0.1,),
+                  ),                
+                  SizedBox(height: mediaScreen * 0.1,),
 
                 ],
               ),

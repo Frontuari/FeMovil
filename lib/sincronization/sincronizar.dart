@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/infrastructure/bank_accounts.dart';
 import 'package:femovil/infrastructure/models/ciiu.dart';
@@ -488,5 +490,152 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) asyn
     }
 
 
+Future<void> syncTaxIdTypes(List<Map<String, dynamic>> taxIdTypeData) async {
+  final db = await DatabaseHelper.instance.database;
 
-     
+  if (db != null) {
+    // Itera sobre los datos de los productos recibidos
+    for (Map<String, dynamic> taxIdType in taxIdTypeData) {        
+      // Consulta si el item ya existe en la base de datos local por su id
+      List<Map<String, dynamic>> existingTaxIdType = await db.query(
+        'tax_id_types',
+        where: 'tax_id_type_id = ?',
+        whereArgs: [taxIdType["tax_id_type_id"]],
+        limit: 1
+      );
+
+      print('existing tax id type: $existingTaxIdType');
+
+      if (existingTaxIdType.isNotEmpty) {
+        // Si el item ya existe, actualiza sus datos
+        await db.update(
+          'tax_id_types',
+          taxIdType,
+          where: 'id = ?',
+          whereArgs: [existingTaxIdType[0]["id"]],
+        );
+
+        print('tax id type actualizado: ${taxIdType["name"]}');
+      } else {
+        // Si el item no existe, inserta un nuevo registro en la tabla
+        await db.insert('tax_id_types', taxIdType);
+        
+        print('tax id type insertado: ${taxIdType["name"]}');
+      }
+    }
+    print('Sincronización de tax id types completada.');
+  } else {
+    // Manejar el caso en el que db sea null
+    print('Error: db is null');
+  }
+}
+
+Future<void> syncTaxPayerTypes(List<Map<String, dynamic>> taxPayerTypeData) async {
+  final db = await DatabaseHelper.instance.database;
+
+  if (db != null) {
+    // Itera sobre los datos de los productos recibidos
+    for (Map<String, dynamic> taxPayerType in taxPayerTypeData) {        
+      // Consulta si el item ya existe en la base de datos local por su id
+      List<Map<String, dynamic>> existingTaxPayerType = await db.query(
+        'tax_payer_types',
+        where: 'tax_payer_type_id = ?',
+        whereArgs: [taxPayerType["tax_payer_type_id"]],
+        limit: 1
+      );
+
+      print('existing tax payer type: $existingTaxPayerType');
+
+      if (existingTaxPayerType.isNotEmpty) {
+        // Si el item ya existe, actualiza sus datos
+        await db.update(
+          'tax_payer_types',
+          taxPayerType,
+          where: 'id = ?',
+          whereArgs: [existingTaxPayerType[0]["id"]],
+        );
+
+        print('tax payer type actualizado: ${taxPayerType["name"]}');
+      } else {
+        // Si el item no existe, inserta un nuevo registro en la tabla
+        await db.insert('tax_payer_types', taxPayerType);
+        
+        print('tax payer type insertado: ${taxPayerType["name"]}');
+      }
+    }
+    print('Sincronización de tax payer types completada.');
+  } else {
+    // Manejar el caso en el que db sea null
+    print('Error: db is null');
+  }
+}
+
+Future<void> syncCountries(List<Map<String, dynamic>> countriesData) async {
+  final db = await DatabaseHelper.instance.database;
+  if (db != null) {
+    // db.delete('countries');
+    // db.delete('regions');
+    // db.delete('cities');
+    // Itera sobre los datos de los productos recibidos
+    for (Map<String, dynamic> country in countriesData) {  
+      // Consulta si el item ya existe en la base de datos local por su id
+      List<Map<String, dynamic>> existingCountry = await db.query(
+        'countries',
+        where: 'c_country_id = ?',
+        whereArgs: [country["c_country_id"]],
+        limit: 1
+      );
+
+      print('existing country: $existingCountry');
+
+      if (existingCountry.isNotEmpty) {
+        // Si el item ya existe, actualiza sus datos
+        await db.update(
+          'countries',
+          {
+            'c_country_id': country["c_country_id"],
+            'name'        : country["name"],
+          },
+          where: 'id = ?',
+          whereArgs: [existingCountry[0]["id"]],
+        );
+
+        print('country actualizado: ${country["name"]}');
+      } else {
+        // Si el item no existe, inserta un nuevo registro en la tabla
+        await db.insert('countries', {
+          'c_country_id': country["c_country_id"],
+          'name'        : country["name"],
+        });
+
+        List regions = jsonDecode(country["regions"]);
+        for (Map<String, dynamic> region in regions) {
+          print('region data: $region');
+
+          await db.insert('regions', {
+            'c_region_id' : region["c_region_id"],
+            'name'        : region["nameregion"],
+            'c_country_id': region["c_country_id"],
+          });
+
+          dynamic cities = region["cities"]; 
+          for (Map<String, dynamic> city in cities) {
+            print('city data: $city');
+
+            await db.insert('cities', {
+              'c_city_id'  : city["c_city_id"],
+              'name'       : city["namecity"],
+              'c_region_id': city["c_region_id"],
+            });
+          }
+        }
+
+        print('country insertado: ${country["name"]}');
+      }
+    }
+    print('Sincronización de countries completada.');
+  } else {
+    // Manejar el caso en el que db sea null
+    print('Error: db is null');
+  }
+}

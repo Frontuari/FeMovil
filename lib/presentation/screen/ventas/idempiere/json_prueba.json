@@ -1,0 +1,109 @@
+{
+  "CompositeRequest":{
+    "ADLoginRequest":{
+      "user":"Admin",
+      "pass":"07@ng3l3s",
+      "lang":"es_CO",
+      "ClientID":1000000,
+      "RoleID":1000000,
+      "OrgID":1000000,
+      "WarehouseID":1000000,
+      "stage":"9"
+    },
+    "serviceType":"UCCompositeOrder",
+    "operations":{
+      "operation":[
+        {
+          "@preCommit":"false",
+          "@postCommit":"false",
+          "TargetPort":"createData",
+          "ModelCRUD":{
+            "serviceType":"UCCreateOrder",
+            "TableName":"C_Order",
+            "RecordID":"0",
+            "Action":"CreateUpdate",
+            "DataRow":{
+              "field":[
+                {"@column":"AD_Client_ID","val":1000000},
+                {"@column":"AD_Org_ID","val":1000000},
+                {"@column":"C_BPartner_ID","val":1000001},
+                {"@column":"C_BPartner_Location_ID","val":1000053},
+                {"@column":"C_Currency_ID","val":100},
+                {"@column":"Description","val":""},
+                {"@column":"C_DocTypeTarget_ID","val":1000041},
+                {"@column":"C_PaymentTerm_ID","val":1000000},
+                {"@column":"DateOrdered","val":"2024-10-10 10:10:08"},
+                {"@column":"IsTransferred","val":"Y"},
+                {"@column":"M_PriceList_ID","val":1000002},
+                {"@column":"M_Warehouse_ID","val":1000000},
+                {"@column":"PaymentRule","val":"P"},
+                {"@column":"SalesRep_ID","val":10},
+                {"@column": "AD_User_ID", "val": "1000000"},
+                {"@column": "Bill_User_ID", "val": "1000000"},                    
+                {"@column": "IsSOTrx", "val": "Y"},
+                {"@column": "C_ConversionType_ID", "val": "114"},
+              ]
+            }
+          }
+        },
+        {
+          "@preCommit": "false",
+          "@postCommit": "false",
+          "TargetPort": "createData",
+          "ModelCRUD": {
+            "serviceType": "UCCreateOrderLine",
+            "TableName": "C_OrderLine",
+            "recordID": "0",
+            "Action": "Create",
+            "DataRow": {
+              "field": [
+                {"@column": "AD_Client_ID", "val": "1000000"},
+                {"@column": "AD_Org_ID", "val": "1000000"},
+                {"@column": "C_Order_ID", "val": "@C_Order.C_Order_ID"},
+                {"@column": "PriceEntered", "val": 40},
+                {"@column": "PriceActual", "val": 40},
+                {"@column": "M_Product_ID", "val": "1003896"},
+                {"@column": "QtyOrdered", "val": 1},
+                {"@column": "QtyEntered", "val": 1},
+                {"@column": "SalesRep_ID", "val": "1000000"}
+              ]
+            }
+          }
+        },
+        {
+          "@preCommit": "false",
+          "@postCommit": "false",
+          "TargetPort": "setDocAction",
+          "ModelSetDocAction": {
+            "serviceType": "completeOrder",
+            "tableName": "C_Order",
+            "recordIDVariable": "@C_Order.C_Order_ID",
+            "docAction": "CO"
+          }
+        }
+      ]
+    }
+  }
+},
+{
+  "ModelCRUDRequest": {
+      "ModelCRUD": {
+          "serviceType": "getOrgInfo",
+          "DataRow": {
+              "field": [
+                  {"@column": "AD_Org_ID_Organization", "val": 1000000}
+              ]
+          }
+      },
+      "ADLoginRequest": {
+          "user":"Admin",
+          "pass":"07@ng3l3s",
+          "lang":"es_CO",
+          "ClientID":1000000,
+          "RoleID":1000000,
+          "OrgID":1000000,
+          "WarehouseID":1000000,
+          "stage":"9"
+      }
+  }
+}

@@ -22,17 +22,13 @@ class Informacion extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 10),
-                Image.asset(
-                  'lib/assets/LogoFemovil.png',
-                  height: 160,
-                  width: 160,
-                ),
+                Image.asset('lib/assets/LogoFemovil.png', height: 160, width: 160),
                 const SizedBox(height: 10),
-               // Color del texto
-
+                // Color del texto
 
                 FutureBuilder(
-                  future: getRuta(), // Llama a la función para obtener la promesa
+                  future:
+                      getRuta(), // Llama a la función para obtener la promesa
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
@@ -43,7 +39,7 @@ class Informacion extends StatelessWidget {
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                           Padding(
+                          Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,40 +50,42 @@ class Informacion extends StatelessWidget {
                                     fontFamily:
                                         'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
                                     fontSize: 15.0, // Tamaño de la fuente
-                                    fontWeight:
-                                        FontWeight.w400, // Peso de la fuente (por ejemplo, bold)
+                                    fontWeight: FontWeight
+                                        .w400, // Peso de la fuente (por ejemplo, bold)
                                     color: Color(0xFF000000), // Color del texto
                                   ),
-                                  
                                 ),
                                 const SizedBox(height: 10),
-                                 Container(
+                                Container(
                                   alignment: Alignment.centerLeft,
                                   width: 300,
                                   height: 50,
-                                   decoration: BoxDecoration(
-                                      color: const Color(0xFFFFFFFF),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.1), // Color y opacidad de la sombra
-                                                blurRadius: 5.0, // Radio de difuminado de la sombra
-                                                offset: const Offset(0, 3), // Desplazamiento de la sombra
-                                              ),
-                                            ],
-                                    ),
-                            padding: const EdgeInsets.all(
-                                8.0), // Ajusta el valor según tu preferencia
-                            child: Text(
-                              ruta ?? 'Ruta no disponible',
-                              style: const TextStyle(
-                                  color: Color.fromARGB(255, 105, 102, 102)), // Cambia el color del texto si es necesario
-                            ),
-                          )
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFFFFF),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(
+                                            0.1), // Color y opacidad de la sombra
+                                        blurRadius:
+                                            5.0, // Radio de difuminado de la sombra
+                                        offset: const Offset(0,
+                                            3), // Desplazamiento de la sombra
+                                      ),
+                                    ],
+                                  ),
+                                  padding: const EdgeInsets.all(
+                                      8.0), // Ajusta el valor según tu preferencia
+                                  child: Text(
+                                    ruta ?? 'Ruta no disponible',
+                                    style: const TextStyle(
+                                        color: Color.fromARGB(255, 105, 102,
+                                            102)), // Cambia el color del texto si es necesario
+                                  ),
+                                )
                               ],
                             ),
                           ),
-                         
                         ],
                       );
                     }
@@ -96,14 +94,19 @@ class Informacion extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min, // Alinear contenido al centro
                   children: [
+                    const SizedBox(height: 10),
+                    const Text('Versión 1.0.0', style: TextStyle(
+                      fontFamily: 'OpenSans',
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black
+                    )),
                     const SizedBox(height: 15),
                     const Text('Contáctanos', style: TextStyle(
-                      fontFamily:
-                          'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
+                      fontFamily: 'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
                       fontSize: 18.0, // Tamaño de la fuente
-                      fontWeight:
-                          FontWeight.w500, // Peso de la fuente (por ejemplo, bold)
-                      color:Colors.black, // Color del texto
+                      fontWeight: FontWeight.w500, // Peso de la fuente (por ejemplo, bold)
+                      color: Colors.black, // Color del texto
                     )),
                     const SizedBox(height: 5),
                     Row(
@@ -112,99 +115,70 @@ class Informacion extends StatelessWidget {
                         GestureDetector(
                           onTap: () async {
                             const url = 'https://www.wa.link/rm9cdg';
-      
-                            await launchUrlString(
-                                url); // Reemplaza con la URL deseada.
+
+                            await launchUrlString(url); // Reemplaza con la URL deseada.
                           },
-                          child: Image.asset(
-                        'lib/assets/WhatsApp.png',
-                        height: 45,
-                        width: 50,
-                      ),
+                          child: Image.asset('lib/assets/WhatsApp.png', height: 45, width: 50),
                         ),
-                       
                       ],
                     ),
-                    const SizedBox(height: 15,),
-                     Column(
+                    const SizedBox(height: 15),
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                          
-                          const Text("Siguenos en nuestras redes Sociales:", style: TextStyle(
-                                  fontFamily:
-                                      'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
-                                  fontSize: 14.0, // Tamaño de la fuente
-                                  fontWeight:
-                                      FontWeight.w400, // Peso de la fuente (por ejemplo, bold)
-                                  color:Colors.black, // Color del texto
-                                ),),
-                          const SizedBox(height: 5,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center, // Centra los elementos en el eje principal (horizontal)
-                            children: [
-                              GestureDetector(
-                                  onTap: () async {
-                                    const url = 'https://www.facebook.com/Frontuari/';
-                                            
-                                    await launchUrlString(url); // Reemplaza con la URL deseada.
-                                  },
-                                  child: Image.asset(
-                                    'lib/assets/FB@3x.png',
-                                    height: 35,
-                                    width: 50,
-                                  ),
-                                ),
-                                 GestureDetector(
-                                  onTap: () async {
-                                    const url = 'https://www.instagram.com/frontuari?igsh=ZXRjaG0yYm44Z3oy';
-                                            
-                                    await launchUrlString(url); // Reemplaza con la URL deseada.
-                                  },
-                                  child: Image.asset(
-                                    'lib/assets/IG@3x.png',
-                                    height: 35,
-                                    width: 50,
-                                  ),
-                                ),
-                            ],
-                          ),
-                       const SizedBox(height: 20,),
+                        const Text("Siguenos en nuestras redes Sociales:", style: TextStyle(
+                          fontFamily: 'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
+                          fontSize: 14.0, // Tamaño de la fuente
+                          fontWeight: FontWeight.w400, // Peso de la fuente (por ejemplo, bold)
+                          color: Colors.black, // Color del texto
+                        )),
+                        const SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center, // Centra los elementos en el eje principal (horizontal)
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                const url = 'https://www.facebook.com/Frontuari/';
 
-                      
-                          
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text('Desarrollado por:', style: TextStyle(
-                                  fontFamily:
-                                      'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
-                                  fontSize: 16.0, // Tamaño de la fuente
-                                  fontWeight:
-                                      FontWeight.w400, // Peso de la fuente (por ejemplo, bold)
-                                  color:Colors.black, // Color del texto
-                                )),
-                                
-                                GestureDetector(
-                                  onTap: () async {
-                                    const url = 'https://frontuari.net/';
-                                      
-                                    await launchUrlString(url);
-                                  },
-                                  child: Image.asset(
-                                    'lib/assets/Logo_Frontuari.png',
-                                    height: 50,
-                                    width: 150,
-                                  ),
-                                ),
-                              ],
+                                await launchUrlString(url); // Reemplaza con la URL deseada.
+                              },
+                              child: Image.asset('lib/assets/FB@3x.png', height: 35, width: 50),
                             ),
+                            GestureDetector(
+                              onTap: () async {
+                                const url = 'https://www.instagram.com/frontuari?igsh=ZXRjaG0yYm44Z3oy';
+
+                                await launchUrlString(url); // Reemplaza con la URL deseada.
+                              },
+                              child: Image.asset('lib/assets/IG@3x.png', height: 35, width: 50),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Desarrollado por:',
+                                style: TextStyle(
+                                  fontFamily: 'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
+                                  fontSize: 16.0, // Tamaño de la fuente
+                                  fontWeight: FontWeight.w400, // Peso de la fuente (por ejemplo, bold)
+                                  color: Colors.black, // Color del texto
+                                )),
+                            GestureDetector(
+                              onTap: () async {
+                                const url = 'https://frontuari.net/';
+
+                                await launchUrlString(url);
+                              },
+                              child: Image.asset('lib/assets/Logo_Frontuari.png', height: 50, width: 150),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                      
                   ],
                 ),
-               
-              
               ],
             ),
           ),
