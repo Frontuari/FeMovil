@@ -199,6 +199,8 @@ verificarConexion(url, token, setState) async {
 
     final jsonBody = jsonEncode(requestBody);
 
+    print('este es el requestBody $requestBody');
+
     // Establecer las cabeceras de la solicitud
     request.headers.set('Content-Type', 'application/json');
     request.headers.set('Accept', 'application/json');

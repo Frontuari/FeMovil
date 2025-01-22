@@ -10,6 +10,7 @@ import 'package:femovil/sincronization/https/impuesto_http.dart';
 import 'package:femovil/sincronization/https/search_id_invoice.dart';
 import 'package:femovil/sincronization/sincronizar_create.dart';
 import 'package:flutter/material.dart';
+import 'package:femovil/sincronization/widgets/empty_database.dart';
 
 double syncPercentage = 0.0; // Estado para mantener el porcentaje sincronizado
 double syncPercentageClient = 0.0;
@@ -95,8 +96,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white, // Color de fondo inicial
                             border: Border.all(color: const Color(0XFFA5F52B)), // Borde verde
-                            borderRadius:
-                                BorderRadius.circular(5.0), // Bordes redondeados
+                         
                           ),
                           child: Stack(
                             children: [
@@ -509,6 +509,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
               ),
             ),
           ),
+           EmptyDatabase(),
         ],
       ),
     );

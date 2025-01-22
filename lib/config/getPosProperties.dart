@@ -57,7 +57,6 @@ getPosPropertiesInit() async {
 
   // Convertir el cuerpo a JSON
   final jsonBody = jsonEncode(requestBody);
-
   // Establecer las cabeceras de la solicitud
   request.headers.set('Content-Type', 'application/json');
   request.headers.set('Accept', 'application/json');
@@ -66,8 +65,13 @@ getPosPropertiesInit() async {
   request.write(jsonBody);
 
 
+  print('respuesta PosPRoperties request $jsonBody');
+
+
+  print('respuesta PosPRoperties requestBody $requestBody');
   final response = await request.close();
   final responseBody = await response.transform(utf8.decoder).join();
+  print('respuesta PosPRoperties $responseBody');
   dynamic getPosProperties =  extractGetPosPropertiesData(responseBody);
   print('Estos son las propiedades registradas en idempiere $getPosProperties');
 
