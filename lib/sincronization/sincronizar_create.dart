@@ -139,8 +139,8 @@ synchronizeProductsUpdateWithIdempiere(setState) async {
 
 
 synchronizeCustomersUpdateWithIdempiere(setState) async {
-  List<Map<String, dynamic>> customers =
-      await getCustomers();
+  List<Map<String, dynamic>> customers = await getCustomersWithZeroValues() ;
+
   int contador = 0;
   // await sincronizationCustomers(setState);
 
