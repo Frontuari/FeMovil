@@ -63,10 +63,10 @@ try {
                         "@column": "M_Product_Category_ID",
                         "val": product['pro_cat_id']
                     },
-                    {
-                        "@column": "FTU_ProductGroup_ID",
-                        "val": product['product_group_id']
-                    },
+                    // {
+                    //     "@column": "FTU_ProductGroup_ID",
+                    //     "val": product['product_group_id']
+                    // },
                     {
                         "@column": "ProductType",
                         "val": product['product_type']
@@ -108,7 +108,11 @@ try {
 };
 
 
+
+
   final jsonBody = jsonEncode(requestBody);
+
+  print('Respuesta del servidor $jsonBody');
 
     request.headers.set('Content-Type', 'application/json; charset=utf-8');
     request.headers.set('Accept', 'application/json');

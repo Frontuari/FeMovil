@@ -2,7 +2,9 @@ import 'package:femovil/config/app_bar_femovil.dart';
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/list_database.dart';
+import 'package:femovil/database/update_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
+import 'package:femovil/presentation/products/idempiere/create_product.dart';
 import 'package:femovil/presentation/products/utils/switch_generated_names_select.dart';
 import 'package:flutter/material.dart';
 
@@ -413,80 +415,80 @@ class _AddProductFormState extends State<AddProductForm> {
                         },
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      height: mediaScreen * 0.22,
-                      width: mediaScreen * 0.95,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              blurRadius: 7,
-                              spreadRadius: 2,
-                            )
-                          ]),
-                      child: DropdownButtonFormField<int>(
-                        icon: Image.asset('lib/assets/Abajo.png'),
-                        value: _seletedProductGroup,
-                        items: _productGroupList
-                            .where((group) => group['product_group_id'] is int)
-                            .map<DropdownMenuItem<int>>((productGroup) {
-                          return DropdownMenuItem<int>(
-                            value: productGroup['product_group_id'] as int,
-                            child: SizedBox(
-                                width: mediaScreen * 0.7,
-                                child: Text(
-                                  productGroup['product_group_name'] as String,
-                                  style: const TextStyle(
-                                      overflow: TextOverflow.clip,
-                                      fontFamily: 'Poppins Regular'),
-                                )),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          String nombreProductGroup = invoke(
-                              'obtenerNombreProductGroup',
-                              newValue,
-                              _productGroupList);
+                    // const SizedBox(
+                    //   height: 10,
+                    // ),
+                    // Container(
+                    //   height: mediaScreen * 0.22,
+                    //   width: mediaScreen * 0.95,
+                    //   decoration: BoxDecoration(
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.circular(10),
+                    //       boxShadow: [
+                    //         BoxShadow(
+                    //           color: Colors.grey.withOpacity(0.5),
+                    //           blurRadius: 7,
+                    //           spreadRadius: 2,
+                    //         )
+                    //       ]),
+                    //   // child: DropdownButtonFormField<int>(
+                    //   //   icon: Image.asset('lib/assets/Abajo.png'),
+                    //   //   value: _seletedProductGroup,
+                    //   //   items: _productGroupList
+                    //   //       .where((group) => group['product_group_id'] is int)
+                    //   //       .map<DropdownMenuItem<int>>((productGroup) {
+                    //   //     return DropdownMenuItem<int>(
+                    //   //       value: productGroup['product_group_id'] as int,
+                    //   //       child: SizedBox(
+                    //   //           width: mediaScreen * 0.7,
+                    //   //           child: Text(
+                    //   //             productGroup['product_group_name'] as String,
+                    //   //             style: const TextStyle(
+                    //   //                 overflow: TextOverflow.clip,
+                    //   //                 fontFamily: 'Poppins Regular'),
+                    //   //           )),
+                    //   //     );
+                    //   //   }).toList(),
+                    //   //   onChanged: (newValue) {
+                    //   //     String nombreProductGroup = invoke(
+                    //   //         'obtenerNombreProductGroup',
+                    //   //         newValue,
+                    //   //         _productGroupList);
 
-                          setState(() {
-                            _productGroupText = nombreProductGroup;
-                            _seletedProductGroup = newValue as int;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          errorStyle:
-                              const TextStyle(fontFamily: 'Poppins Regular'),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: BorderSide.none),
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                  15.0), // Set desired border radius
-                              borderSide: BorderSide.none),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                                15.0), // Maintain border radius on focus
-                            borderSide: BorderSide
-                                .none, // Change border color and thickness on focus (optional)
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value == 0) {
-                            return 'Por favor seleccionar el grupo del producto';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
+                    //   //     setState(() {
+                    //   //       _productGroupText = nombreProductGroup;
+                    //   //       _seletedProductGroup = newValue as int;
+                    //   //     });
+                    //   //   },
+                    //   //   decoration: InputDecoration(
+                    //   //     errorStyle:
+                    //   //         const TextStyle(fontFamily: 'Poppins Regular'),
+                    //   //     filled: true,
+                    //   //     fillColor: Colors.white,
+                    //   //     contentPadding: const EdgeInsets.symmetric(
+                    //   //         horizontal: 20, vertical: 10),
+                    //   //     border: OutlineInputBorder(
+                    //   //         borderRadius: BorderRadius.circular(15),
+                    //   //         borderSide: BorderSide.none),
+                    //   //     enabledBorder: OutlineInputBorder(
+                    //   //         borderRadius: BorderRadius.circular(
+                    //   //             15.0), // Set desired border radius
+                    //   //         borderSide: BorderSide.none),
+                    //   //     focusedBorder: OutlineInputBorder(
+                    //   //       borderRadius: BorderRadius.circular(
+                    //   //           15.0), // Maintain border radius on focus
+                    //   //       borderSide: BorderSide
+                    //   //           .none, // Change border color and thickness on focus (optional)
+                    //   //     ),
+                    //   //   ),
+                    //   //   validator: (value) {
+                    //   //     if (value == null || value == 0) {
+                    //   //       return 'Por favor seleccionar el grupo del producto';
+                    //   //     }
+                    //   //     return null;
+                    //   //   },
+                    //   // ),
+                    // ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -696,6 +698,16 @@ class _AddProductFormState extends State<AddProductForm> {
 
     // Llama a un método para guardar el producto en Sqflite
     final id = saveProductToDatabase(product);
+
+   try {
+     createProductIdempiere(product.toMap());
+
+     
+  
+  } catch (e) {
+  print("Error sincronizando con Idempiere: $e");
+  // Aquí podrías mostrar un SnackBar o un AlertDialog de error.
+}
     print('Esto es el id $id');
     //  dynamic result = await createProductIdempiere(product.toMap());
     //  print('este es el $result');
@@ -727,6 +739,8 @@ class _AddProductFormState extends State<AddProductForm> {
     //     content: Text('Producto guardado correctamente'),
     //   ),
     // );
+
+
 
     setState(() {
       _nameController.clear();
