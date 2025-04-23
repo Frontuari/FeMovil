@@ -699,13 +699,25 @@ class _AddProductFormState extends State<AddProductForm> {
     // Llama a un método para guardar el producto en Sqflite
     final id = saveProductToDatabase(product);
 
-   try {
-     createProductIdempiere(product.toMap());
+      try {
+        createProductIdempiere(product.toMap());
+        final scaffoldMessenger = ScaffoldMessenger.of(_context);
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('Producto guardado En Idempiere'),
+          ),
+        );
 
-     
-  
-  } catch (e) {
-  print("Error sincronizando con Idempiere: $e");
+        
+      
+      } catch (e) {
+      print("Error sincronizando con Idempiere: $e");
+          final scaffoldMessenger = ScaffoldMessenger.of(_context);
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('No se Guardo en Idempiere'),
+          ),
+        );
   // Aquí podrías mostrar un SnackBar o un AlertDialog de error.
 }
     print('Esto es el id $id');

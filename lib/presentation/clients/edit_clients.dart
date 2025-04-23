@@ -1,6 +1,7 @@
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/database/update_database.dart';
+import 'package:femovil/presentation/clients/idempiere/update_customer.dart';
 import 'package:femovil/presentation/clients/select_customer.dart';
 import 'package:flutter/material.dart';
 
@@ -415,6 +416,8 @@ class _EditClientScreenState extends State<EditClientScreen> {
 
                               // Actualizar el producto en la base de datos
                               await updateClient(updatedClient);
+
+                              await updateCustomerIdempiere(updatedClient);
 
                               showDialog(
                                 context: currentContext!,

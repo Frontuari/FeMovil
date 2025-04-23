@@ -3,7 +3,9 @@ import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/presentation/clients/helpers/save_client_to_database.dart';
+import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
 import 'package:femovil/presentation/clients/select_customer.dart';
+import 'package:femovil/utils/alerts_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -1008,6 +1010,8 @@ class _AddClientsFormState extends State<AddClientsForm> {
 
     bool ifExists = await customerExists(ruc);
 
+    
+
     if (ifExists) {
       showDialog(
         context: context,
@@ -1101,8 +1105,10 @@ class _AddClientsFormState extends State<AddClientsForm> {
       cBpGroupName: groupBpName,
     );
 
+    print('Data antes de enviar $client' );
+
     // Llama a un método para guardar el producto en Sqflite
-    await saveClientToDatabase(client);
+    // await saveClientToDatabase(client);
 
     // Limpia los controladores de texto después de guardar el producto
     _nameController.clear();
@@ -1120,6 +1126,10 @@ class _AddClientsFormState extends State<AddClientsForm> {
       _selectedTaxPayer = 0;
       _seletectedTypePerson = 0;
     });
+
+    showLoadingDialog(context);
+    await createCustomerIdempiere(client.toMap());
+    Navigator.pop(context);
 
     showDialog(
       context: context,
