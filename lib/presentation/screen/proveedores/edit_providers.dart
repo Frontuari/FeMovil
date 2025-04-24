@@ -60,7 +60,7 @@ class _EditProviderScreenState extends State<EditProviderScreen> {
   String _cityText            = '';
   int? _idMaxlength;
 
-  loadList() async {
+  loadList() async {  
     List<Map<String, dynamic>> getGroupVendor = await listarTypeGroupVendor();
     List<Map<String, dynamic>> getIdTypeVendor = await listarTaxType();
     List<Map<String, dynamic>> getCountryVendor = await listarCountries();

@@ -321,42 +321,44 @@ class ProvidersDetailsScreen extends StatelessWidget {
                   SizedBox(
                     height: screenMax * 0.02,
                   ),
-                  Container(
-                    width: screenMax,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Aquí puedes manejar la acción de agregar orden
-                        // Por ejemplo, puedes navegar a una pantalla de agregar orden
 
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  EditProviderScreen(provider: provider)),
-                        );
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: const WidgetStatePropertyAll<Color>(
-                            Color(0xFF7531FF)),
-                        foregroundColor:
-                            const WidgetStatePropertyAll<Color>(Colors.white),
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                15), // Aquí establece el radio de borde
-                          ),
-                        ),
-                      ),
-                      child: const Text(
-                        'Editar',
-                        style:
-                            TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
-                      ),
-                    ),
-                  ),
+                  //Editar Provider Comentado
+                  // Container(
+                  //   width: screenMax,
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(15),
+                  //   ),
+                  //   child: ElevatedButton(
+                  //     onPressed: () {
+                  //       // Aquí puedes manejar la acción de agregar orden
+                  //       // Por ejemplo, puedes navegar a una pantalla de agregar orden
+
+                  //       Navigator.pushReplacement(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) =>
+                  //                 EditProviderScreen(provider: provider)),
+                  //       );
+                  //     },
+                  //     style: ButtonStyle(
+                  //       backgroundColor: const WidgetStatePropertyAll<Color>(
+                  //           Color(0xFF7531FF)),
+                  //       foregroundColor:
+                  //           const WidgetStatePropertyAll<Color>(Colors.white),
+                  //       shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                  //         RoundedRectangleBorder(
+                  //           borderRadius: BorderRadius.circular(
+                  //               15), // Aquí establece el radio de borde
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     child: const Text(
+                  //       'Editar',
+                  //       style:
+                  //           TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

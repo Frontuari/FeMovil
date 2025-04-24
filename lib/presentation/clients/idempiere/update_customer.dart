@@ -83,7 +83,7 @@ try {
                           "serviceType":"CreateBPAPP",
                           "TableName": "C_BPartner_Tercero",
                           "RecordID": "0",
-                          "Action":"Update",
+                          "Action":"CreateUpdate",
                           "DataRow": {
                       "field": [
                           {

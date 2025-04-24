@@ -95,7 +95,7 @@ class Informacion extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min, // Alinear contenido al centro
                   children: [
                     const SizedBox(height: 10),
-                    const Text('Versión 1.1.1', style: TextStyle(
+                    const Text('Versión 1.1.2', style: TextStyle(
                       fontFamily: 'OpenSans',
                       fontSize: 14.0,
                       fontWeight: FontWeight.w400,

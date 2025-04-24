@@ -146,7 +146,7 @@ try {
                       }
 
                       },
-                      {
+                         {
                       "TargetPort": "createUpdateData",
                       "ModelCRUD": {
                       "serviceType" : "CreateLocationAPP",
@@ -155,25 +155,29 @@ try {
                       "Action": "CreateUpdate",
                       "DataRow": {
                       "field": [
-                          {
-                              "@column": "Address1",
-                              "val": vendor['address']
-                          },
-                          {
-                              "@column": "City",
-                              "val": vendor['city']
-                          },
-                          {
+                            {
                               "@column": "C_Country_ID",
                               "val": vendor['c_country_id']
                           },
+                     
+                              {
+                              "@column": "C_Region_ID",
+                              "val": vendor['c_region_id']
+                          },
+                             {
+                              "@column": "C_City_ID",
+                              "val": vendor['c_city_id']
+                          },
+
+                               {
+                              "@column": "Address1",
+                              "val": vendor['address']
+                          },
+                      
+                      
                           {
                               "@column": "Postal",
-                              "val": vendor['postal']
-                          },
-                           {
-                              "@column": "RegionName",
-                              "val": vendor['province']
+                              "val": vendor['code_postal']
                           }
                       
                       ]
@@ -210,11 +214,6 @@ try {
                               "val": vendor['phone']
                           },
                           {
-                              //quisiera que tome el nombre de @C_Location que se genera en createlocationapp
-                              "@column": "Name",
-                              "val":vendor['city']
-                          },
-                          {
                               "@column": "C_Location_ID",
                               "val": "@C_Location.C_Location_ID"
                           },
@@ -247,6 +246,8 @@ try {
 
   final jsonBody = jsonEncode(requestBody);
 
+  print('Enviando Providers $jsonBody');
+
     request.headers.set('Content-Type', 'application/json; charset=utf-8');
     request.headers.set('Accept', 'application/json');
 
@@ -259,7 +260,7 @@ try {
   final parsedJson = jsonDecode(responseBody);
 
 
-      print("esta es la respuesta $parsedJson");
+      print("esta es la respuesta Providers $parsedJson");
       return parsedJson;
         } catch (e) {
           return 'este es el error e $e';
