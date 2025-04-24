@@ -1108,7 +1108,7 @@ class _AddClientsFormState extends State<AddClientsForm> {
     print('Data antes de enviar $client' );
 
     // Llama a un método para guardar el producto en Sqflite
-    // await saveClientToDatabase(client);
+
 
     // Limpia los controladores de texto después de guardar el producto
     _nameController.clear();
@@ -1128,7 +1128,10 @@ class _AddClientsFormState extends State<AddClientsForm> {
     });
 
     showLoadingDialog(context);
+  
     await createCustomerIdempiere(client.toMap());
+
+    await saveClientToDatabase(client);
     Navigator.pop(context);
 
     showDialog(
