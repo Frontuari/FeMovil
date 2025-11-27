@@ -55,6 +55,8 @@ getPosPropertiesInit() async {
     }
   };
 
+
+  print('requestBody PosPRoperties $requestBody');
   // Convertir el cuerpo a JSON
   final jsonBody = jsonEncode(requestBody);
   // Establecer las cabeceras de la solicitud
