@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 
@@ -14,16 +15,25 @@ class DatabaseHelper {
     return _database;
   }
 
+
   Future<void> deleteDatabases() async {
     String databasesPath = await getDatabasesPath();
     String dbPath = path.join(databasesPath, 'femovil.db');
+
+    print(databasesPath);
+    print(dbPath);
+
+    print(databasesPath);
+    print(dbPath);
 
     // Elimina la base de datos si existe
     await deleteDatabase(dbPath);
     print('Base de datos eliminada');
 
     // Llama al método _initDatabase para crear la base de datos con la nueva estructura
-    await _initDatabase();
+    await initDatabase();
+
+    SystemNavigator.pop();
     print('Base de datos creada nuevamente');
   }
 
@@ -313,8 +323,6 @@ class DatabaseHelper {
             date TEXT,
             monto REAL,
             FOREIGN KEY (provider_id) REFERENCES providers(id)
-
-
             )
 
         ''');
@@ -347,16 +355,31 @@ class DatabaseHelper {
             
         ''');
 
-        await db.execute('''
+            await db.execute('''
           CREATE TABLE usuarios(
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             name TEXT,
-            password INTEGER,
+            password TEXT,
             ad_user_id TEXT,
             email TEXT,
-            phone TEXT
+            phone TEXT,
+            client_id INTEGER,
+            org_id INTEGER,
+            role_id INTEGER,
+            warehouse_id INTEGER,
+            languaje TEXT,
+            username TEXT,
+            description TEXT
             )
         ''');
+       await db.execute('''
+          CREATE TABLE org_info(
+            ruc TEXT PRIMARY KEY,
+            org TEXT, 
+            address TEXT
+            )
+        ''');
+
 
         await db.execute('''
           CREATE TABLE posproperties(
@@ -397,7 +420,8 @@ class DatabaseHelper {
           rate REAL,
           name TEXT,
           c_tax_category_id INTEGER,
-          iswithholding TEXT
+          iswithholding TEXT,
+          sopo_type TEXT
           )
         ''');
 

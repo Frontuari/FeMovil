@@ -572,70 +572,53 @@ Future<void> syncTaxPayerTypes(List<Map<String, dynamic>> taxPayerTypeData) asyn
 
 Future<void> syncCountries(List<Map<String, dynamic>> countriesData) async {
   final db = await DatabaseHelper.instance.database;
-  if (db != null) {
-    // db.delete('countries');
-    // db.delete('regions');
-    // db.delete('cities');
-    // Itera sobre los datos de los productos recibidos
-    for (Map<String, dynamic> country in countriesData) {  
-      // Consulta si el item ya existe en la base de datos local por su id
-      List<Map<String, dynamic>> existingCountry = await db.query(
-        'countries',
-        where: 'c_country_id = ?',
-        whereArgs: [country["c_country_id"]],
-        limit: 1
-      );
+  if (db == null) {
+    print("Error: db is null");
+    return;
+  }
 
-      print('existing country: $existingCountry');
+  await db.transaction((txn) async {
+    final batch = txn.batch();
 
-      if (existingCountry.isNotEmpty) {
-        // Si el item ya existe, actualiza sus datos
-        await db.update(
-          'countries',
-          {
-            'c_country_id': country["c_country_id"],
-            'name'        : country["name"],
-          },
-          where: 'id = ?',
-          whereArgs: [existingCountry[0]["id"]],
-        );
+    for (final country in countriesData) {
 
-        print('country actualizado: ${country["name"]}');
-      } else {
-        // Si el item no existe, inserta un nuevo registro en la tabla
-        await db.insert('countries', {
-          'c_country_id': country["c_country_id"],
-          'name'        : country["name"],
-        });
+      batch.rawInsert('''
+        INSERT OR REPLACE INTO countries (c_country_id, name)
+        VALUES (?, ?)
+      ''', [
+        country["c_country_id"],
+        country["name"],
+      ]);
 
-        List regions = jsonDecode(country["regions"]);
-        for (Map<String, dynamic> region in regions) {
-          print('region data: $region');
+      // REGIONS
+      final regions = jsonDecode(country["regions"]);
+      for (final region in regions) {
+        batch.rawInsert('''
+          INSERT OR REPLACE INTO regions (c_region_id, name, c_country_id)
+          VALUES (?, ?, ?)
+        ''', [
+          region["c_region_id"],
+          region["nameregion"],
+          region["c_country_id"],
+        ]);
 
-          await db.insert('regions', {
-            'c_region_id' : region["c_region_id"],
-            'name'        : region["nameregion"],
-            'c_country_id': region["c_country_id"],
-          });
-
-          dynamic cities = region["cities"]; 
-          for (Map<String, dynamic> city in cities) {
-            print('city data: $city');
-
-            await db.insert('cities', {
-              'c_city_id'  : city["c_city_id"],
-              'name'       : city["namecity"],
-              'c_region_id': city["c_region_id"],
-            });
-          }
+        // CITIES
+        final cities = region["cities"];
+        for (final city in cities) {
+          batch.rawInsert('''
+            INSERT OR REPLACE INTO cities (c_city_id, name, c_region_id)
+            VALUES (?, ?, ?)
+          ''', [
+            city["c_city_id"],
+            city["namecity"],
+            city["c_region_id"],
+          ]);
         }
-
-        print('country insertado: ${country["name"]}');
       }
     }
-    print('Sincronización de countries completada.');
-  } else {
-    // Manejar el caso en el que db sea null
-    print('Error: db is null');
-  }
+
+    await batch.commit(noResult: true);
+  });
+
+  print("Sincronización optimizada completada.");
 }

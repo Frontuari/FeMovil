@@ -1,5 +1,6 @@
 import 'package:femovil/database/create_database.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
 
 Future<List<Map<String, dynamic>>> getProductsAndTaxes() async {
   final db = await DatabaseHelper.instance.database;
@@ -216,6 +217,20 @@ Future<List<Map<String, dynamic>>> getAllOrdersWithClientNames() async {
     print('Error: db is null');
     return [];
   }
+}
+
+Future<List<Map<String, dynamic>>> getUserData() async {
+  Database? db = await DatabaseHelper.instance.database;
+
+  if (db == null) {
+    return [];
+  }
+
+  final result = await db.rawQuery(
+    '''SELECT name,email,phone,description,username,password,org_id,client_id,role_id,languaje,warehouse_id FROM usuarios LIMIT 1; ''',
+  );
+
+  return result.isNotEmpty ? result : [];
 }
 
 Future<List<Map<String, dynamic>>> getAllOrdersWithVendorsNames() async {

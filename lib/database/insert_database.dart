@@ -282,11 +282,30 @@ Future<void> insertTaxData() async {
     }
 
 
- Future<void> insertUser(Map<String, dynamic> user) async {
-    final db = await DatabaseHelper.instance.database;
-    await db?.insert(
+Future<void> insertUser(Map<String, dynamic> user) async {
+  print('Inserción/Actualización de usuario: $user');
+
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) return;
+
+  // Forzar que id = ad_user_id si es numérico
+  final int? idValue = int.tryParse(user['ad_user_id'].toString());
+  if (idValue != null) {
+    user['id'] = idValue;
+  }
+
+  await db.transaction((txn) async {
+    // Borra todo, siempre
+    await txn.delete('usuarios');
+
+    // Inserta único usuario
+    await txn.insert(
       'usuarios',
       user,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-  }
+  });
+
+  print('Usuario único guardado correctamente.');
+}
+

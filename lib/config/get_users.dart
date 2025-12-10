@@ -8,7 +8,7 @@ import 'package:femovil/config/url.dart';
 import 'package:path_provider/path_provider.dart';
 
 
-getUsers(username, password) async {
+getUsersLegacy(username, password) async {
 
 
     HttpClient httpClient = HttpClient()
@@ -84,4 +84,76 @@ getUsers(username, password) async {
   
   return response;
 
+}
+
+getUsersNew(username, password) async {
+
+  HttpClient httpClient = HttpClient()
+    ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+  var map = await getRuta();
+
+  final uri = Uri.parse('${map['URL']}ADInterface/services/rest/model_adservice/query_data');
+  final request = await httpClient.postUrl(uri);
+
+  final info = await getApplicationSupportDirectory();
+  final String filePathEnv = '${info.path}/.env';
+  final archivo = File(filePathEnv);
+
+  String contenidoActual = await archivo.readAsString();
+  Map<String, dynamic> jsonData = jsonDecode(contenidoActual);
+
+  var role = jsonData["RoleID"];
+  var orgId = jsonData["OrgID"];
+  var clientId = jsonData["ClientID"];
+  var wareHouseId = jsonData["WarehouseID"];
+  var language = jsonData["Language"];
+  jsonData["Username"] = username;
+  jsonData["Password"] = password;
+
+print('DATA USUARIO EN GET USERS NEW: $jsonData');
+
+  final requestBody = {
+    "ModelCRUDRequest": {
+      "ModelCRUD": {
+        "serviceType": "getUser",
+        "DataRow": {
+          "field": [
+            {"@column": "Name", "val": username}
+          ]
+        }
+      },
+      "ADLoginRequest": {
+        "user": username,
+        "pass": password,
+        "lang": language,
+        "ClientID": clientId,
+        "RoleID": role,
+        "OrgID": orgId,
+        "WarehouseID": wareHouseId,
+        "stage": 9
+      }
+    }
+  };
+
+  final jsonBody = jsonEncode(requestBody);
+
+  request.headers.set('Content-Type', 'application/json; charset=utf-8');
+  request.headers.set('Accept', 'application/json');
+  request.write(jsonBody);
+
+  final response = await request.close();
+
+  // 🔥 AQUÍ se lee la respuesta SOLO UNA VEZ
+  final responseBody = await response.transform(utf8.decoder).join();
+
+
+  final parsedJson = jsonDecode(responseBody);
+
+  return {
+    "response": response,        // Esto lo puedes dejar para el statusCode
+    "responseBody": responseBody, 
+    "json": parsedJson,
+    'dataLogin': jsonData
+  };
 }
