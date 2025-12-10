@@ -374,8 +374,9 @@ class DatabaseHelper {
         ''');
        await db.execute('''
           CREATE TABLE org_info(
-            ruc TEXT PRIMARY KEY,
-            org TEXT, 
+            ad_org_id INTEGER PRIMARY KEY,
+            name TEXT,
+            ruc TEXT, 
             address TEXT
             )
         ''');

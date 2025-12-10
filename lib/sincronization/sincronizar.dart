@@ -5,6 +5,7 @@ import 'package:femovil/infrastructure/bank_accounts.dart';
 import 'package:femovil/infrastructure/models/ciiu.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/infrastructure/models/impuestos.dart';
+import 'package:femovil/infrastructure/models/org_info.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/sincronization/sincronizar_create.dart';
@@ -211,6 +212,7 @@ Future<void> syncImpuestos(List<Map<String, dynamic>> impuestosData,setState) as
             name: impuestoData['name'].toString(),
             rate: impuestoData['rate'],
             taxIndicators: impuestoData['tax_indicator'].toString(),
+            sopoType: impuestoData['sopo_type'].toString()
             
             
           );
@@ -621,4 +623,68 @@ Future<void> syncCountries(List<Map<String, dynamic>> countriesData) async {
   });
 
   print("Sincronización optimizada completada.");
+}
+
+Future<void> syncOrgInfo(List<Map<String, dynamic>> data) async {
+  print('🌟 Datos entrando a suggest_product: $data');
+
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) {
+    print('❌ Error: Base de datos no disponible');
+    return;
+  }
+
+  try {
+    await db.transaction((txn) async {
+      final batch = txn.batch();
+
+      for (Map<String, dynamic> datas in data) {
+        final dataObjet = OrgInfo(
+          adORGID: datas['ad_org_id'],
+          name: datas['name'],
+          taxID: datas['ruc'],
+          orgAddress: datas['address']
+     
+        );
+
+        final dataToMap = dataObjet.toMap();
+
+        print('📦 Valor de la variable ORG: $dataToMap');
+
+        // Verificamos si ya existe el registro (llave compuesta)
+        final existingState = await txn.query(
+          'org_info',
+          where: 'ad_org_id = ?',
+          whereArgs: [
+            dataObjet.adORGID
+          ],
+          limit: 1,
+        );
+
+        if (existingState.isNotEmpty) {
+          // Si existe, actualizamos
+          batch.update(
+            'org_info',
+            dataToMap,
+            where: 'ad_org_id = ?',
+            whereArgs: [
+                dataObjet.adORGID
+            ],
+          );
+          print('✅ Informacion de Organizacion Actualizada ${dataObjet.adORGID} - ${dataObjet.name} - ${dataObjet.orgAddress}');
+        } else {
+          // Si no existe, insertamos
+          batch.insert('org_info', dataToMap);
+          print('🆕 Informacion de Organizacion Actualizada: ${dataToMap.toString()} - ${dataObjet.name} - ${dataObjet.orgAddress}');
+        }
+      }
+
+      // Ejecutamos todas las operaciones en batch
+      await batch.commit(noResult: true);
+    });
+
+    print('🎉 Sincronización de ORGINFO completada.');
+  } catch (e) {
+    print('🚨 Error en la sincronización de ORGINFO: $e');
+  }
 }

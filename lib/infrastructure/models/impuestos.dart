@@ -5,6 +5,7 @@ class Impuesto {
   final String name; // Stock mínimo
   final dynamic cTaxCategoryId;
   final String isWithHolding;
+  dynamic sopoType;
 
 
   Impuesto({
@@ -13,7 +14,8 @@ class Impuesto {
     required this.rate,
     required this.name,
     required this.cTaxCategoryId,
-    required this.isWithHolding
+    required this.isWithHolding,
+    this.sopoType
   });
 
   // Método para convertir un producto a un mapa para ser almacenado en la base de datos
@@ -25,6 +27,7 @@ class Impuesto {
       'name': name,
       'c_tax_category_id': cTaxCategoryId,
       'iswithholding': isWithHolding,
+      'sopo_type': sopoType
     };
   }
 }

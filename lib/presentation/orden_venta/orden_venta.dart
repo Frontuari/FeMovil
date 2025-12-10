@@ -11,6 +11,8 @@ import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
 import 'package:femovil/presentation/screen/ventas/ventas.dart';
 import 'package:femovil/presentation/screen/ventas/ventas_details.dart';
+import 'package:femovil/utils/alerts_messages.dart';
+import 'package:femovil/utils/searck_key_idempiere.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart'; // Importa la librería de formateo de fechas
@@ -54,6 +56,7 @@ class _OrdenDeVentaScreenState extends State<OrdenDeVentaScreen> {
   Map<String, dynamic> infoUserForOrder = {};
   bool isDragging = false;
   bool enableButton = true;
+  dynamic rucCliente='';
 
  dynamic calcularMontoTotal() {
   double total = 0;
@@ -832,24 +835,8 @@ Color getColorBg(Set<WidgetState> states){
                       onPressed: enableButton ? () async{              
                         if (infoUserForOrder.isNotEmpty) {                                    
                           if (selectedProducts.isEmpty) {                   
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Error'),
-                                  content: const Text('La orden debe tener productos adjuntos.'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context); // Cerrar el diálogo
-                                      },
-                                      child: const Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                    
+                            ErrorMessage.showErrorMessageDialog(context, 'Debe agregar al menos un producto a la orden de venta.');
+
                             return;
                           }
 
@@ -879,8 +866,10 @@ Color getColorBg(Set<WidgetState> states){
                             'saldo_impuesto' : saldoImpuestoController.text.substring(2),
                             'status_sincronized': 'Borrador',
                           };
+                          rucCliente= widget.rucCbpartner;
 
                           // Luego puedes guardar la orden de venta en la base de datos o enviarla al servidor
+                     
                           await insertOrder(order).then((orderId) async {
                             print('Se guardo la orden: $orderId');
                           
@@ -909,58 +898,47 @@ Color getColorBg(Set<WidgetState> states){
                               },
                               'products': selectedProducts,
                             };
-    
-                            try {
-                              await createOrdenSalesIdempiere(orderCreateIdempiere).then((res) => print(res));
-                              print('Se guardo la orden de venta Idempiere');
-                            } catch (err) {
-                              print('Error: $err');
-                            }
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Orden de venta guardada correctamente con ID: $orderId'),
-                              ),
-                            );
+                          try {
+                      showLoadingDialog(   context, message: 'Enviando Orden de Venta...');
+                        final result = await createOrdenSalesIdempiere(orderCreateIdempiere);
+                      Navigator.of(context).pop(); // cerrar el diálogo de carga
 
-                            setState(() {
-                              enableButton = true;
-                            });
+                        print("RESULTADO DE LA FUNCIÓN: $result");
 
-                            Navigator.pushNamed(context, '/');
+                        // Caso: sin conexión o error interno (retorna false)
+                        if (result == false) {
 
-                            /*Map<String, dynamic> order = await getOrderWithProducts(orderId);
-                            // print('Esto es la order $order');
-
-                            double saldoTotal;
-                            try {
-                              saldoTotal = double.parse(order['order']['saldo_total'].toString());
-                            } catch (e) {
-                              saldoTotal = 0.0; // Valor predeterminado en caso de error
-                            }
-
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VentasDetails(
-                              ventaId: orderId, 
-                              emailClient: order['client'][0]['email'],
-                              nameClient: order['client'][0]['bp_name'], 
-                              phoneClient: order['client'][0]!['phone'].toString(), 
-                              rucClient: order['client'][0]['ruc'].toString(), 
-                              saldoTotal: saldoTotal
-                            )));
+                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                          WarningMessages.showWarningMessagesDialog(
+                            context,
+                            'Sin Conexión, Envie La Orden de Venta Individualmente N° $rucCliente'
+                          );
+                       
+                    
+                          return;
+                        }
+                        else{
+                         final documentNo = findValueByColumn(result, "DocumentNo") ?? "Sin Número";
                         
-                            numeroReferenciaController.clear();
-                            descripcionController.clear();
-                            montoController.clear();
-                            saldoNetoController.clear();
-                            saldoExentoController.clear();
-                            saldoImpuestoController.clear();                          
-                    
-                            // Limpiar la lista de productos seleccionados después de guardar la orden
-                            setState(() {
-                              selectedProducts.clear();
-                              enableButton = true;
-                            });*/
-                    
+                          print("NUMERO DE DOCUMENTO: $documentNo");
+                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                          SuccesMessages.showSuccesMessagesDialog(
+                            context,
+                            'Orden de Venta Enviada Correctamente\nN° $documentNo',
+                          );
+                    }
+
+                      } catch (err) {
+                        ErrorMessage.showErrorMessageDialog(
+                          context,
+                          'Error inesperado: $err',
+                          goBack: true,
+                        );
+                        setState(() => enableButton = true);
+                      }
+
+                      
                             // Notificar al usuario que la orden se ha guardado exitosamente
                           });
                         }

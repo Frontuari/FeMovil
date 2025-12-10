@@ -7,9 +7,12 @@ import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:femovil/sincronization/design_charger/striped_design.dart';
 import 'package:femovil/sincronization/https/bank_account.dart';
 import 'package:femovil/sincronization/https/ciuu_activities.dart';
+import 'package:femovil/sincronization/https/get_orginfo.dart';
 import 'package:femovil/sincronization/https/impuesto_http.dart';
 import 'package:femovil/sincronization/https/search_id_invoice.dart';
 import 'package:femovil/sincronization/sincronizar_create.dart';
+import 'package:femovil/utils/alerts_messages.dart';
+import 'package:femovil/utils/snackbar_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:femovil/sincronization/widgets/empty_database.dart';
 
@@ -470,57 +473,69 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide.none)),
                 ),
-                onPressed: _enableButtons
+               onPressed: _enableButtons
                     ? () async {
-                        // Llamada a la función de sincronización
                         setState(() {
                           _enableButtons = false;
                         });
+                     
+                        try {
+                          if (!setearValoresEnCero) {
+                            setState(() {
+                              syncPercentage = 0;
+                              syncPercentageClient = 0;
+                              syncPercentageImpuestos = 0;
+                              syncPercentageProviders = 0;
+                              syncPercentageSelling = 0;
+                              syncPercentageBankAccount = 0;
+                              setearValoresEnCero = true;
+                              totalProducts = 0;
+                              currentSyncCount = 0;
+                              syncedProducts = 0;
+                            });
+                          }
+                          
 
-                        if (setearValoresEnCero == false) {
+                          await getPosPropertiesInit();
+                          List<Map<String, dynamic>> response = await getPosPropertiesV();
+
                           setState(() {
-                            syncPercentage = 0;
-                            syncPercentageClient = 0;
-                            syncPercentageImpuestos = 0;
-                            syncPercentageProviders = 0;
-                            syncPercentageSelling = 0;
-                            syncPercentageBankAccount = 0;
-                            setearValoresEnCero = true;
-                            totalProducts = 0;
-                            currentSyncCount = 0;
-                            syncedProducts = 0;
+                            variablesG = response;
                           });
+
+                          // Aquí si falla CUALQUIER llamada, saltará al catch
+                          sincronizationSearchIdInvoice(setState);
+                          sincronizationCiuActivities(setState);
+                          sincronizationBankAccount(setState);
+                          sincronizationPaymentTerms();
+                          sincronizationImpuestos(setState);
+                          await sincronizationOrgInfo();
+                          await synchronizeCustomersUpdateWithIdempiere(setState);
+                          await synchronizeVendorsWithIdempiere(setState);
+                          await synchronizeProductsUpdateWithIdempiere(setState);
+                          await synchronizeOrderSalesWithIdempiere(setState);
+                          await synchronizeTaxIdTypes();
+                          await synchronizeTaxPayerTypes();
+                          await synchronizeCountries();
+
+                          showSuccesSnackbar(context, 'Sincronización completada');
+
+                          setState(() {
+                            _enableButtons = true;
+                            setearValoresEnCero = false;
+                          });
+
+                        } catch (e) {
+                          // Restablecer el botón
+                          setState(() {
+                            _enableButtons = true;
+                            setearValoresEnCero = false;
+                          });
+
+                          // Mostrar mensaje de error
+                          ErrorMessage.showErrorMessageDialog(
+                              context, 'Sin Conexión a Internet. La sincronización no se pudo completar.');
                         }
-
-                        await getPosPropertiesInit();
-
-                        List<Map<String, dynamic>> response =
-                            await getPosPropertiesV();
-
-                        setState(() {
-                          variablesG = response;
-                        });
-
-                        sincronizationSearchIdInvoice(setState);
-                        sincronizationCiuActivities(setState);
-                        sincronizationBankAccount(setState);
-                        sincronizationPaymentTerms();
-                        sincronizationImpuestos(setState);
-                        await getOrgInfo();
-                        await synchronizeCustomersUpdateWithIdempiere(setState);
-                        await synchronizeVendorsWithIdempiere(setState);
-                        await synchronizeProductsUpdateWithIdempiere(setState);
-                        await synchronizeOrderSalesWithIdempiere(setState);
-                        await synchronizeTaxIdTypes();
-                        await synchronizeTaxPayerTypes();
-                        await synchronizeCountries();
-
-                        // sincronizationCustomers(setState);
-
-                        setState(() {
-                          _enableButtons = true;
-                          setearValoresEnCero = false;
-                        });
                       }
                     : null,
                 child: Text(
