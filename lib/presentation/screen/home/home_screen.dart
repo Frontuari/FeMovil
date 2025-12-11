@@ -92,7 +92,7 @@ class HomeState extends State<Home> {
                       const SizedBox(width: 15,),
 
                       const Text(
-                        'Inicio\nFe Móvil  Legacy',
+                        'Inicio',
                         style: TextStyle(
                           fontFamily: 'Poppins ExtraBold',
                           color: Colors.white,
