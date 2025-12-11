@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
         Locale('es', ''), 
       ],
       debugShowCheckedModeBanner: false,
-      title: 'Fe Movil',
+      title: 'Fe Movil Legacy',
       theme: AppTheme(selectedColor: 0).theme(),
       routes: {
         '/' :(context) => const Login(),
