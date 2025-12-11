@@ -1,4 +1,4 @@
-package com.frontuari.femovil
+package com.frontuari.femovil.legacy
 
 import io.flutter.embedding.android.FlutterActivity
 

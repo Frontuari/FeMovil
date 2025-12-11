@@ -20,7 +20,7 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
+    flutterVersionCode = '2'
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
@@ -29,7 +29,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.frontuari.femovil"
+    namespace "com.frontuari.femovil.legacy"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -47,10 +47,10 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.frontuari.femovil"
+        applicationId "com.frontuari.femovil.legacy"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
+        versionCode 3
         versionName flutterVersionName
     }
 
