@@ -50,7 +50,7 @@ android {
         applicationId "com.frontuari.femovil"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
+        versionCode 4
         versionName flutterVersionName
     }
 
