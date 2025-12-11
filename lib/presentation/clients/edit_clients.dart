@@ -1,7 +1,9 @@
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/database/update_database.dart';
+import 'package:femovil/presentation/clients/idempiere/update_customer.dart';
 import 'package:femovil/presentation/clients/select_customer.dart';
+import 'package:femovil/utils/alerts_messages.dart';
 import 'package:flutter/material.dart';
 
 class EditClientScreen extends StatefulWidget {
@@ -64,6 +66,8 @@ class _EditClientScreenState extends State<EditClientScreen> {
     print('Esta es la respuesta de getGroupTercero $getGroupTercero');
     print('Esto es getTaxType $getTaxType');
     print('Estos son los taxPayers $getTaxPayer');
+
+  
     // print('Estos son los type person $getTypePerson');
 
     _groupList.add({
@@ -95,6 +99,8 @@ class _EditClientScreenState extends State<EditClientScreen> {
     //   'person_type_name': 'Selecciona un tipo de Persona'
     // });
 
+    
+
     setState(() {
       _countryList.addAll(getCountryGroup);
       _groupList.addAll(getGroupTercero);
@@ -104,6 +110,7 @@ class _EditClientScreenState extends State<EditClientScreen> {
     });
 
     if (widget.client['c_country_id'] != 0) {
+   
       _selectedCountryIndex = widget.client['c_country_id'].toString() != '{@nil=true}' ? widget.client['c_country_id'] : 0;
       List<Map<String, dynamic>> provinceListByCountry  = await listarRegions(widget.client['c_country_id']);
       List<Map<String, dynamic>> cityListByProvince     = await listarCities(widget.client['c_region_id']);
@@ -390,10 +397,13 @@ class _EditClientScreenState extends State<EditClientScreen> {
                               int selectedCountryId   = _selectedCountryIndex;
                               int selectedProvinceId  = _selectedProvinceIndex;
                               int selectedCityId      = _selectedCityIndex;
+                              
                                     
                               // Crear un mapa con los datos actualizados del producto
                               Map<String, dynamic> updatedClient = {
                                 'id': widget.client['id'], // Asegúrate de incluir el ID del producto
+
+                                'c_bpartner_id': widget.client['c_bpartner_id'],
                                 'bp_name': newName,
                                 'ruc': newRuc,
                                 'email': newCorreo,
@@ -411,10 +421,20 @@ class _EditClientScreenState extends State<EditClientScreen> {
                                 'c_country_id': selectedCountryId,
                                 'c_region_id': selectedProvinceId,
                                 'c_city_id': selectedCityId,
+                                
                               };
+                                print('Data que trae el client $updatedClient');
+
+                              print('id updateClient $updatedClient');
 
                               // Actualizar el producto en la base de datos
+
+                              showLoadingDialog(context, message: 'Guardando');
                               await updateClient(updatedClient);
+
+                              await updateCustomerIdempiere(updatedClient);
+                              Navigator.pop(context);
+
 
                               showDialog(
                                 context: currentContext!,

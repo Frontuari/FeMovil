@@ -68,11 +68,13 @@ sincronizationBankAccount(setState) async {
 
   final response = await request.close();
   final responseBody = await response.transform(utf8.decoder).join();
+
+  print( 'Esto es la respuesta de bankAccount $responseBody');
   dynamic bankAccount =  extractBankAccountData(responseBody);
 
 
 
-            print('Esta es la cuenta de banco extraida desde idempiere $bankAccount');
+      print('Esta es la cuenta de banco extraida desde idempiere $bankAccount');
 
 
   await syncBankAccount(bankAccount,setState); 

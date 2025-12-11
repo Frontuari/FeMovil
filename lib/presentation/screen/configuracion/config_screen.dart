@@ -1,4 +1,6 @@
 import 'package:femovil/config/banner_app.dart';
+import 'package:femovil/database/create_database.dart';
+import 'package:femovil/utils/alerts_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:femovil/presentation/screen/configuracion/services/config_services.dart';
 import 'package:femovil/presentation/screen/login/login_screen.dart';
@@ -280,24 +282,40 @@ class _ConfiguracionState extends State<Configuracion> {
                                       )
                                     : null,
                               )),
-                          onChanged: (value) async {
-                            print('VERIFICAR CONEXION');
-                            bool resp = await verificarConexion(textUrlController.text, textTokenController.text, setState);
-                            print(resp);
+                           onSubmitted:  (value) async {
+                                    textTokenController.value = textTokenController.value.copyWith(
+                                        text: value.toUpperCase(),
+                                        selection: TextSelection.collapsed(offset: value.length),
+                                      );
+                                      print('Valor actual: ${textTokenController.text}');
 
-                            if (resp == true) {
-                              setState(() {
-                                mensajeConexion = 'Conexión exitosa';
-                                openButton = true;
-                              });
-                            }
-                            else {
-                              setState(() {
-                                mensajeConexion = 'No se pudo realizar la conexión';
-                                openButton = false;
-                              });
-                            }
-                          },
+                                      // Solo ejecutar si tiene 4 o más caracteres
+                                      if (value.length >= 4) {
+                                        bool resp = await verificarConexion(
+                                          textUrlController.text,
+                                          textTokenController.text,
+                                          setState,
+                                        );
+
+                                        print('Esto es la respuesta: $resp');
+
+                                        setState(() {
+                                          if (resp) {
+                                            mensajeConexion = 'Conexión exitosa';
+                                            openButton = true;
+                                          } else {
+                                            mensajeConexion = 'No se pudo realizar la conexión';
+                                            openButton = false;
+                                          }
+                                        });
+                                      } else {
+                                        // Si tiene menos de 4 caracteres, resetea el estado
+                                        setState(() {
+                                          mensajeConexion = '';
+                                          openButton = false;
+                                        });
+                                      }
+                                    },
                         ),
                       ),
                     ],
@@ -369,7 +387,7 @@ class _ConfiguracionState extends State<Configuracion> {
                               height: 20,
                             ),
                             Text(
-                              'Realizar Test',
+                              'Comprobar Token',
                               style: TextStyle(
                                 fontFamily: 'Poppins Regular',
                                 // Reemplaza con el nombre definido en pubspec.yaml
@@ -411,9 +429,8 @@ class _ConfiguracionState extends State<Configuracion> {
                                     mensajeConexion =
                                         'Se guardo la configuración';
                                   });
-
-                                  await Future.delayed(
-                                      const Duration(seconds: 1));
+                                  await  DatabaseHelper.instance.initDatabase();
+                                  await Future.delayed(const Duration(seconds: 1));
 
                                   Navigator.pushReplacementNamed(context, '/');
                                 } else {
@@ -444,7 +461,53 @@ class _ConfiguracionState extends State<Configuracion> {
                               255, 255, 254, 254), // Color del texto
                         ),
                       ),
+
                     ),
+
+                  ),
+  SizedBox(
+                    width: 300,
+                    // Establece el margen entre los botones
+                  child: ElevatedButton(
+                        onPressed: () async {
+                        bool? result =await showConfirmationDialog(
+                         context: context,
+                      title: "¿Estás seguro?",
+                      content: "Esta acción eliminará la base de datos. ¿Quieres continuar? \n\nNota:Se cerrara la App.",
+                      confirmText: "Sí, eliminar",
+                      cancelText: "Cancelar",
+                      confirmColor: Colors.red,
+                      cancelColor: Colors.grey
+                      );
+
+                        if (result == true) {
+
+                          showLoadingDialog(context, message: "Renovando Base de datos");
+                          DatabaseHelper.instance.deleteDatabases();
+
+                         Navigator.pop(context);
+                        // Acción confirmada
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Base de datos Renovada")),
+                        );
+                      } 
+                          
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0), // Ajusta el radio de las esquinas
+                          ),
+                          backgroundColor: Theme.of(context).colorScheme.primary, // Usa el color primario del tema
+                        ),
+                        child: const Text(
+                          'Renovar Bases de datos',
+                          style: TextStyle(
+                            fontFamily: 'OpenSans', // Reemplaza con el nombre definido en pubspec.yaml
+                            fontSize: 15.0, // Tamaño de la fuente
+                            color: Color.fromARGB(255, 255, 254, 254), // Color del texto
+                          ),
+                        ),
+                      ),
                   ),
                 ],
               ),

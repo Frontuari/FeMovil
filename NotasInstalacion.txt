@@ -1,0 +1,66 @@
+Dart version
+
+
+PS C:\development\DesarrolloMovil\FeMovil> flutter --version
+Flutter 3.24.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 2663184aa7 (8 months ago) • 2024-09-11 16:27:48 -0500
+Engine • revision 36335019a8
+Tools • Dart 3.5.3 • DevTools 2.37.3
+
+Tambien debe de entrar a la carpeta de flutter con el archivo de bluetooh
+
+Por Ejemplo
+PS C:\Users\opens\AppData\Local\Pub\Cache\hosted\pub.dev\bluetooth_print-4.3.0\android>
+
+y entraar al buil.gradle y agregar este nameSpace
+
+
+
+Agregar en android {
+    namespace 'net.flowcrown.bluetooth_print' 
+
+}  
+
+
+Si quieres instalar la version de dart en especifico en el proyecto, deberas de instarla las librerias de fvm
+
+
+** Instalar FVM:
+
+ Si no lo tienes, sigue las instrucciones de instalación de FVM. Generalmente es con dart pub global activate fvm.
+Instalar la versión de Flutter SDK necesaria: Dentro de la carpeta de tu proyecto, si sabes la versión exacta de Flutter que se usó originalmente (por ejemplo, 3.3.0), puedes
+
+
+stalarla con FVM:
+Bash
+
+fvm install 3.3.0
+Si no estás seguro de la versión exacta, puedes empezar con la mínima especificada (3.3.0) o alguna intermedia que creas que se usó.
+Usar la versión de Flutter SDK para el proyecto: Una vez instalada, dile a FVM que tu proyecto use esa versión:
+Bash
+
+fvm use 3.3.0
+Esto creará una carpeta .fvm en tu proyecto que enlaza a la versión correcta del SDK. A partir de ahora, todos los comandos de Flutter para este proyecto deben ejecutarse con fvm flutter ... (por ejemplo, fvm flutter pub get).
+2. Obtener las Dependencias Correctas 🔗
+Una vez que tienes configurada la versión correcta del Flutter SDK a través de FVM:
+
+Verifica el archivo pubspec.lock: Este archivo es crucial. Si tienes un pubspec.lock en tu proyecto antiguo, este contiene las versiones exactas de cada dependencia que se usaron la última vez que el proyecto funcionó correctamente. FVM respetará este archivo.
+Obtén las dependencias: Ejecuta el siguiente comando en la raíz de tu proyecto:
+Bash
+
+fvm flutter pub get
+Esto descargará las versiones de las dependencias especificadas en tu pubspec.yaml y, más importante, las que estén "bloqueadas" en tu pubspec.lock (si existe). Como no quieres actualizar nada, este paso no debería cambiar las versiones si el pubspec.lock está presente y es el original.
+3. Compilar para Windows 💻
+Con el SDK y las dependencias correctas, ya puedes intentar compilar:
+
+Asegúrate de tener el soporte para Windows habilitado en esa versión de Flutter (si es muy antigua, podría no tenerlo o requerir pasos adicionales, pero la 3.3.0 ya lo tiene bien establecido). Si no estás seguro, puedes ejecutar:
+Bash
+
+fvm flutter doctor
+Y revisa la sección de desarrollo para Windows.
+Construye la aplicación:
+Bash
+
+fvm flutter build windows
+
+Nota: El puedes consultarle a geminis, pero esto era para instalar el FVM, creo que no es tan necesario, ya que igualmente actualice las versiones de compilado

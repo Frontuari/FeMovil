@@ -283,7 +283,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
 
     final parsedJson = jsonDecode(responseBody);
 
-    print("esta es la respuesta json parsed $parsedJson");
+    print("Respuesta de la Orden de Venta $parsedJson");
 
     // dynamic isErrorTwo = parsedJson['CompositeResponses']['CompositeResponse']['StandardResponse']['@IsError'] ?? 0;
     //   if(isErrorTwo == 0){
@@ -314,7 +314,7 @@ createOrdenSalesIdempiere(orderSalesList) async {
 
     return parsedJson;
   } catch (e) {
-    return 'este es el error e $e';
+      return 'este es el error e $e';
   }
 }
 

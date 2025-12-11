@@ -199,6 +199,8 @@ verificarConexion(url, token, setState) async {
 
     final jsonBody = jsonEncode(requestBody);
 
+    print('este es el requestBody $requestBody');
+
     // Establecer las cabeceras de la solicitud
     request.headers.set('Content-Type', 'application/json');
     request.headers.set('Accept', 'application/json');
@@ -224,6 +226,69 @@ verificarConexion(url, token, setState) async {
   } catch (e) {
     print('Error: $e');
 
+    return false;
+  }
+}
+Future<bool> verificarNuevosDatosDeAcceso(String token) async {
+  try {
+    HttpClient httpClient = HttpClient()
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+    var map = await getRuta();
+    final uri = Uri.parse('${map['URL']}ADInterface/services/rest/model_adservice/query_data');
+
+    final request = await httpClient.postUrl(uri);
+
+    final requestBody = {
+      "ModelCRUDRequest": {
+        "ModelCRUD": {
+          "serviceType": "testConn",
+          "DataRow": {
+            "field": [
+              {"@column": "Value", "val": token}
+            ]
+          }
+        },
+        "ADLoginRequest": {
+          "user": "ERPDocApproved",
+          "pass": "3rp2023**",
+          "lang": "en_US",
+          "ClientID": 0,
+          "RoleID": "50000",
+          "OrgID": "0",
+          "stage": 9
+        }
+      }
+    };
+
+    request.headers.set('Content-Type', 'application/json; charset=utf-8');
+    request.headers.set('Accept', 'application/json');
+    request.write(jsonEncode(requestBody));
+
+    final response = await request.close();
+
+    if (response.statusCode != 200) return false;
+
+    final responseBody = await response.transform(utf8.decoder).join();
+    final parsedJson = jsonDecode(responseBody);
+
+    final windowTabData = parsedJson['WindowTabData'];
+
+    if (windowTabData['@TotalRows'] > 0) {
+      await crearVariablesEntorno(
+        windowTabData['DataSet']['DataRow']['field'][0]['val'],
+        windowTabData['DataSet']['DataRow']['field'][2]['val'],
+        windowTabData['DataSet']['DataRow']['field'][1]['val'],
+        windowTabData['DataSet']['DataRow']['field'][3]['val'],
+        windowTabData['DataSet']['DataRow']['field'][4]['val'],
+      );
+      return true; // éxito, guardar
+    } else {
+      // No hay datos → no guardar
+      return false;
+    }
+  } catch (e) {
+    print('Error en verificarNuevosDatosDeAcceso: $e');
     return false;
   }
 }

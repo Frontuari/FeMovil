@@ -5,19 +5,19 @@ List<Map<String, dynamic>> extractBankAccountData(String responseData) {
   // Decodifica la respuesta JSON
   Map<String, dynamic> parsedResponse = jsonDecode(responseData);
 
+  print('Esto es parseResponse $parsedResponse');
+
   // Extrae la lista de DataRow de la respuesta
-  List<dynamic> dataRows = parsedResponse['WindowTabData']['DataSet']['DataRow'];
+   List<dynamic> dataRows = parsedResponse['WindowTabData']['DataSet']['DataRow'] is Map ? [parsedResponse['WindowTabData']['DataSet']['DataRow']]:parsedResponse['WindowTabData']['DataSet']['DataRow'];
 
   // Crea una lista para almacenar los datos de los productos
   List<Map<String, dynamic>> bankAccountsData = [];
 
-  print('Esto es la respuesta de las bank accounts $dataRows');
+  print('Esto es la respuesta de las bank accounts en Extract $dataRows');
 
 
 try {
 
-  
-  
   for (var row in dataRows) {
     Map<String, dynamic> bankAccountData = {
       'c_bank_id': row['field'].firstWhere((field) => field['@column'] == 'C_Bank_ID')['val'],

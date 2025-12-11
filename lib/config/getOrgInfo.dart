@@ -95,5 +95,7 @@ getOrgInfo() async {
     } 
   }
 
+  print('Data org info: $result');
+
   return result;
 }

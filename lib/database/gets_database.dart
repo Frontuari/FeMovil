@@ -1,15 +1,16 @@
 import 'package:femovil/database/create_database.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
 
 Future<List<Map<String, dynamic>>> getProductsAndTaxes() async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {
     // Realiza una consulta que una las tablas "products" y "tax" utilizando una cláusula JOIN
     return await db.rawQuery('''
-      SELECT p.*, t.rate AS tax_rate
+    SELECT p.*, t.rate AS tax_rate,t.c_tax_category_id,t.name as tax_category_name,t.sopo_type
       FROM products p
       JOIN tax t ON p.tax_cat_id = t.c_tax_category_id
-      WHERE t.iswithholding = 'N'
+      WHERE t.iswithholding = 'N' AND  (t.sopo_type='S' OR t.sopo_type='B')
     ''');
   } else {
     // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
@@ -17,6 +18,24 @@ Future<List<Map<String, dynamic>>> getProductsAndTaxes() async {
     return [];
   }
 }
+
+Future<List<Map<String, dynamic>>> getProductsAndTaxesBuys() async {
+  final db = await DatabaseHelper.instance.database;
+  if (db != null) {
+    // Realiza una consulta que una las tablas "products" y "tax" utilizando una cláusula JOIN
+    return await db.rawQuery('''
+    SELECT p.*, t.rate AS tax_rate,t.c_tax_category_id,t.name as tax_category_name,t.sopo_type
+      FROM products p
+      JOIN tax t ON p.tax_cat_id = t.c_tax_category_id
+      WHERE t.iswithholding = 'N' AND  (t.sopo_type='P' OR t.sopo_type='B') AND p.pricelistsales>0
+    ''');
+  } else {
+    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
+    print('Error: db is null');
+    return [];
+  }
+}
+
 
 Future<List<Map<String, dynamic>>> getProductsScreen(
     {required int page, required int pageSize}) async {
@@ -218,6 +237,34 @@ Future<List<Map<String, dynamic>>> getAllOrdersWithClientNames() async {
   }
 }
 
+Future<List<Map<String, dynamic>>> getUserData() async {
+  Database? db = await DatabaseHelper.instance.database;
+
+  if (db == null) {
+    return [];
+  }
+
+  final result = await db.rawQuery(
+    '''SELECT name,email,phone,description,username,password,org_id,client_id,role_id,languaje,warehouse_id FROM usuarios LIMIT 1; ''',
+  );
+
+  return result.isNotEmpty ? result : [];
+}
+
+Future<List<Map<String, dynamic>>> getORGInfoData() async {
+  Database? db = await DatabaseHelper.instance.database;
+
+  if (db == null) {
+    return [];
+  }
+
+  final result = await db.rawQuery(
+    '''SELECT ad_org_id,name,ruc,address FROM org_info LIMIT 1; ''',
+  );
+
+  return result.isNotEmpty ? result : [];
+}
+
 Future<List<Map<String, dynamic>>> getAllOrdersWithVendorsNames() async {
   final db = await DatabaseHelper.instance.database;
   if (db != null) {
@@ -278,7 +325,7 @@ Future<Map<String, dynamic>> getOrderWithProducts(int orderId) async {
           FROM products p
           INNER JOIN orden_venta_lines ovl ON p.id = ovl.producto_id
           INNER JOIN tax t ON p.tax_cat_id  = t.c_tax_category_id
-          WHERE ovl.orden_venta_id = ?
+          WHERE ovl.orden_venta_id = ? AND (t.sopo_type = 'S' OR t.sopo_type = 'B')
         ''', [orderId]);
 
       int clienteId = orderResult[0]['cliente_id'];
@@ -328,7 +375,7 @@ Future<Map<String, dynamic>> getOrderPurchaseWithProducts(int orderId) async {
           FROM products p
           INNER JOIN orden_compra_lines ocl ON p.id = ocl.producto_id
           INNER JOIN tax t ON p.tax_cat_id  = t.c_tax_category_id
-          WHERE ocl.orden_compra_id = ?
+          WHERE ocl.orden_compra_id = ? AND (t.sopo_type = 'S' OR t.sopo_type = 'B')
         ''', [orderId]);
 
       int provedorId = orderResult[0]['proveedor_id'];

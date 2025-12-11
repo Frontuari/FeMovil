@@ -5,6 +5,7 @@ import 'package:femovil/infrastructure/bank_accounts.dart';
 import 'package:femovil/infrastructure/models/ciiu.dart';
 import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/infrastructure/models/impuestos.dart';
+import 'package:femovil/infrastructure/models/org_info.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/sincronization/sincronizar_create.dart';
@@ -211,6 +212,7 @@ Future<void> syncImpuestos(List<Map<String, dynamic>> impuestosData,setState) as
             name: impuestoData['name'].toString(),
             rate: impuestoData['rate'],
             taxIndicators: impuestoData['tax_indicator'].toString(),
+            sopoType: impuestoData['sopo_type'].toString()
             
             
           );
@@ -572,70 +574,145 @@ Future<void> syncTaxPayerTypes(List<Map<String, dynamic>> taxPayerTypeData) asyn
 
 Future<void> syncCountries(List<Map<String, dynamic>> countriesData) async {
   final db = await DatabaseHelper.instance.database;
-  if (db != null) {
-    // db.delete('countries');
-    // db.delete('regions');
-    // db.delete('cities');
-    // Itera sobre los datos de los productos recibidos
-    for (Map<String, dynamic> country in countriesData) {  
-      // Consulta si el item ya existe en la base de datos local por su id
-      List<Map<String, dynamic>> existingCountry = await db.query(
-        'countries',
-        where: 'c_country_id = ?',
-        whereArgs: [country["c_country_id"]],
-        limit: 1
-      );
+  if (db == null) {
+    print("Error: db is null");
+    return;
+  }
 
-      print('existing country: $existingCountry');
+  await db.transaction((txn) async {
+    final batch = txn.batch();
 
-      if (existingCountry.isNotEmpty) {
-        // Si el item ya existe, actualiza sus datos
-        await db.update(
-          'countries',
-          {
-            'c_country_id': country["c_country_id"],
-            'name'        : country["name"],
-          },
-          where: 'id = ?',
-          whereArgs: [existingCountry[0]["id"]],
-        );
+    for (final country in countriesData) {
+      batch.rawInsert('''
+        INSERT OR REPLACE INTO countries (c_country_id, name)
+        VALUES (?, ?)
+      ''', [
+        country["c_country_id"],
+        country["name"],
+      ]);
 
-        print('country actualizado: ${country["name"]}');
-      } else {
-        // Si el item no existe, inserta un nuevo registro en la tabla
-        await db.insert('countries', {
-          'c_country_id': country["c_country_id"],
-          'name'        : country["name"],
-        });
+      // REGIONS
+      final regions = jsonDecode(country["regions"]);
+      for (final region in regions) {
+        batch.rawInsert('''
+          INSERT OR REPLACE INTO regions (c_region_id, name, c_country_id)
+          VALUES (?, ?, ?)
+        ''', [
+          region["c_region_id"],
+          region["nameregion"],
+          region["c_country_id"],
+        ]);
 
-        List regions = jsonDecode(country["regions"]);
-        for (Map<String, dynamic> region in regions) {
-          print('region data: $region');
-
-          await db.insert('regions', {
-            'c_region_id' : region["c_region_id"],
-            'name'        : region["nameregion"],
-            'c_country_id': region["c_country_id"],
-          });
-
-          dynamic cities = region["cities"]; 
-          for (Map<String, dynamic> city in cities) {
-            print('city data: $city');
-
-            await db.insert('cities', {
-              'c_city_id'  : city["c_city_id"],
-              'name'       : city["namecity"],
-              'c_region_id': city["c_region_id"],
-            });
-          }
+        // CITIES
+        final cities = region["cities"];
+        for (final city in cities) {
+          batch.rawInsert('''
+            INSERT OR REPLACE INTO cities (c_city_id, name, c_region_id)
+            VALUES (?, ?, ?)
+          ''', [
+            city["c_city_id"],
+            city["namecity"],
+            city["c_region_id"],
+          ]);
         }
-
-        print('country insertado: ${country["name"]}');
       }
     }
-    print('Sincronización de countries completada.');
-  } else {
-    // Manejar el caso en el que db sea null
-    print('Error: db is null');
+
+    await batch.commit(noResult: true);
+  });
+
+  // 🔥 ELIMINAR DUPLICADOS (solo si existen)
+  await db.execute('''
+    DELETE FROM countries
+    WHERE id NOT IN (
+      SELECT MIN(id)
+      FROM countries
+      GROUP BY c_country_id
+    );
+  ''');
+
+  await db.execute('''
+    DELETE FROM regions
+    WHERE id NOT IN (
+      SELECT MIN(id)
+      FROM regions
+      GROUP BY c_region_id
+    );
+  ''');
+
+  await db.execute('''
+    DELETE FROM cities
+    WHERE id NOT IN (
+      SELECT MIN(id)
+      FROM cities
+      GROUP BY c_city_id
+    );
+  ''');
+
+  print("Sincronización optimizada completada.");
+}
+
+
+Future<void> syncOrgInfo(List<Map<String, dynamic>> data) async {
+  print('🌟 Datos entrando a suggest_product: $data');
+
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) {
+    print('❌ Error: Base de datos no disponible');
+    return;
+  }
+
+  try {
+    await db.transaction((txn) async {
+      final batch = txn.batch();
+
+      for (Map<String, dynamic> datas in data) {
+        final dataObjet = OrgInfo(
+          adORGID: datas['ad_org_id'],
+          name: datas['name'],
+          taxID: datas['ruc'],
+          orgAddress: datas['address']
+     
+        );
+
+        final dataToMap = dataObjet.toMap();
+
+        print('📦 Valor de la variable ORG: $dataToMap');
+
+        // Verificamos si ya existe el registro (llave compuesta)
+        final existingState = await txn.query(
+          'org_info',
+          where: 'ad_org_id = ?',
+          whereArgs: [
+            dataObjet.adORGID
+          ],
+          limit: 1,
+        );
+
+        if (existingState.isNotEmpty) {
+          // Si existe, actualizamos
+          batch.update(
+            'org_info',
+            dataToMap,
+            where: 'ad_org_id = ?',
+            whereArgs: [
+                dataObjet.adORGID
+            ],
+          );
+          print('✅ Informacion de Organizacion Actualizada ${dataObjet.adORGID} - ${dataObjet.name} - ${dataObjet.orgAddress}');
+        } else {
+          // Si no existe, insertamos
+          batch.insert('org_info', dataToMap);
+          print('🆕 Informacion de Organizacion Actualizada: ${dataToMap.toString()} - ${dataObjet.name} - ${dataObjet.orgAddress}');
+        }
+      }
+
+      // Ejecutamos todas las operaciones en batch
+      await batch.commit(noResult: true);
+    });
+
+    print('🎉 Sincronización de ORGINFO completada.');
+  } catch (e) {
+    print('🚨 Error en la sincronización de ORGINFO: $e');
   }
 }

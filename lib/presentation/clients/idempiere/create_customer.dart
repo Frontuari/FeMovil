@@ -146,18 +146,26 @@ try {
                       "Action": "CreateUpdate",
                       "DataRow": {
                       "field": [
-                          {
-                              "@column": "Address1",
-                              "val": customer['address']
-                          },
-                          {
-                              "@column": "City",
-                              "val": customer['city']
-                          },
-                          {
+                            {
                               "@column": "C_Country_ID",
                               "val": customer['c_country_id']
                           },
+                     
+                              {
+                              "@column": "C_Region_ID",
+                              "val": customer['c_region_id']
+                          },
+                             {
+                              "@column": "C_City_ID",
+                              "val": customer['c_city_id']
+                          },
+
+                               {
+                              "@column": "Address1",
+                              "val": customer['address']
+                          },
+                      
+                      
                           {
                               "@column": "Postal",
                               "val": customer['code_postal']
@@ -196,11 +204,7 @@ try {
                               "@column": "Phone",
                               "val": customer['phone']
                           },
-                          {
-                              //quisiera que tome el nombre de @C_Location que se genera en createlocationapp
-                              "@column": "Name",
-                              "val":customer['city']
-                          },
+                       
                           {
                               "@column": "C_Location_ID",
                               "val": "@C_Location.C_Location_ID"
@@ -233,6 +237,8 @@ try {
 
 
   final jsonBody = jsonEncode(requestBody);
+
+  print('Enviando json customer $jsonBody');
 
     request.headers.set('Content-Type', 'application/json; charset=utf-8');
     request.headers.set('Accept', 'application/json');

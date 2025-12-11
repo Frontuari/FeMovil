@@ -26,7 +26,8 @@ try {
       'rate': row['field'].firstWhere((field) => field['@column'] == 'Rate')['val'],
       'name': row['field'].firstWhere((field) => field['@column'] == 'Name')['val'],
       'c_tax_category_id': row['field'].firstWhere((field) => field['@column'] == 'C_TaxCategory_ID')['val'],
-      'iswithholding':row['field'].firstWhere((field) => field['@column'] == 'IsWithholding')['val']
+      'iswithholding':row['field'].firstWhere((field) => field['@column'] == 'IsWithholding')['val'],
+      'sopo_type':row['field'].firstWhere((field) => field['@column'] == 'SOPOType')['val'],
      // Asegúrate de convertir la cantidad a un tipo numérico adecuado
       // Añade otros campos que necesites sincronizar
     };

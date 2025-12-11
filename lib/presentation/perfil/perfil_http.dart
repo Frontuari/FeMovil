@@ -8,7 +8,7 @@ Future infoP({required String username, required String password}) async {
   //  await Future.delayed(const Duration(seconds: 2)); // Simulación de tiempo de espera.
 try {
 
-  dynamic response = await getUsers(username, password);
+  dynamic response = await getUsersLegacy(username, password);
 
   if (response.statusCode == 200) {
     // La solicitud fue exitosa, puedes procesar la respuesta aquí.

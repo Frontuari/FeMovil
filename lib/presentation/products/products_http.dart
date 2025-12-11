@@ -66,8 +66,13 @@ sincronizationProducts(setState) async {
   request.write(jsonBody);
 
 
+
   final response = await request.close();
   final responseBody = await response.transform(utf8.decoder).join();
+  print('estoy testeando');
+  print('este es el request $request');
+print('Esta es la respuesta de producto antes del extract $response ');
+  print('Esta es la respuesta de producto antes del extract $responseBody');
   dynamic products =  extractProductData(responseBody);
   await syncProducts(products,setState); // Obtener todos los productos
   

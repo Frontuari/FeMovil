@@ -3,7 +3,9 @@ import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/list_database.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
+import 'package:femovil/presentation/screen/proveedores/idempiere/create_vendor.dart';
 import 'package:femovil/presentation/screen/proveedores/select_vendor.dart';
+import 'package:femovil/utils/alerts_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -1078,7 +1080,10 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     );
 
     // Llama a un método para guardar el producto en Sqflite
+    showLoadingDialog(context,message: 'Guardando Proveedor');
     await saveProviderToDatabase(provider);
+    await createVendorIdempiere(provider.toMap());
+    Navigator.pop(context);
 
     // Limpia los controladores de texto después de guardar el producto
     _nameController.clear();

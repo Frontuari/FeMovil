@@ -1,36 +1,35 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:femovil/config/get_users.dart';
-import 'package:femovil/database/gets_database.dart';
 import 'package:femovil/database/insert_database.dart';
+import 'package:femovil/sincronization/ExtractData/extract_get_user.dart';
 import 'package:path_provider/path_provider.dart';
+
 
 class AuthenticationService {
   bool isAuthenticated = false; // Inicialmente, el usuario no está autenticado.
 
   Future login({required String username, required String password}) async {
     dynamic response;
+    dynamic result;
     try {
       final info = await getApplicationSupportDirectory();
       final String filePath = '${info.path}/.login.json';
       final File configFile = File(filePath);
       print('Esto es temporal $info');
 
-      // Simula una solicitud de autenticación a un servidor o base de datos.
-      await Future.delayed(
-          const Duration(seconds: 2)); // Simulación de tiempo de espera.
+    
+      result = await getUsersNew(username, password);
 
-      // Configurar el cuerpo de la solicitud en formato JSON
-      response = await getUsers(username, password);
+      response = result["response"];
+      final responseBody = result["responseBody"];
+      final parsedJson = result["json"];
+      final dataLogin = result["dataLogin"];
+
 
       if (response.statusCode == 200) {
-        // La solicitud fue exitosa, puedes procesar la respuesta aquí.
 
-        final responseBody = await response.transform(utf8.decoder).join();
-
-        final parsedJson = jsonDecode(responseBody);
-
-        final windowTabData = parsedJson['WindowTabData'];
+           final windowTabData = parsedJson['WindowTabData'];
         print('esto es el windowTabData $windowTabData');
 
         // String windowTabData = responseBody;
@@ -48,23 +47,31 @@ class AuthenticationService {
           print('este es el json data $jsonData');
           final String newContent = json.encode(jsonData);
           await configFile.writeAsString(newContent);
+          //El Endpoint es  'getUser'
+          dynamic dataExtractUser =  extractGetUser(responseBody);
 
-          //  name TEXT,
-          //         password INTEGER,
-          //         ad_user_id TEXT,
-          //         email TEXT,
-          //         phone TEXT
+          print('Data ExtractUser $dataExtractUser');
+          print('Data Login $dataLogin');
 
           Map<String, dynamic> user = {
-            "name": username,
-            "password": password,
-            "ad_user_id": windowTabData['DataSet']['DataRow']['field'][0]
-                ['val'],
-            "email": windowTabData['DataSet']['DataRow']['field'][2]['val'],
-            "phone": windowTabData['DataSet']['DataRow']['field'][3]['val']
+            "name": dataLogin["Username"],
+            "password": dataLogin["Password"],
+            "ad_user_id": dataExtractUser[0]['ad_user_id'],
+            "email": dataExtractUser[0]['email'],
+            "phone": dataExtractUser[0]['phone'],
+            "client_id": dataLogin["ClientID"],
+            "org_id": dataLogin["OrgID"],
+            "role_id": dataLogin["RoleID"],
+            "warehouse_id": dataLogin["WarehouseID"],
+            "languaje": dataLogin["Language"].toString(),
+            "username": dataLogin["Username"],
+            "description": dataExtractUser[0]['description'],
+
           };
+          print('esto es el user a insertar $user');
 
           await insertUser(user);
+        print('Exitosomente insertado en la base de datos local.');
 
           return true; // Inicio de sesión exitoso.
         } else {
@@ -89,7 +96,7 @@ class AuthenticationService {
     } catch (e) {
       print("este es el error de login $e");
       print('esto es el user $username && password $password');
-      response = await getUserByLogin(username, password);
+      //response = await getUserByLogin(username, password);
 
       print('Esto es la respuesta del user $response');
       if (response is! Map<String, dynamic>) {
@@ -155,6 +162,7 @@ class AuthenticationService {
 
       // Resto del código...
       isAuthenticated = false;
+
       // ... (otros cambios necesarios)
     } catch (error) {
       print('Error en la función logout: $error');

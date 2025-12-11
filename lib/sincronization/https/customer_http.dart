@@ -58,6 +58,8 @@ sincronizationCustomers(setState) async {
   // Convertir el cuerpo a JSON
   final jsonBody = jsonEncode(requestBody);
 
+  print('este es el cliente $requestBody');
+
   // Establecer las cabeceras de la solicitud
   request.headers.set('Content-Type', 'application/json');
   request.headers.set('Accept', 'application/json');
