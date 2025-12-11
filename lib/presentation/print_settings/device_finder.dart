@@ -1,66 +1,52 @@
 import 'package:femovil/config/app_bar_femovil.dart';
-import 'package:bluetooth_print_plus/bluetooth_print_plus.dart' hide Alignment; 
+import 'package:bluetooth_print/bluetooth_print.dart'; 
+import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
 
 class DeviceFinder extends StatefulWidget {
-  const DeviceFinder({super.key});
+  const DeviceFinder({ super.key });
 
   @override
   State<DeviceFinder> createState() => _DeviceFinderState();
 }
 
 class _DeviceFinderState extends State<DeviceFinder> {
-  
+  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+
   List<BluetoothDevice> _devices = [];
   BluetoothDevice? _device;
   bool _connected = false;
   bool _connecting = false;
   String _message = 'No hay dispositivos disponibles';
-
+   
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => searchDevices());
   }
 
   void searchDevices() async {
     setState(() {
       _connecting = true;
-      _devices = []; 
-    });
-
-    print('🔍 DEBUG: Iniciando escaneo...'); // Debug inicio
-
-    await BluetoothPrintPlus.startScan(timeout: const Duration(seconds: 4));
+    });    
+    
+    await bluetoothPrint.startScan(timeout: Duration(seconds: 2));
 
     if (!mounted) return;
 
-    BluetoothPrintPlus.scanResults.listen((result) {
+    bluetoothPrint.scanResults.listen((result) {
       if (!mounted) return;
-
-      // --- ZONA DE DEBUG ---
-      print('🔍 DEBUG: Stream recibió datos. Cantidad raw: ${result.length}');
-      for (var d in result) {
-         print('   👉 Dispositivo detectado: Nombre="${d.name}", Mac="${d.address}", Tipo=${d.type}');
-      }
-      // ---------------------
-
+      
       setState(() {
-        // Aquí filtramos. Si tu impresora no tiene nombre, la estamos borrando aquí.
-        _devices = result.where((d) => d.name != null && d.name!.isNotEmpty).toList();
-        
-        print('🔍 DEBUG: Dispositivos visibles tras filtro: ${_devices.length}');
+        _devices = result;
       });
+      print('found devices $_devices');
     });
-
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        print('🔍 DEBUG: Tiempo de escaneo finalizado.');
-        setState(() {
-          _connecting = false;
-        });
-      }
-    });
+    
+    setState(() {
+      _connecting = false;
+    }); 
   }
 
   @override
@@ -69,14 +55,13 @@ class _DeviceFinderState extends State<DeviceFinder> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(170),
-        child: AppBars(labelText: 'Dispositivos'),
+        preferredSize: const Size.fromHeight(170), 
+        child: AppBars(labelText: 'Dispositivos')
       ),
       body: Align(
         alignment: Alignment.center,
         child: Container(
           padding: const EdgeInsets.all(16.0),
-          width: screenMaxWidth, 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,75 +69,69 @@ class _DeviceFinderState extends State<DeviceFinder> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  !_connecting
-                      ? const Text('Estatus: ', style: TextStyle(fontFamily: 'Poppins Semibold'))
-                      : const SizedBox(),
-                  Flexible(
-                    child: Text(
-                      _connecting
-                          ? 'Buscando dispositivos...'
-                          : (_connected ? 'Conectado' : 'Desconectado'),
-                      style: const TextStyle(fontFamily: 'Poppins Regular'),
-                    ),
-                  )
+                  !_connecting ? const Text('Estatus: ', style: TextStyle(fontFamily: 'Poppins Semibold')) : SizedBox(),
+                  Flexible(child: Text(
+                    _connecting ? 'Buscando dispositivos...' : (_connected ? 'Conectado' : 'Desconectado'),
+                    style: TextStyle(fontFamily: 'Poppins Regular')
+                  ))
                 ],
               ),
               const SizedBox(height: 20),
 
-              Expanded(
-                child: _devices.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: _devices.length,
-                        itemBuilder: (BuildContext c, int i) {
-                          return ListTile(
-                            leading: const Icon(Icons.print),
-                            title: Text(_devices[i].name ?? 'Desconocido',
-                                style: const TextStyle(fontFamily: 'Poppins Semibold')),
-                            subtitle: Text(_devices[i].address ?? '',
-                                style: const TextStyle(fontFamily: 'Poppins Regular')),
-                            trailing: _device != null && _device!.address == _devices[i].address
-                                ? const Icon(Icons.check, color: Colors.green)
-                                : null,
-                            onTap: () async {
-                              print('🔍 DEBUG: Intentando conectar a ${_devices[i].name}...');
-                              
-                              await BluetoothPrintPlus.stopScan(); 
-                              
-                              await BluetoothPrintPlus.connect(_devices[i]);
-                              
-                              // Verificamos conexión de forma segura
-                              bool isConnected = false;
-                              try {
-                                isConnected = await BluetoothPrintPlus.isConnected ?? false;
-                              } catch (e) {
-                                print('❌ ERROR al verificar conexión: $e');
-                              }
+              _devices.isNotEmpty ? SizedBox(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: _devices.length,
+                  itemBuilder: (BuildContext c, int i) {
+                    return ListTile(
+                      title: Text(_devices[i].name ?? '', style: TextStyle(fontFamily: 'Poppins Semibold')),
+                      subtitle: Text(_devices[i].address ?? '', style: TextStyle(fontFamily: 'Poppins Regular')),
+                      onTap: () async {
+                        await bluetoothPrint.connect(_devices[i]);
 
-                              print('🔍 DEBUG: Resultado de conexión: $isConnected');
+                        bool isConnected = await bluetoothPrint.isConnected ?? false;
 
-                              if (isConnected && mounted) {
-                                setState(() {
-                                  _connected = true;
-                                  _message = 'Se conectó exitosamente';
-                                  _device = _devices[i];
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                   SnackBar(content: Text(_message))
-                                );
-                              }
-                            },
-                          );
-                        },
-                      )
-                    : Center(
-                        child: Text(
-                          !_connecting ? 'No se encontraron dispositivos' : '',
-                          style: const TextStyle(fontFamily: 'Poppins Regular'),
-                        ),
-                      ),
-              ),
-            ],
-          ),
+                        if (isConnected) {
+                          setState(() {
+                            _connected  = true;
+                            _message    = 'Se conecto exitosamente';
+                            _device     = _devices[i];
+                          });
+                        }
+                      },
+                    );
+                  }
+                )
+              ) : Text(!_connecting ? 'No se encontraron dispositivos' : ''),
+
+              
+
+              /*StreamBuilder<List<BluetoothDevice>>(
+                stream: bluetoothPrint.scanResults,
+                initialData: const [],
+                builder: (c, snapshot) => Column(
+                  children: snapshot.data!.map((d) => ListTile(
+                    title: Text(d.name ?? '', style: TextStyle(fontFamily: 'Poppins Semibold')),
+                    subtitle: Text(d.address ?? '', style: TextStyle(fontFamily: 'Poppins Regular')),
+                    onTap: () async {
+                      await bluetoothPrint.connect(d);
+
+                      bool isConnected = await bluetoothPrint.isConnected ?? false;
+
+                      if (isConnected) {
+                        setState(() {
+                          _connected  = true;
+                          _message    = 'Se conecto exitosamente';
+                          _device     = d;
+                        });
+                      }
+                    },
+                    trailing: _device!=null && _device!.address == d.address ? Icon(Icons.check, color: Colors.green) : null,
+                  )).toList(),
+                ),
+              ),*/
+            ]
+          )
         ),
       ),
     );

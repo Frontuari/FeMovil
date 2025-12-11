@@ -3,32 +3,40 @@ import 'package:femovil/presentation/print_settings/device_finder.dart';
 import 'package:flutter/material.dart';
 
 class PrintSettings extends StatefulWidget {
-  const PrintSettings({super.key});
+  const PrintSettings({ super.key });
 
   @override
   State<PrintSettings> createState() => _PrintSettingsState();
 }
 
 class _PrintSettingsState extends State<PrintSettings> {
+  String tips = '';
+
+  @override
+  void initState() {
+    super.initState();
+  } 
+  
   @override
   Widget build(BuildContext context) {
     final screenMaxWidth = MediaQuery.of(context).size.width * 0.8;
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(170),
-        child: AppBars(labelText: 'Ajustes de Impresión'),
+        preferredSize: const Size.fromHeight(170), 
+        child: AppBars(labelText: 'Ajustes de Impresión')
       ),
       body: Align(
         alignment: Alignment.center,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SizedBox(
+          child: Container(
             width: screenMaxWidth,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
+                /// const SizedBox(height: 20),
                 const Text('Bluetooth', style: TextStyle(fontFamily: 'Poppins Semibold')),
                 const SizedBox(height: 10),
 
@@ -46,9 +54,9 @@ class _PrintSettingsState extends State<PrintSettings> {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const DeviceFinder()));
                     },
                     child: const Text('Buscar Dispositivos', style: TextStyle(fontFamily: 'Poppins SemiBold')),
-                  ),
+                  )
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
 
                 SizedBox(
                   width: screenMaxWidth,
@@ -62,11 +70,11 @@ class _PrintSettingsState extends State<PrintSettings> {
                     ),
                     onPressed: () {},
                     child: const Text('Probar Impresora', style: TextStyle(fontFamily: 'Poppins SemiBold')),
-                  ),
+                  )
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
               ],
-            ),
+            )
           ),
         ),
       ),
