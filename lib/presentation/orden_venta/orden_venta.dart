@@ -667,8 +667,7 @@ Color getColorBg(Set<WidgetState> states){
                                               ),
                                               GestureDetector(
                                                   onTap: () {
-                                                    if (product['quantity'] <=
-                                                        0) {
+                                                    if (product['quantity'] <=  1) {
                                                       return;
                                                     }
 

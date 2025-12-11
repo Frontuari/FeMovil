@@ -583,7 +583,6 @@ Future<void> syncCountries(List<Map<String, dynamic>> countriesData) async {
     final batch = txn.batch();
 
     for (final country in countriesData) {
-
       batch.rawInsert('''
         INSERT OR REPLACE INTO countries (c_country_id, name)
         VALUES (?, ?)
@@ -622,8 +621,37 @@ Future<void> syncCountries(List<Map<String, dynamic>> countriesData) async {
     await batch.commit(noResult: true);
   });
 
+  // 🔥 ELIMINAR DUPLICADOS (solo si existen)
+  await db.execute('''
+    DELETE FROM countries
+    WHERE id NOT IN (
+      SELECT MIN(id)
+      FROM countries
+      GROUP BY c_country_id
+    );
+  ''');
+
+  await db.execute('''
+    DELETE FROM regions
+    WHERE id NOT IN (
+      SELECT MIN(id)
+      FROM regions
+      GROUP BY c_region_id
+    );
+  ''');
+
+  await db.execute('''
+    DELETE FROM cities
+    WHERE id NOT IN (
+      SELECT MIN(id)
+      FROM cities
+      GROUP BY c_city_id
+    );
+  ''');
+
   print("Sincronización optimizada completada.");
 }
+
 
 Future<void> syncOrgInfo(List<Map<String, dynamic>> data) async {
   print('🌟 Datos entrando a suggest_product: $data');

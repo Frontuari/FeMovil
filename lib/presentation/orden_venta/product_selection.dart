@@ -1,5 +1,6 @@
 import 'package:femovil/config/app_bar_sampler.dart';
 import 'package:femovil/database/gets_database.dart';
+import 'package:femovil/utils/widgets.dart';
 import 'package:flutter/material.dart';
 
 class ProductSelectionScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
 
   Future<void> _loadProducts() async {
     final productList =
-        await getProductsAndTaxes(); // Obtener todos los productos
+        await getProductsAndTaxesBuys(); // Obtener todos los productos
 
     // Filtrar los productos con precio igual a '{@nil=true}'
     final filteredList = productList
@@ -133,87 +134,76 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
 
                             final isSelected = selectedProducts.any(
                                 (product) => product['name'] == productName);
+
                             final quantity =
                                 productQuantities[productName] ?? 0;
 
                             return Card(
-                              elevation: 0,
-                              color: Colors.white,
+                              elevation: 4,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              shadowColor: Colors.grey.withOpacity(0.5),
+                              shadowColor: Colors.black12,
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
+                                  borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
                                       color: isSelected
-                                          ? const Color(0xff7531FF).withOpacity(0.5)
-                                          : Colors.grey.withOpacity(0.5),
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Colors.grey.withOpacity(0.15),
                                       spreadRadius: 2,
-                                      blurRadius: 7,
-                                      offset: const Offset(0, 3),
                                     ),
                                   ],
                                 ),
                                 child: ListTile(
-                                  title: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 0, vertical: 7),
-                                    child: Text(productName,
-                                        style: const TextStyle(
-                                            fontFamily: 'Poppins Bold')),
+                                  splashColor: Colors.red,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
+
+                                  // --- TITLE ---
+                                  title: Text(
+                                    productName,
+                                    style: const TextStyle(
+                                      fontFamily: 'Poppins Bold',
+                                      fontSize: 12,
+                                    ),
                                   ),
+
+                                  // --- SUBTITLES IGUALES AL CARD 1 ---
                                   subtitle: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          const Text(
-                                            'Stock: ',
-                                            style: TextStyle(
-                                                fontFamily: 'Poppins SemiBold'),
-                                          ),
-                                          Text(
-                                              '${filteredProducts[index]['quantity']}'),
-                                        ],
+                                      const SizedBox(height: 8),
+                                      buildInfoRow(
+                                        'Stock',
+                                        filteredProducts[index]['quantity']
+                                            .toString(),
                                       ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          const Text(
-                                            'Precio: ',
-                                            style: TextStyle(
-                                                fontFamily: 'Poppins SemiBold'),
-                                          ),
-                                          Text(
-                                              '\$ ${productPrice != '{@nil=true}' ? productPrice.toStringAsFixed(2) : 0}')
-                                        ],
+                                      buildInfoRow(
+                                        'Precio',
+                                        '\$${productPrice.toStringAsFixed(2)}',
                                       ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          const Text(
-                                            'Cantidad Seleccionada: ',
-                                            style: TextStyle(
-                                                fontFamily: 'Poppins SemiBold'),
-                                          ),
-                                          Text(quantity.toString())
-                                        ],
+                                      buildInfoRow(
+                                        'Cantidad Seleccionada',
+                                        quantity.toString(),
                                       ),
                                     ],
                                   ),
+
                                   onTap: () async {
                                     final selectedQuantity =
-                                        await _showQuantityPickerDialog(context,
-                                            productName, quantity, colorTheme);
+                                        await _showQuantityPickerDialog(
+                                      context,
+                                      productName,
+                                      quantity,
+                                      colorTheme,
+                                    );
+
                                     if (selectedQuantity != null) {
                                       if (selectedQuantity > 0) {
                                         final selectedProductIndex =
@@ -221,6 +211,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                                                 (product) =>
                                                     product['name'] ==
                                                     productName);
+
                                         final int newQuantity =
                                             selectedQuantity;
 
@@ -238,18 +229,15 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                                         };
 
                                         setState(() {
-                                          print(
-                                              "que tiene newquantity $newQuantity");
                                           if (isSelected) {
                                             selectedProducts[
                                                     selectedProductIndex] =
                                                 selectedProduct;
                                           } else {
-                                        
-                                              selectedProducts
-                                                  .add(selectedProduct);
-                                           
+                                            selectedProducts
+                                                .add(selectedProduct);
                                           }
+
                                           productQuantities[productName] =
                                               newQuantity;
                                         });
@@ -271,8 +259,15 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                         ),
                       )
                     : const Center(
-                        child: CircularProgressIndicator(),
+                      child: Text(
+                        "No hay productos disponibles",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
                       ),
+                    ),
               ),
             ],
           ),
@@ -343,9 +338,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                         IconButton(
                           onPressed: () {
                             setState(() {
-                            
-                                selectedQuantity++;
-                              
+                              selectedQuantity++;
                             });
                           },
                           icon: const Icon(Icons.add),

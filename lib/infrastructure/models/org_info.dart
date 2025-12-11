@@ -35,8 +35,7 @@ class OrgInfo {
       adORGID: map['ad_org_id'],
       name: map['name'],  
       taxID: map['ruc'],
-      orgAddress: map['address']
-      
+      orgAddress: map['address']   
     );
   }
 }

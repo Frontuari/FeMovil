@@ -27,7 +27,7 @@ Future<List<Map<String, dynamic>>> getProductsAndTaxesBuys() async {
     SELECT p.*, t.rate AS tax_rate,t.c_tax_category_id,t.name as tax_category_name,t.sopo_type
       FROM products p
       JOIN tax t ON p.tax_cat_id = t.c_tax_category_id
-      WHERE t.iswithholding = 'N' AND  (t.sopo_type='P' OR t.sopo_type='B')
+      WHERE t.iswithholding = 'N' AND  (t.sopo_type='P' OR t.sopo_type='B') AND p.pricelistsales>0
     ''');
   } else {
     // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
