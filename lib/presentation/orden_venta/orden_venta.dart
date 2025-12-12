@@ -906,27 +906,27 @@ Color getColorBg(Set<WidgetState> states){
                         print("RESULTADO DE LA FUNCIÓN: $result");
 
                         // Caso: sin conexión o error interno (retorna false)
-                        if (result == false) {
+                            if (result == false) {
 
-                            Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                          WarningMessages.showWarningMessagesDialog(
-                            context,
-                            'Sin Conexión, Envie La Orden de Venta Individualmente N° $rucCliente'
-                          );
-                       
-                    
-                          return;
-                        }
-                        else{
-                         final documentNo = findValueByColumn(result, "DocumentNo") ?? "Sin Número";
+                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              WarningMessages.showWarningMessagesDialog(
+                                context,
+                                'Sin Conexión, Envie La Orden de Venta Individualmente N° $rucCliente'
+                              );
+                          
                         
-                          print("NUMERO DE DOCUMENTO: $documentNo");
-                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                          SuccesMessages.showSuccesMessagesDialog(
-                            context,
-                            'Orden de Venta Enviada Correctamente\nN° $documentNo',
-                          );
-                    }
+                              return;
+                            }
+                            else{
+                            final documentNo = findValueByColumn(result, "DocumentNo") ?? "Sin Número";
+                            
+                              print("NUMERO DE DOCUMENTO: $documentNo");
+                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              SuccesMessages.showSuccesMessagesDialog(
+                                context,
+                                'Orden de Venta Enviada Correctamente\nN° $documentNo',
+                              );
+                        }
 
                       } catch (err) {
                         ErrorMessage.showErrorMessageDialog(

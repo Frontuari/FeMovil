@@ -439,11 +439,6 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) asyn
             priceListSales: productData['pricelistsales'],
           );
           
-
-           
-
-
-
           // Convierte el objeto Product a un mapa
           Map<String, dynamic> productMap = product.toMap();
 
@@ -451,8 +446,8 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) asyn
           // Consulta si el producto ya existe en la base de datos local por su nombre
           List<Map<String, dynamic>> existingProducts = await db.query(
             'products',
-            where: 'name = ?',
-            whereArgs: [product.name],
+            where: 'm_product_id = ?',
+            whereArgs: [product.mProductId],
           );
 
           if (existingProducts.isNotEmpty) {
@@ -460,8 +455,8 @@ Future<void> syncProducts(List<Map<String, dynamic>> productsData,setState) asyn
             await db.update(
               'products',
               productMap,
-              where: 'name = ?',
-              whereArgs: [product.name],
+              where: 'm_product_id = ?',
+              whereArgs: [product.mProductId],
             );
             print('Producto actualizado: ${product.name}');
           } else {
