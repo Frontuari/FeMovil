@@ -512,7 +512,7 @@ class DatabaseHelper {
         'model_android': info['modelo'],
         'description_android': info['descripcion'],
         'version_android': info['version'],
-        'name_app':'Fe Movil',
+        'name_app':'Fe Movil Legacy',
       });
       },
     );
