@@ -55,6 +55,7 @@ dependencies:
   auto_size_text: ^3.0.0 #Para saltos de Lineas y ajustar texto
   gap: ^3.0.1
   dropdown_search: ^5.0.6
+  device_info_plus: ^10.1.0
 
 
 
