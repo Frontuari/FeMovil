@@ -63,3 +63,25 @@ Widget buildPerfilRow(BuildContext context, IconData icon, String label, String 
   );
 }
 
+
+
+Widget infoRow(String label, dynamic value) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 4),
+    child: Row(
+      children: [
+        Text(
+          "$label: ",
+          style: const TextStyle(fontFamily: "Poppins SemiBold"),
+        ),
+        Expanded(
+          child: Text(
+            "$value",
+            style: const TextStyle(fontFamily: "Poppins Regular"),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ),
+  );
+}

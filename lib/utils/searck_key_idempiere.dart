@@ -39,3 +39,31 @@ dynamic findValueByColumn(dynamic json, String columnName) {
 
   return null;
 }
+
+dynamic findIsError(dynamic json) {
+  if (json is Map) {
+    // Si encontramos la propiedad "@IsError", la retornamos
+    if (json.containsKey("@IsError")) {
+      // Convertimos a booleano por si viene como string o bool
+      final value = json["@IsError"];
+      if (value is bool) return value;
+      if (value is String) return value.toLowerCase() == 'true';
+      return false;
+    }
+
+    // Recorrer recursivamente hijos
+    for (var value in json.values) {
+      final result = findIsError(value);
+      if (result != null) return result;
+    }
+  }
+
+  if (json is List) {
+    for (var element in json) {
+      final result = findIsError(element);
+      if (result != null) return result;
+    }
+  }
+
+  return null;
+}

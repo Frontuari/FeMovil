@@ -465,88 +465,92 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                 )
               ]),
               child: ElevatedButton(
-                style: ButtonStyle(
-                  elevation: WidgetStateProperty.all<double>(0),
-                  foregroundColor: const WidgetStatePropertyAll(Colors.black),
-                  shape: WidgetStateProperty.all<OutlinedBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide.none)),
-                ),
-               onPressed: _enableButtons
-                    ? () async {
-                        setState(() {
-                          _enableButtons = false;
-                        });
-                     
-                        try {
-                          if (!setearValoresEnCero) {
-                            setState(() {
-                              syncPercentage = 0;
-                              syncPercentageClient = 0;
-                              syncPercentageImpuestos = 0;
-                              syncPercentageProviders = 0;
-                              syncPercentageSelling = 0;
-                              syncPercentageBankAccount = 0;
-                              setearValoresEnCero = true;
-                              totalProducts = 0;
-                              currentSyncCount = 0;
-                              syncedProducts = 0;
-                            });
-                          }
-                          
+                          style: ButtonStyle(
+                            elevation: MaterialStateProperty.all<double>(0),
+                            foregroundColor: const MaterialStatePropertyAll(Colors.black),
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                          onPressed: _enableButtons
+                              ? () async {
+                                  setState(() {
+                                    _enableButtons = false;
+                                  });
 
-                          await getPosPropertiesInit();
-                          List<Map<String, dynamic>> response = await getPosPropertiesV();
+                                  if (!setearValoresEnCero) {
+                                    setState(() {
+                                      syncPercentage = 0;
+                                      syncPercentageClient = 0;
+                                      syncPercentageImpuestos = 0;
+                                      syncPercentageProviders = 0;
+                                      syncPercentageSelling = 0;
+                                      syncPercentageBankAccount = 0;
+                                      setearValoresEnCero = true;
+                                      totalProducts = 0;
+                                      currentSyncCount = 0;
+                                      syncedProducts = 0;
+                                    });
+                                  }
 
-                          setState(() {
-                            variablesG = response;
-                          });
+                                  // 🔹 Solo este bloque tiene manejo de error con mensaje
+                                  try {
+                                    await getPosPropertiesInit();
+                                    final response = await getPosPropertiesV();
 
-                          // Aquí si falla CUALQUIER llamada, saltará al catch
-                          sincronizationSearchIdInvoice(setState);
-                          sincronizationCiuActivities(setState);
-                          sincronizationBankAccount(setState);
-                          sincronizationPaymentTerms();
-                          sincronizationImpuestos(setState);
-                          await sincronizationOrgInfo();
-                          await synchronizeCustomersUpdateWithIdempiere(setState);
-                          await synchronizeVendorsWithIdempiere(setState);
-                          await synchronizeProductsUpdateWithIdempiere(setState);
-                          await synchronizeOrderSalesWithIdempiere(setState);
-                          await synchronizeTaxIdTypes();
-                          await synchronizeTaxPayerTypes();
-                          await synchronizeCountries();
+                                    setState(() {
+                                      variablesG = response;
+                                    });
+                                  } catch (e) {
+                                    setState(() {
+                                      _enableButtons = true;
+                                      setearValoresEnCero = false;
+                                    });
 
-                          showSuccesSnackbar(context, 'Sincronización completada');
+                                    ErrorMessage.showErrorMessageDialog(
+                                      context,
+                                      'Sin Conexión a Internet. La sincronización no se pudo completar.',
+                                    );
+                                    return; // ❗ Detener la operación aquí
+                                  }
 
-                          setState(() {
-                            _enableButtons = true;
-                            setearValoresEnCero = false;
-                          });
+                                  // 🔹 El resto de sincronizaciones se ejecuta normalmente
+                                  sincronizationSearchIdInvoice(setState);
+                                  sincronizationCiuActivities(setState);
+                                  sincronizationBankAccount(setState);
+                                  sincronizationPaymentTerms();
+                                  sincronizationImpuestos(setState);
+                                  await sincronizationOrgInfo();
+                                  await synchronizeCustomersUpdateWithIdempiere(setState);
+                                  await synchronizeVendorsWithIdempiere(setState);
+                                  await synchronizeProductsUpdateWithIdempiere(setState);
+                                  await synchronizeOrderSalesWithIdempiere(setState);
+                                  await synchronizeTaxIdTypes();
+                                  await synchronizeTaxPayerTypes();
+                                  await synchronizeCountries();
 
-                        } catch (e) {
-                          // Restablecer el botón
-                          setState(() {
-                            _enableButtons = true;
-                            setearValoresEnCero = false;
-                          });
+                                  showSuccesSnackbar(context, 'Sincronización completada');
 
-                          // Mostrar mensaje de error
-                          ErrorMessage.showErrorMessageDialog(
-                              context, 'Sin Conexión a Internet. La sincronización no se pudo completar.');
-                        }
-                      }
-                    : null,
-                child: Text(
-                    !_enableButtons ? 'Sincronizando...' : 'Sincronizar',
-                    style: TextStyle(
-                        fontFamily: 'Poppins Bold',
-                        fontSize: 17,
-                        color: _enableButtons
-                            ? const Color(0XFF7531FF)
-                            : const Color.fromARGB(255, 82, 78, 78))),
-              ),
+                                  setState(() {
+                                    _enableButtons = true;
+                                    setearValoresEnCero = false;
+                                  });
+                                }
+                              : null,
+                          child: Text(
+                            !_enableButtons ? 'Sincronizando...' : 'Sincronizar',
+                            style: TextStyle(
+                              fontFamily: 'Poppins Bold',
+                              fontSize: 17,
+                              color: _enableButtons
+                                  ? const Color(0XFF7531FF)
+                                  : const Color.fromARGB(255, 82, 78, 78),
+                            ),
+                          ),
+                        ),
             ),
           ),
           EmptyDatabase(),
@@ -555,3 +559,6 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     );
   }
 }
+
+
+                       

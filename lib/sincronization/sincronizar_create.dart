@@ -48,18 +48,18 @@ synchronizeProductsWithIdempiere(setState) async {
       taxId: productData['tax_cat_id'],
       priceListSales: productData['pricelistsales'],
     );
-    dynamic result = await createProductIdempiere(product.toMap());
-    print('este es el $result');
+    // dynamic result = await createProductIdempiere(product.toMap());
+    // print('este es el $result');
 
-    final mProductId =
-        result['StandardResponse']['outputFields']['outputField'][0]['@value'];
-    final codProdc =
-        result['StandardResponse']['outputFields']['outputField'][1]['@value'];
-    print('Este es el mp product id $mProductId && el codprop $codProdc');
-    // Limpia los controladores de texto después de guardar el producto
-    await updateProductMProductIdAndCodProd(
-        productData['id'], mProductId, codProdc);
-         } catch (e) {
+    // final mProductId =
+    //     result['StandardResponse']['outputFields']['outputField'][0]['@value'];
+    // final codProdc =
+    //     result['StandardResponse']['outputFields']['outputField'][1]['@value'];
+    // print('Este es el mp product id $mProductId && el codprop $codProdc');
+    // // Limpia los controladores de texto después de guardar el producto
+    // await updateProductMProductIdAndCodProd(productData['id'], mProductId, codProdc);
+} 
+catch (e) {
 
           print('este es el error $e');
           continue;
@@ -112,14 +112,14 @@ synchronizeProductsUpdateWithIdempiere(setState) async {
       taxId: productData['tax_cat_id'],
       priceListSales: productData['pricelistsales'],
     );
-    dynamic result = await updateProductIdempiere(product.toMap());
-    print('este es el $result');
+    // dynamic result = await updateProductIdempiere(product.toMap());
+    // print('este es el $result');
 
-    final mProductId =
-        result['StandardResponse']['outputFields']['outputField'][0]['@value'];
-    final codProdc =
-        result['StandardResponse']['outputFields']['outputField'][1]['@value'];
-    print('Este es el mp product id $mProductId && el codprop $codProdc');
+    // final mProductId =
+    //     result['StandardResponse']['outputFields']['outputField'][0]['@value'];
+    // final codProdc =
+    //     result['StandardResponse']['outputFields']['outputField'][1]['@value'];
+    // print('Este es el mp product id $mProductId && el codprop $codProdc');
     // Limpia los controladores de texto después de guardar el producto
  
 
@@ -133,7 +133,7 @@ synchronizeProductsUpdateWithIdempiere(setState) async {
       }
   }
 
-   await synchronizeProductsWithIdempiere(setState);
+  // await synchronizeProductsWithIdempiere(setState); //comentado para evitar Sincronizacion 2 veces
 
 }
 

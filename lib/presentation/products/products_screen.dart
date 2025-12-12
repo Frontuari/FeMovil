@@ -34,6 +34,8 @@ class _ProductsState extends State<Products> {
     // final inserccion = await DatabaseHelper.instance.insertTaxData(); // Obtener todos los productos
     print("Estoy obteniendo products $products");
 
+    print('Products cargados: $productos');
+
     setState(() {
       products = productos;
       filteredProducts = productos;
@@ -70,15 +72,15 @@ class _ProductsState extends State<Products> {
   Future<void> _loadMoreProducts() async {
     if (_isLoading || !_hasMoreProducts) return;
 
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       final List<Map<String, dynamic>> newData = await getProductsScreen(
           page: (products.length ~/ _pageSize) + 1, pageSize: _pageSize);
 
-      print('New data $newData');
+      print('Data Productos $newData');
 
       if (newData.isNotEmpty) {
         setState(() {
@@ -132,7 +134,6 @@ class _ProductsState extends State<Products> {
     print('Esto es el montaje');
     // _deleteBaseDatos();
     super.initState();
-    // sincronizationProducts();
   }
 
   @override
@@ -341,7 +342,7 @@ class _ProductsState extends State<Products> {
                         final product = filteredProducts[index];
 
                         return Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(10.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -362,7 +363,7 @@ class _ProductsState extends State<Products> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Container(
-                                      height: 130,
+                                      height: 150,
                                       decoration: BoxDecoration(
                                         color: const Color.fromARGB(
                                             255, 255, 255, 255),
@@ -403,7 +404,7 @@ class _ProductsState extends State<Products> {
                                                 padding:
                                                     const EdgeInsets.all(15.0),
                                                 child: Text(
-                                                  product['categoria'],
+                                                  product['name'],
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontFamily: 'Poppins Bold',
@@ -435,7 +436,7 @@ class _ProductsState extends State<Products> {
                                                         Row(
                                                           children: [
                                                             const Text(
-                                                              'Nombre: ',
+                                                              'Código: ',
                                                               style: TextStyle(
                                                                   fontFamily:
                                                                       'Poppins SemiBold'),
@@ -445,7 +446,7 @@ class _ProductsState extends State<Products> {
                                                                     screenMax *
                                                                         0.45,
                                                                 child: Text(
-                                                                  '${product['name']}',
+                                                                  '${product['cod_product']}',
                                                                   style: const TextStyle(
                                                                       fontFamily:
                                                                           'Poppins Regular'),
@@ -479,6 +480,29 @@ class _ProductsState extends State<Products> {
                                                           ],
                                                         ),
                                                         Row(
+                                                          children: [
+                                                            const Text(
+                                                              'Categoría: ',
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins SemiBold'),
+                                                            ),
+                                                            SizedBox(
+                                                                width:
+                                                                    screenMax *
+                                                                        0.45,
+                                                                child: Text(
+                                                                  '${product['categoria']}',
+                                                                  style: const TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins Regular'),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                ))
+                                                          ],
+                                                        ),
+      Row(
                                                           children: [
                                                             const Text(
                                                               'Precio: ',

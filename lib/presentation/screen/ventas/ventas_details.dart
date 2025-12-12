@@ -7,6 +7,7 @@ import 'package:femovil/presentation/cobranzas/cobro.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/create_orden_sales.dart';
 import 'package:femovil/presentation/screen/ventas/idempiere/query_id_dno.dart';
 import 'package:femovil/sincronization/https/search_id_invoice.dart';
+import 'package:femovil/utils/alerts_messages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,13 +49,15 @@ class _VentasDetailsState extends State<VentasDetails> {
 
 
   _updateAndCreateOrders() async {
+    showLoadingDialog(context, message: "Enviando Orden...");
     dynamic isTrue = await createOrdenSalesIdempiere(_ventaData);
-
+    Navigator.pop(context);
     if (isTrue == false) {
       return false;
     } else {
       return true;
     }
+
   }
 
  

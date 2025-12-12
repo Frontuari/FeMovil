@@ -50,25 +50,25 @@ updateAndCreateTercero(orderSalesList) async {
         taxIdTypeName: customerIsSincronized['tax_id_type_name'],
         taxPayerTypeName: customerIsSincronized['tax_payer_type_name']);
 
-    print('Entre aqui en la creacion del cliente');
-    dynamic result = await createCustomerIdempiere(customer.toMap());
-    print('este es el $result');
+    // print('Entre aqui en la creacion del cliente');
+    // dynamic result = await createCustomerIdempiere(customer.toMap());
+    // print('este es el $result');
 
-    final cBParnertId = result['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][0]['outputFields']['outputField'][0]['@value'];
-    final newCodClient = result['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
-    final cLocationId = result['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][1]['outputFields']['outputField']['@value'];
-    final cBPartnerLocationId = result['CompositeResponses']
-            ['CompositeResponse']['StandardResponse'][2]['outputFields']
-        ['outputField']['@value'];
+    // final cBParnertId = result['CompositeResponses']['CompositeResponse']
+    //     ['StandardResponse'][0]['outputFields']['outputField'][0]['@value'];
+    // final newCodClient = result['CompositeResponses']['CompositeResponse']
+    //     ['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
+    // final cLocationId = result['CompositeResponses']['CompositeResponse']
+    //     ['StandardResponse'][1]['outputFields']['outputField']['@value'];
+    // final cBPartnerLocationId = result['CompositeResponses']
+    //         ['CompositeResponse']['StandardResponse'][2]['outputFields']
+    //     ['outputField']['@value'];
 
-    print(
-        'Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
+    // print(
+    //     'Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
 
-    await updateCustomerCBPartnerIdAndCodClient(customerIsSincronized['id'],
-        cBParnertId, newCodClient, cLocationId, cBPartnerLocationId);
+    // await updateCustomerCBPartnerIdAndCodClient(customerIsSincronized['id'],
+    //     cBParnertId, newCodClient, cLocationId, cBPartnerLocationId);
 
     print('Entre aqui 3');
 
@@ -145,9 +145,9 @@ createOrdenSalesIdempiere(orderSalesList) async {
     return false;
   }
 
-  if (resOrdenSales['order']['c_bpartner_id'] == 0 && resOrdenSales['order']['c_bpartner_location_id'] == 0) {
-    resOrdenSales = await updateAndCreateTercero(resOrdenSales);
-  }
+  // if (resOrdenSales['order']['c_bpartner_id'] == 0 && resOrdenSales['order']['c_bpartner_location_id'] == 0) {
+  //   resOrdenSales = await updateAndCreateTercero(resOrdenSales);
+  // }
 
   HttpClient httpClient = HttpClient()
     ..badCertificateCallback = (X509Certificate cert, String host, int port) {
@@ -270,6 +270,9 @@ createOrdenSalesIdempiere(orderSalesList) async {
     // Configurar el cuerpo de la solicitud en formato JSON
 
     final jsonBody = jsonEncode(requestBody);
+
+
+    print('Lineas: $lines');
 
     print('jsonBody: $jsonBody');
 

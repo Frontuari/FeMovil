@@ -6,6 +6,7 @@ import 'package:femovil/presentation/clients/helpers/save_client_to_database.dar
 import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
 import 'package:femovil/presentation/clients/select_customer.dart';
 import 'package:femovil/utils/alerts_messages.dart';
+import 'package:femovil/utils/searck_key_idempiere.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -1129,51 +1130,67 @@ class _AddClientsFormState extends State<AddClientsForm> {
 
     showLoadingDialog(context);
   
-    await createCustomerIdempiere(client.toMap());
+      final responseIdempiere = await createCustomerIdempiere(client.toMap());
+      print('Respuesta de iDempiere: $responseIdempiere');
 
-    await saveClientToDatabase(client);
-    Navigator.pop(context);
+       final c_BPartner_ID = findValueByColumn(responseIdempiere, 'C_BPartner_ID') ?? 0;
+      final c_Location_ID = findValueByColumn(responseIdempiere, 'C_Location_ID') ?? 0;
+       final c_BPartner_Location_ID = findValueByColumn(responseIdempiere, 'C_BPartner_Location_ID') ?? 0;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          backgroundColor: Colors.white,
-          // Center the title, content, and actions using a Column
-          content: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min, // Wrap content vertically
-            children: [
-              Image.asset('lib/assets/Check@2x.png',
-                  width: 50, height: 50), // Adjust width and height
-              const Text('Cliente creado con éxito',
-                  style: TextStyle(fontFamily: 'Poppins Bold')),
-              TextButton(
-                onPressed: () =>
-                    {Navigator.pop(context), Navigator.pop(context)},
-                child: const Text('Volver'),
-              ),
-            ],
-          ),
-        );
-      },
+      final isErrorTrue = findIsError(responseIdempiere) ?? false;
+      print('C_BPartner_ID: $c_BPartner_ID, C_Location_ID: $c_Location_ID, C_BPartner_Location_ID: $c_BPartner_Location_ID is ERROR $isErrorTrue');
+
+    Customer clientResponse = Customer(
+      bpName: name,
+      ruc: ruc,
+      address: address,
+      cBpGroupId: selectGoupBp,
+      cBparnetLocationId: c_BPartner_Location_ID,
+      lcoTaxPayerTypeId: selectlcoTaxPayerTypeId,
+      lvePersonTypeId: selectlveTypePerson,
+      personTypeName: personTypeText,
+      taxPayerTypeName: payerTypeName,
+      cCityId: selectCityId,
+      cCountryId: selectCountryId,
+      cLocationId: c_Location_ID,
+      cRegionId: selectProvinceId,
+      cbPartnerId: c_BPartner_ID,
+      codClient: 0,
+      codePostal: codePostal,
+      isBillTo: 'Y',
+      lcoTaxIdTypeId: selectIdType,
+      taxIdTypeName: idTypeName,
+      email: correo,
+      phone: telefono,
+      cBpGroupName: groupBpName,
     );
+    Navigator.pop(context);
+        if (isErrorTrue) {
+          ErrorMessage.showErrorMessageDialog(context, 'Error al crear el cliente. Por favor, intenta de nuevo. Verifique que los datos esten correctos');
+        }
+      else{
+          if (c_BPartner_ID==0) {
+            WarningMessages.showWarningMessagesDialog( context, 'Se Creo cliente a Nivel de APP pero No en el sistema',goBack: true);
+            await saveClientToDatabase(responseIdempiere);
+          }else{
+          print("TERCERO CREADO EXITOSAMENTE: $c_BPartner_ID"); 
+          SuccesMessages.showSuccesMessagesDialog( context, 'Cliente Creado Correctamente En Sistema \nN° $c_BPartner_ID',goBack: true);
+          await saveClientToDatabase(clientResponse);
 
-    // Muestra un mensaje de éxito o realiza cualquier otra acción necesaria
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Cliente guardado correctamente'),
-    ));
+          }
+    }
+                            
+
+
+
+ 
+
+
   }
 
   @override
   void dispose() {
-    // Limpia los controladores de texto cuando el widget se elimina del árbol
-    _nameController.dispose();
-    _rucController.dispose();
-    _correoController.dispose();
-    _telefonoController.dispose();
+
 
     super.dispose();
   }

@@ -831,16 +831,16 @@ List orgInfo = [];
                                                                 (BuildContext
                                                                     bc) {
                                                               return const [
-                                                                PopupMenuItem(
-                                                                    child: Text(
-                                                                        "Editar"),
-                                                                    value:
-                                                                        'EDIT'),
-                                                                PopupMenuItem(
-                                                                    child: Text(
-                                                                        "Eliminar"),
-                                                                    value:
-                                                                        'DELETE'),
+                                                                // PopupMenuItem(
+                                                                //     child: Text(
+                                                                //         "Editar"),
+                                                                //     value:
+                                                                //         'EDIT'),
+                                                                // PopupMenuItem(
+                                                                //     child: Text(
+                                                                //         "Eliminar"),
+                                                                //     value:
+                                                                //         'DELETE'),
                                                                 PopupMenuItem(
                                                                     child: Text(
                                                                         "Vista Previa"),

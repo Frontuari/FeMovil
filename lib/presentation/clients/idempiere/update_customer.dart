@@ -81,7 +81,7 @@ try {
                       "TargetPort": "createUpdateData",
                       "ModelCRUD": {
                           "serviceType":"CreateBPAPP",
-                          "TableName": "C_BPartner_Tercero",
+                          "TableName": "C_BPartner",
                           "RecordID": "0",
                           "Action":"CreateUpdate",
                           "DataRow": {

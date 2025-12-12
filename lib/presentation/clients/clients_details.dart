@@ -172,49 +172,55 @@ class ClientDetailsScreen extends StatelessWidget {
                       ),
                
                   const SizedBox(height: 29,),
-                 Container(
-                  width: mediaScreen,
-                  decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              blurRadius: 7,
-                              spreadRadius: 2 
-                            )
-                          ]
-
-                  ) ,
-                  child: ElevatedButton(
-                    
-                    onPressed: () {
-                      // Aquí puedes manejar la acción de agregar orden
-                      // Por ejemplo, puedes navegar a una pantalla de agregar orden
-                      Navigator.push(context,MaterialPageRoute(builder: (context) => OrdenDeVentaScreen(
-                        clientId: client["id"], 
-                        clientName: client["bp_name"], 
-                        cBPartnerId: client['c_bpartner_id'], 
-                        cBPartnerLocationId: client['c_bpartner_location_id'].toString() != '{@nil=true}' 
-                          ? int.parse(client['c_bpartner_location_id'].toString()) 
-                          : null, 
-                        rucCbpartner: client['ruc'].toString(), 
-                        emailCustomer: client['email'].toString(), 
-                        phoneCustomer: client['phone'].toString() 
-                      )));
-                    }, 
-                    style:  ButtonStyle(
-                      
-                      backgroundColor: const WidgetStatePropertyAll<Color>(Color(0xFFA5F52B)),
-                      foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black),
-                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15), // Aquí establece el radio de borde
+                Visibility(
+                    visible: client['c_bpartner_id'] != 0,
+                    child: Container(
+                      width: mediaScreen,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            blurRadius: 7,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrdenDeVentaScreen(
+                                clientId: client["id"],
+                                clientName: client["bp_name"],
+                                cBPartnerId: client['c_bpartner_id'],
+                                cBPartnerLocationId: client['c_bpartner_location_id'].toString() != '{@nil=true}'
+                                    ? int.parse(client['c_bpartner_location_id'].toString())
+                                    : null,
+                                rucCbpartner: client['ruc'].toString(),
+                                emailCustomer: client['email'].toString(),
+                                phoneCustomer: client['phone'].toString(),
+                              ),
+                            ),
+                          );
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: const MaterialStatePropertyAll<Color>(Color(0xFFA5F52B)),
+                          foregroundColor: const MaterialStatePropertyAll<Color>(Colors.black),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          'Agregar Orden',
+                          style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
                         ),
                       ),
-                    ) ,
-                    child: const Text('Agregar Orden', style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),),
-            
+                    ),
                   ),
-                ),
+                  SizedBox(height: mediaScreen * 0.02),
                 SizedBox(height: mediaScreen * 0.02,),
                 Container(
                   width: mediaScreen,                 
@@ -240,6 +246,56 @@ class ClientDetailsScreen extends StatelessWidget {
             
                   ),
                 ),
+
+                  //   Visibility(
+                  //   visible: client['c_bpartner_id'] == 0,
+                  //   child: Container(
+                  //     width: mediaScreen,
+                  //     decoration: BoxDecoration(
+                  //       boxShadow: [
+                  //         BoxShadow(
+                  //           color: Colors.grey.withOpacity(0.5),
+                  //           blurRadius: 7,
+                  //           spreadRadius: 2,
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     child: ElevatedButton(
+                  //       onPressed: () {
+                  //         Navigator.push(
+                  //           context,
+                  //           MaterialPageRoute(
+                  //             builder: (context) => OrdenDeVentaScreen(
+                  //               clientId: client["id"],
+                  //               clientName: client["bp_name"],
+                  //               cBPartnerId: client['c_bpartner_id'],
+                  //               cBPartnerLocationId: client['c_bpartner_location_id'].toString() != '{@nil=true}'
+                  //                   ? int.parse(client['c_bpartner_location_id'].toString())
+                  //                   : null,
+                  //               rucCbpartner: client['ruc'].toString(),
+                  //               emailCustomer: client['email'].toString(),
+                  //               phoneCustomer: client['phone'].toString(),
+                  //             ),
+                  //           ),
+                  //         );
+                  //       },
+                  //       style: ButtonStyle(
+                  //         backgroundColor: const MaterialStatePropertyAll<Color>(Color(0xFFA5F52B)),
+                  //         foregroundColor: const MaterialStatePropertyAll<Color>(Colors.black),
+                  //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  //           RoundedRectangleBorder(
+                  //             borderRadius: BorderRadius.circular(15),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       child: const Text(
+                  //         'Sincronizar Cliente',
+                  //         style: TextStyle(fontFamily: 'Poppins Bold', fontSize: 15),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+     
                 ],
               ),
             ),
