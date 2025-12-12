@@ -88,7 +88,7 @@ synchronizeProductsUpdateWithIdempiere(setState) async {
 
    totalSyncCount = products.length;
   totalProducts += totalSyncCount;
-
+await synchronizeProductsWithIdempiere(setState); 
 
   for (var productData in products) {
     try {
@@ -120,7 +120,7 @@ synchronizeProductsUpdateWithIdempiere(setState) async {
     // final codProdc =
     //     result['StandardResponse']['outputFields']['outputField'][1]['@value'];
     // print('Este es el mp product id $mProductId && el codprop $codProdc');
-    // Limpia los controladores de texto después de guardar el producto
+    // //Limpia los controladores de texto después de guardar el producto
  
 
            } catch (e) {
@@ -133,7 +133,7 @@ synchronizeProductsUpdateWithIdempiere(setState) async {
       }
   }
 
-  // await synchronizeProductsWithIdempiere(setState); //comentado para evitar Sincronizacion 2 veces
+   ///await synchronizeProductsWithIdempiere(setState); //comentado para evitar Sincronizacion 2 veces
 
 }
 
