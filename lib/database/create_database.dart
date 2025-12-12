@@ -1,3 +1,4 @@
+import 'package:femovil/utils/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
@@ -19,7 +20,6 @@ class DatabaseHelper {
   Future<void> deleteDatabases() async {
     String databasesPath = await getDatabasesPath();
     String dbPath = path.join(databasesPath, 'femovil.db');
-
     print(databasesPath);
     print(dbPath);
 
@@ -57,6 +57,8 @@ class DatabaseHelper {
     print("Entré aquí en init database");
     String databasesPath = await getDatabasesPath();
     String dbPath = path.join(databasesPath, 'femovil.db');
+    final info = await getDeviceInfo();
+
     // Abre la base de datos o crea una nueva si no existe
     Database database = await openDatabase(
       dbPath,
@@ -481,6 +483,37 @@ class DatabaseHelper {
             c_region_id INTEGER
           )
         ''');
+      await db.execute('''
+        CREATE TABLE logs_error(
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          description TEXT,
+          details TEXT,
+          date DATETIME DEFAULT (DATETIME('now', 'localtime'))
+          
+        )
+      ''');
+       await db.execute('''
+          CREATE TABLE logs_idempiere(
+      
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          id_user  INTEGER,
+          num_version TEXT,
+          url TEXT,
+          token TEXT,
+          name_app TEXT,
+          model_android TEXT,
+          version_android TEXT,
+          description_android TEXT,
+          date_create_local DATETIME DEFAULT (DATETIME('now', 'localtime')),
+          updated_at_local DATETIME DEFAULT (DATETIME('now', 'localtime'))
+          )
+        ''');
+        await db.insert('logs_idempiere', {
+        'model_android': info['modelo'],
+        'description_android': info['descripcion'],
+        'version_android': info['version'],
+        'name_app':'Fe Movil',
+      });
       },
     );
 
