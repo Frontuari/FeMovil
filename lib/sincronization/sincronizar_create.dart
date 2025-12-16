@@ -327,29 +327,29 @@ synchronizeVendorsWithIdempiere(setState) async {
       ciiuId: vendorsData['ciiu_id'],
       ciiuTagName: vendorsData['ciiu_tagname']
     );
-    dynamic result = await createVendorIdempiere(provider.toMap());
-    print('este es el $result');
+    //dynamic result = await createVendorIdempiere(provider.toMap());
+    //print('este es el $result');
 
-    final cBParnertId =
-        result['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][0]['outputFields']
-        ['outputField'][0]['@value'];
-    final newCodClient =
-        result['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][0]['outputFields']
-        ['outputField'][1]['@value'];
-    final cLocationId =  result['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][1]['outputFields']
-        ['outputField']['@value'];
-    final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
-        ['StandardResponse'][2]['outputFields']
-        ['outputField']['@value'];
+    // final cBParnertId =
+    //     result['CompositeResponses']['CompositeResponse']
+    //     ['StandardResponse'][0]['outputFields']
+    //     ['outputField'][0]['@value'];
+    // final newCodClient =
+    //     result['CompositeResponses']['CompositeResponse']
+    //     ['StandardResponse'][0]['outputFields']
+    //     ['outputField'][1]['@value'];
+    // final cLocationId =  result['CompositeResponses']['CompositeResponse']
+    //     ['StandardResponse'][1]['outputFields']
+    //     ['outputField']['@value'];
+    // final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
+    //     ['StandardResponse'][2]['outputFields']
+    //     ['outputField']['@value'];
 
-    print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
+    // print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
 
 
-    await updateCBPartnerIdAndCodVendor(
-        vendorsData['id'], cBParnertId, newCodClient, cLocationId, cBPartnerLocationId );
+    // await updateCBPartnerIdAndCodVendor(
+    //     vendorsData['id'], cBParnertId, newCodClient, cLocationId, cBPartnerLocationId );
      } catch (e) {
          print('Error al procesar Proveedor: $e');
       // Continuar con el siguiente cliente

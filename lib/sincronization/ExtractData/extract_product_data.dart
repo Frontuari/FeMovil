@@ -7,13 +7,19 @@ List<Map<String, dynamic>> extractProductData(String responseData) {
   // Decodifica la respuesta JSON
   Map<String, dynamic> parsedResponse = jsonDecode(responseData);
 
+    if(parsedResponse['WindowTabData']['@NumRows'] == 0){
+
+    return []; 
+
+    }   
+
   // Extrae la lista de DataRow de la respuesta
-  List<dynamic> dataRows = parsedResponse['WindowTabData']['DataSet']['DataRow'];
+  List<dynamic> dataRows = parsedResponse['WindowTabData']['DataSet']['DataRow'] is Map ? [parsedResponse['WindowTabData']['DataSet']['DataRow']]: parsedResponse['WindowTabData']['DataSet']['DataRow'];
 
   // Crea una lista para almacenar los datos de los productos
   List<Map<String, dynamic>> productsData = [];
 
-  print('Esto es la respuesta del erp productos $dataRows');
+  print('Esto es la respuesta del erp products $dataRows');
 
   // Itera sobre cada DataRow y extrae los datos relevantes de los productos
 
@@ -23,24 +29,24 @@ try {
   
   for (var row in dataRows) {
     Map<String, dynamic> productData = {
-      'cod_product': row['field'][0]['val'],
-      'm_product_id': row['field'][11]['val'],
-      'name': row['field'][1]['val'],
-      'price':row['field'][10]['val'],
-      'quantity':row['field'][9]['val'] is int ? row['field'][9]['val'] : 0,
-      'pro_cat_id':row['field'][3]['val'],
-      'categoria':row['field'][4]['val'].toString(),
-      'product_type':row['field'][7]['val'],
-      'product_type_name':row['field'][8]['val'],
+      'cod_product': row['field'].firstWhere((field) => field['@column'] == 'Value')['val'],
+      'm_product_id': row['field'].firstWhere((field) => field['@column'] == 'M_Product_ID')['val'],
+      'name': row['field'].firstWhere((field) => field['@column'] == 'Name')['val'],
+      'price':row['field'].firstWhere((field) => field['@column'] == 'PriceList')['val'],
+      'quantity':row['field'].firstWhere((field) => field['@column'] == 'QtyOnHand')['val'],
+      'pro_cat_id':row['field'].firstWhere((field) => field['@column'] == 'M_Product_Category_ID')['val'] ,
+      'categoria':row['field'].firstWhere((field) => field['@column'] == 'category_name')['val'].toString(),
+      'product_type':row['field'].firstWhere((field) => field['@column'] == 'ProductType')['val'],
+      'product_type_name':row['field'].firstWhere((field) => field['@column'] == 'producttype_name')['val'],
       'total_sold': 0,
-      'tax_cat_id':row['field'][5]['val'],
-      'tax_cat_name': row['field'][6]['val'],
-      'product_group_id':row['field'][15]['val'],
-      'product_group_name': row['field'][16]['val'],
-      'um_id':row['field'][12]['val'],
-      'um_name':row['field'][14]['val'],
+      'tax_cat_id':row['field'].firstWhere((field) => field['@column'] == 'C_TaxCategory_ID')['val'],
+      'tax_cat_name': row['field'].firstWhere((field) => field['@column'] == 'taxcategory_name')['val'],
+      'product_group_id':row['field'].firstWhere((field) => field['@column'] == 'FTU_ProductGroup_ID')['val'],
+      'product_group_name': row['field'].firstWhere((field) => field['@column'] == 'FTU_ProductGroup_Name')['val'],
+      'um_id':row['field'].firstWhere((field) => field['@column'] == 'C_UOM_ID')['val'],
+      'um_name':row['field'].firstWhere((field) => field['@column'] == 'UOMName')['val'],
       'quantity_sold': 0,
-      'pricelistsales': row['field'][17]['val'],
+      'pricelistsales': row['field'].firstWhere((field) => field['@column'] == 'pricelistsales')['val'],
      // Asegúrate de convertir la cantidad a un tipo numérico adecuado
       // Añade otros campos que necesites sincronizar
     };
