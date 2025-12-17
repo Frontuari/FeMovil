@@ -235,7 +235,6 @@ try {
     }
 };
 
-
   final jsonBody = jsonEncode(requestBody);
 
   print('Enviando json customer $jsonBody');

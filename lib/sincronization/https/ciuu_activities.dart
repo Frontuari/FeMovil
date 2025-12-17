@@ -69,6 +69,8 @@ sincronizationCiuActivities(setState) async {
 
   final response = await request.close();
   final responseBody = await response.transform(utf8.decoder).join();
+            print('Estos son las actividades comerciales de algun proveedor  $responseBody');
+
   dynamic ciiuCode =  extractCiiuActivitiesData(responseBody);
 
 

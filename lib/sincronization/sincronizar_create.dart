@@ -142,7 +142,6 @@ synchronizeCustomersUpdateWithIdempiere(setState) async {
   List<Map<String, dynamic>> customers = await getCustomersWithZeroValues() ;
 
   int contador = 0;
-  // await sincronizationCustomers(setState);
 
   print('Esto es custommer en cero $customers');
   
@@ -176,8 +175,8 @@ synchronizeCustomersUpdateWithIdempiere(setState) async {
           taxPayerTypeName: customersData['tax_payer_type_name']
       );
 
-      dynamic result = await updateCustomerIdempiere(customer.toMap());
-      print('este es el $result');
+      //dynamic result = await updateCustomerIdempiere(customer.toMap());
+      // print('este es el $result');
 
           contador++;
 
@@ -190,22 +189,22 @@ synchronizeCustomersUpdateWithIdempiere(setState) async {
                     });
 
 
-      final cBParnertId =
-          result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][0]['outputFields']
-          ['outputField'][0]['@value'];
-      final newCodClient =
-          result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][0]['outputFields']
-          ['outputField'][1]['@value'];
-      final cLocationId =  result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][1]['outputFields']
-          ['outputField']['@value'];
-      final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][2]['outputFields']
-          ['outputField']['@value'];
+      // final cBParnertId =
+      //     result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][0]['outputFields']
+      //     ['outputField'][0]['@value'];
+      // final newCodClient =
+      //     result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][0]['outputFields']
+      //     ['outputField'][1]['@value'];
+      // final cLocationId =  result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][1]['outputFields']
+      //     ['outputField']['@value'];
+      // final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][2]['outputFields']
+      //     ['outputField']['@value'];
 
-      print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
+      // print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
 
     } catch (error) {
       print('Error al procesar cliente: $error');
@@ -253,29 +252,28 @@ synchronizeCustomersWithIdempiere(setState) async {
           taxIdTypeName: customersData['tax_id_type_name'],
           taxPayerTypeName: customersData['tax_payer_type_name']
       );
+      // dynamic result = await createCustomerIdempiere(customer.toMap());
+      // print('este es el $result');
 
-      dynamic result = await createCustomerIdempiere(customer.toMap());
-      print('este es el $result');
+      // final cBParnertId =
+      //     result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][0]['outputFields']
+      //     ['outputField'][0]['@value'  ];
+      // final newCodClient =
+      //     result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][0]['outputFields']
+      //     ['outputField'][1]['@value'];
+      // final cLocationId =  result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][1]['outputFields']
+      //     ['outputField']['@value'];
+      // final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
+      //     ['StandardResponse'][2]['outputFields']
+      //     ['outputField']['@value'];
 
-      final cBParnertId =
-          result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][0]['outputFields']
-          ['outputField'][0]['@value'];
-      final newCodClient =
-          result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][0]['outputFields']
-          ['outputField'][1]['@value'];
-      final cLocationId =  result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][1]['outputFields']
-          ['outputField']['@value'];
-      final cBPartnerLocationId = result['CompositeResponses']['CompositeResponse']
-          ['StandardResponse'][2]['outputFields']
-          ['outputField']['@value'];
+      // print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
 
-      print('Esto es el codigo de partnert id  $cBParnertId, esto es el $newCodClient, esto es el $cLocationId y esto es el cbparnert location id $cBPartnerLocationId');
-
-      await updateCustomerCBPartnerIdAndCodClient(
-          customersData['id'], cBParnertId, newCodClient, cLocationId, cBPartnerLocationId );
+      // await updateCustomerCBPartnerIdAndCodClient(
+      //     customersData['id'], cBParnertId, newCodClient, cLocationId, cBPartnerLocationId );
     } catch (error) {
       print('Error al procesar cliente: $error');
       // Continuar con el siguiente cliente

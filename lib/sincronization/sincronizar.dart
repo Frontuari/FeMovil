@@ -10,186 +10,162 @@ import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/infrastructure/models/vendors.dart';
 import 'package:femovil/sincronization/sincronizar_create.dart';
 import 'package:femovil/sincronization/sincronization_screen.dart';
+import 'package:sqflite/sqflite.dart';
 
 
 
 
-Future<void> syncCustomers( customersData,setState) async {
-      final db = await DatabaseHelper.instance.database;
-    
-       double contador = 0;
+Future<void> syncCustomers(List<Map<String, dynamic>> customersData, setState) async {
+
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) return;
+
+  int contador = 0;
+  final batch = db.batch();
+
+  for (final customerData in customersData) {
+
+    final customer = Customer(
+      cbPartnerId: customerData['c_bpartner_id'],
+      codClient: customerData['cod_client'],
+      bpName: customerData['bp_name'].toString(),
+      cBpGroupId: customerData['c_bp_group_id'],
+      cBpGroupName: customerData['group_bp_name'].toString(),
+      lcoTaxIdTypeId: customerData['lco_tax_id_typeid'],
+      taxIdTypeName: customerData['tax_id_type_name'].toString(),
+      email: customerData['email'].toString(),
+      cBparnetLocationId: customerData['c_bpartner_location_id'],
+      isBillTo: customerData['is_bill_to'].toString(),
+      phone: customerData['phone'].toString(),
+      cLocationId: customerData['c_location_id'],
+      city: customerData['city'].toString(),
+      region: customerData['region'].toString(),
+      country: customerData['country'].toString(),
+      codePostal: customerData['code_postal'] ?? 0,
+      cCityId: customerData['c_city_id'],
+      cRegionId: customerData['c_region_id'],
+      cCountryId: customerData['c_country_id'],
+      ruc: customerData['ruc'].toString(),
+      address: customerData['address'].toString(),
+      lcoTaxPayerTypeId: customerData['lco_tax_payer_typeid'],
+      taxPayerTypeName: customerData['tax_payer_type_name'].toString(),
+      lvePersonTypeId: customerData['lve_person_type_id'],
+      personTypeName: customerData['person_type_name'].toString(),
+    );
+
+    contador++;
+
+    setState(() {
+      syncPercentageClient = (contador / customersData.length) * 100;
+    });
+
+    final customerMap = customer.toMap();
+
+    // ----> EL QUERY DEBE IR FUERA DEL BATCH <----
+    final existingCustomer = await db.query(
+      'clients',
+      where: 'c_bpartner_id = ?',
+      whereArgs: [customer.cbPartnerId],
+    );
+
+    if (existingCustomer.isNotEmpty) {
+      batch.update(
+        'clients',
+        customerMap,
+        where: 'c_bpartner_id = ?',
+        whereArgs: [customer.cbPartnerId],
+      );
+    } else {
+      batch.insert('clients', customerMap);
+    }
+  }
+
+  await batch.commit(noResult: true);
+}
 
 
-      if (db != null) {
-        // Itera sobre los datos de los productos recibidos
-        for (Map<String, dynamic> customerData in customersData) {
-          // Construye un objeto Product a partir de los datos recibidos
-          Customer customer = Customer(
-              cbPartnerId: customerData['c_bpartner_id'],
-              codClient: customerData['cod_client'],
-              bpName: customerData['bp_name'].toString(),
-              cBpGroupId: customerData['c_bp_group_id'],
-              cBpGroupName: customerData['group_bp_name'].toString(),
-              lcoTaxIdTypeId: customerData['lco_tax_id_typeid'],
-              taxIdTypeName: customerData['tax_id_type_name'].toString(),
-              email: customerData['email'].toString(),
-              cBparnetLocationId: customerData['c_bpartner_location_id'],
-              isBillTo: customerData['is_bill_to'].toString(),
-              phone: customerData['phone'].toString(),
-              cLocationId: customerData['c_location_id'],
-              city: customerData['city'].toString(),
-              region: customerData['region'].toString(),
-              country: customerData['country'].toString(),
-              codePostal: customerData['code_postal'] ?? 0 ,
-              cCityId: customerData['c_city_id'],
-              cRegionId: customerData['c_region_id'],
-              cCountryId: customerData['c_country_id'],
-              ruc: customerData['ruc'].toString(),
-              address: customerData['address'].toString(),
-              lcoTaxPayerTypeId: customerData['lco_tax_payer_typeid'],
-              taxPayerTypeName: customerData['tax_payer_type_name'].toString(),
-              lvePersonTypeId: customerData['lve_person_type_id'],
-              personTypeName: customerData['person_type_name'].toString(),
-            
-          );
-          
-            contador++;
+Future<void> syncVendors(List<Map<String, dynamic>> vendorsData, setState) async {
 
-         
-            
-                    setState(() {
-                      
-                          syncPercentageClient = (contador / customersData.length) * 100;
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) {
+    print('Error: db is null');
+    return;
+  }
 
-                    });
+  double contador = 0;
+  final batch = db.batch();
+  final total = vendorsData.length;
 
-          
-          
-                   
+  for (final vendorData in vendorsData) {
 
+    final vendor = Vendor(
+      cBPartnerId: vendorData['c_bpartner_id'],
+      cCodeId: vendorData['c_code_id'],
+      bPName: vendorData['bpname'],
+      email: vendorData['email'],
+      cBPGroupId: vendorData['c_bp_group_id'],
+      groupBPName: vendorData['groupbpname'],
+      taxId: vendorData['tax_id'],
+      isVendor: vendorData['is_vendor'],
+      lcoTaxIdTypeId: vendorData['lco_tax_id_type_id'],
+      taxIdTypeName: vendorData['tax_id_type_name'],
+      cBPartnerLocationId: vendorData['c_bpartner_location_id'],
+      isBillTo: vendorData['is_bill_to'],
+      phone: vendorData['phone'],
+      cLocationId: vendorData['c_location_id'],
+      address: vendorData['address'],
+      city: vendorData['city'],
+      countryName: vendorData['country_name'],
+      postal: vendorData['postal'],
+      cCityId: vendorData['c_city_id'],
+      cCountryId: vendorData['c_country_id'],
+      lcoTaxtPayerTypeId: vendorData['lco_taxt_payer_type_id'],
+      taxPayerTypeName: vendorData['tax_payer_type_name'],
+      lvePersonTypeId: vendorData['lve_person_type_id'],
+      personTypeName: vendorData['person_type_name'],
+      ciiuId: vendorData['ciiu_id'],
+      ciiuTagName: vendorData['ciiu_tagname'],
+      province: vendorData['province'],
+    );
 
-          // Convierte el objeto Product a un mapa
-          Map<String, dynamic> customerMap = customer.toMap();
+    final vendorMap = vendor.toMap();
 
+    // Consulta si el proveedor ya existe
+    final existingVendor = await db.query(
+      'providers',
+      where: 'c_bpartner_id = ?',
+      whereArgs: [vendor.cBPartnerId],
+    );
 
-          // Consulta si el producto ya existe en la base de datos local por su nombre
-          List<Map<String, dynamic>> existingCustomer= await db.query(
-            'clients',
-            where: 'ruc = ?',
-            whereArgs: [customer.ruc],
-          );
-
-          if (existingCustomer.isNotEmpty) {
-            // Si el producto ya existe, actualiza sus datos
-            await db.update(
-              'clients',
-              customerMap,
-              where: 'ruc = ?',
-              whereArgs: [customer.ruc],
-            );
-            print('cliente actualizado: ${customer.bpName}');
-          } else {
-            // Si el producto no existe, inserta un nuevo registro en la tabla de productos
-            await db.insert('clients', customerMap);
-            print('cliente insertado: ${customer.bpName}');
-          }
-        }
-        print('Sincronización de clientes completada.');
-      } else {
-        // Manejar el caso en el que db sea null
-        print('Error: db is null');
-      }
+    if (existingVendor.isNotEmpty) {
+      // Actualiza
+      batch.update(
+        'providers',
+        vendorMap,
+        where: 'c_bpartner_id = ?',
+        whereArgs: [vendor.cBPartnerId],
+      );
+      print('Proveedor actualizado: ${vendor.bPName}');
+    } else {
+      // Inserta
+      batch.insert('providers', vendorMap);
+      print('Proveedor insertado: ${vendor.bPName}');
     }
 
-Future<void> syncVendors( vendorsData,setState) async {
-      final db = await DatabaseHelper.instance.database;
-    
-       double contador = 0;
-print('Esto es vendor Datas $vendorsData');
+    contador++;
+    // Actualiza UI igual que clients
+    setState(() {
+      syncPercentageProviders = (contador / total) * 100;
+    });
+  }
 
-      if (db != null) {
-        // Itera sobre los datos de los productos recibidos
-        for (Map<String, dynamic> vendorData in vendorsData) {
-          // Construye un objeto Product a partir de los datos recibidos
-          print('Vendor data $vendorData');
-          Vendor vendor = Vendor(
-            cBPartnerId: vendorData['c_bpartner_id'],
-            cCodeId: vendorData['c_code_id'],
-            bPName: vendorData['bpname'],
-            email: vendorData['email'],
-            cBPGroupId: vendorData['c_bp_group_id'],
-            groupBPName: vendorData['groupbpname'],
-            taxId: vendorData['tax_id'], 
-            isVendor: vendorData['is_vendor'],
-            lcoTaxIdTypeId: vendorData['lco_tax_id_type_id'],
-            taxIdTypeName: vendorData['tax_id_type_name'],
-            cBPartnerLocationId: vendorData['c_bpartner_location_id'],
-            isBillTo: vendorData['is_bill_to'],
-            phone: vendorData['phone'],
-            cLocationId: vendorData['c_location_id'],
-            address: vendorData['address'],
-            city: vendorData['city'],
-            countryName: vendorData['country_name'],
-            postal: vendorData['postal'],
-            cCityId: vendorData['c_city_id'],
-            cCountryId: vendorData['c_country_id'],
-            lcoTaxtPayerTypeId: vendorData['lco_taxt_payer_type_id'],
-            taxPayerTypeName: vendorData['tax_payer_type_name'],
-            lvePersonTypeId: vendorData['lve_person_type_id'],
-            personTypeName: vendorData['person_type_name'],
-            ciiuId: vendorData['ciiu_id'],
-            ciiuTagName: vendorData['ciiu_tagname'],
-            province: vendorData['province']
-          );
-          
-            contador++;
+  await batch.commit(noResult: true);
 
-         
-            
-                    setState(() {
-                      
-                          syncPercentageProviders = (contador / vendorsData.length) * 100;
+  setState(() => syncPercentageProviders = 100);
 
-                    });
+  print("Sincronización de proveedores completada con batch.");
+}
 
-          
-          
-                   
-
-
-          // Convierte el objeto Product a un mapa
-          Map<String, dynamic> vendorMap = vendor.toMap();
-
-          print('Esto es vendorMap $vendorMap');
-
-          // Consulta si el producto ya existe en la base de datos local por su nombre
-          List<Map<String, dynamic>> existingCustomer= await db.query(
-            'providers',
-            where: 'tax_id = ?',
-            whereArgs: [vendor.taxId],
-          );
-
-          if (existingCustomer.isNotEmpty) {
-            // Si el producto ya existe, actualiza sus datos
-            await db.update(
-              'providers',
-              vendorMap,
-              where: 'tax_id = ?',
-              whereArgs: [vendor.taxId],
-            );
-            print('proveedor actualizado: ${vendor.bPName}');
-          } else {
-            // Si el producto no existe, inserta un nuevo registro en la tabla de productos
-            await db.insert('providers', vendorMap);
-            print('proveedor insertado: ${vendor.bPName}');
-          }
-        }
-        print('Sincronización de proveedores completada.');
-      } else {
-        // Manejar el caso en el que db sea null
-        print('Error: db is null');
-      }
-    }
 
 
 

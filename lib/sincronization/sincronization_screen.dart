@@ -7,9 +7,11 @@ import 'package:femovil/presentation/screen/home/home_screen.dart';
 import 'package:femovil/sincronization/design_charger/striped_design.dart';
 import 'package:femovil/sincronization/https/bank_account.dart';
 import 'package:femovil/sincronization/https/ciuu_activities.dart';
+import 'package:femovil/sincronization/https/customer_http.dart';
 import 'package:femovil/sincronization/https/get_orginfo.dart';
 import 'package:femovil/sincronization/https/impuesto_http.dart';
 import 'package:femovil/sincronization/https/search_id_invoice.dart';
+import 'package:femovil/sincronization/https/vendors_http.dart';
 import 'package:femovil/sincronization/sincronizar_create.dart';
 import 'package:femovil/utils/alerts_messages.dart';
 import 'package:femovil/utils/snackbar_messages.dart';
@@ -465,92 +467,96 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                 )
               ]),
               child: ElevatedButton(
-                          style: ButtonStyle(
-                            elevation: MaterialStateProperty.all<double>(0),
-                            foregroundColor: const MaterialStatePropertyAll(Colors.black),
-                            shape: MaterialStateProperty.all<OutlinedBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                          onPressed: _enableButtons
-                              ? () async {
-                                  setState(() {
-                                    _enableButtons = false;
-                                  });
+                style: ButtonStyle(
+                  elevation: MaterialStateProperty.all<double>(0),
+                  foregroundColor: const MaterialStatePropertyAll(Colors.black),
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide.none,
+                    ),
+                  ),
+                ),
+                onPressed: _enableButtons
+                    ? () async {
+                        setState(() {
+                          _enableButtons = false;
+                        });
 
-                                  if (!setearValoresEnCero) {
-                                    setState(() {
-                                      syncPercentage = 0;
-                                      syncPercentageClient = 0;
-                                      syncPercentageImpuestos = 0;
-                                      syncPercentageProviders = 0;
-                                      syncPercentageSelling = 0;
-                                      syncPercentageBankAccount = 0;
-                                      setearValoresEnCero = true;
-                                      totalProducts = 0;
-                                      currentSyncCount = 0;
-                                      syncedProducts = 0;
-                                    });
-                                  }
+                        if (!setearValoresEnCero) {
+                          setState(() {
+                            syncPercentage = 0;
+                            syncPercentageClient = 0;
+                            syncPercentageImpuestos = 0;
+                            syncPercentageProviders = 0;
+                            syncPercentageSelling = 0;
+                            syncPercentageBankAccount = 0;
+                            setearValoresEnCero = true;
+                            totalProducts = 0;
+                            currentSyncCount = 0;
+                            syncedProducts = 0;
+                          });
+                        }
 
-                                  // 🔹 Solo este bloque tiene manejo de error con mensaje
-                                  try {
-                                    await getPosPropertiesInit();
-                                    final response = await getPosPropertiesV();
+                        // 🔹 Solo este bloque tiene manejo de error con mensaje
+                        try {
+                          await getPosPropertiesInit();
+                          final response = await getPosPropertiesV();
 
-                                    setState(() {
-                                      variablesG = response;
-                                    });
-                                  } catch (e) {
-                                    setState(() {
-                                      _enableButtons = true;
-                                      setearValoresEnCero = false;
-                                    });
+                          setState(() {
+                            variablesG = response;
+                          });
+                        } catch (e) {
+                          setState(() {
+                            _enableButtons = true;
+                            setearValoresEnCero = false;
+                          });
 
-                                    ErrorMessage.showErrorMessageDialog(
-                                      context,
-                                      'Sin Conexión a Internet. La sincronización no se pudo completar.',
-                                    );
-                                    return; // ❗ Detener la operación aquí
-                                  }
+                          ErrorMessage.showErrorMessageDialog(
+                            context,
+                            'Sin Conexión a Internet. La sincronización no se pudo completar.',
+                          );
+                          return; // ❗ Detener la operación aquí
+                        }
 
-                                  // 🔹 El resto de sincronizaciones se ejecuta normalmente
-                                  sincronizationSearchIdInvoice(setState);
-                                  sincronizationCiuActivities(setState);
-                                  sincronizationBankAccount(setState);
-                                  sincronizationPaymentTerms();
-                                  sincronizationImpuestos(setState);
-                                  await sincronizationOrgInfo();
-                                  await synchronizeCustomersUpdateWithIdempiere(setState);
-                                  await synchronizeVendorsWithIdempiere(setState);
-                                  await synchronizeProductsUpdateWithIdempiere(setState);
-                                  await synchronizeOrderSalesWithIdempiere(setState);
-                                  await synchronizeTaxIdTypes();
-                                  await synchronizeTaxPayerTypes();
-                                  await synchronizeCountries();
+                        // 🔹 El resto de sincronizaciones se ejecuta normalmente
+                        sincronizationSearchIdInvoice(setState);
+                        sincronizationCiuActivities(setState);
+                        sincronizationBankAccount(setState);
+                        sincronizationPaymentTerms();
+                        sincronizationImpuestos(setState);
+                        await sincronizationOrgInfo();
+                        await sincronizationCustomers(setState); //Customer Actualizados,
+                        await sincronizationVendors(setState); //Proveedores, Actualizado
+                        //await synchronizeCustomersUpdateWithIdempiere(setState); Despreciado, explotaba mucho la API
+                        //await synchronizeVendorsWithIdempiere(setState); Despreciado, explotaba mucho la API
+                        await synchronizeProductsWithIdempiere(setState);
+                        //await synchronizeProductsUpdateWithIdempiere(setState); Despreciado, explotaba mucho la API
+                        await synchronizeOrderSalesWithIdempiere(setState);
+                        await synchronizeTaxIdTypes();
+                        await synchronizeTaxPayerTypes();
+                        await synchronizeCountries();
 
-                                  showSuccesSnackbar(context, 'Sincronización completada');
+                        showSuccesSnackbar(
+                            context, 'Sincronización completada');
 
-                                  setState(() {
-                                    _enableButtons = true;
-                                    setearValoresEnCero = false;
-                                  });
-                                }
-                              : null,
-                          child: Text(
-                            !_enableButtons ? 'Sincronizando...' : 'Sincronizar',
-                            style: TextStyle(
-                              fontFamily: 'Poppins Bold',
-                              fontSize: 17,
-                              color: _enableButtons
-                                  ? const Color(0XFF7531FF)
-                                  : const Color.fromARGB(255, 82, 78, 78),
-                            ),
-                          ),
-                        ),
+                        setState(() {
+                          _enableButtons = true;
+                          setearValoresEnCero = false;
+                        });
+                      }
+                    : null,
+                child: Text(
+                  !_enableButtons ? 'Sincronizando...' : 'Sincronizar',
+                  style: TextStyle(
+                    fontFamily: 'Poppins Bold',
+                    fontSize: 17,
+                    color: _enableButtons
+                        ? const Color(0XFF7531FF)
+                        : const Color.fromARGB(255, 82, 78, 78),
+                  ),
+                ),
+              ),
             ),
           ),
           EmptyDatabase(),
@@ -559,6 +565,3 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     );
   }
 }
-
-
-                       
