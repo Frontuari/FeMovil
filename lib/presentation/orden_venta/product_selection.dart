@@ -179,6 +179,11 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       const SizedBox(height: 8),
+                                    buildInfoRow(
+                                        'Codigo del Producto',
+                                        filteredProducts[index]['cod_product']
+                                            .toString(),
+                                      ),
                                       buildInfoRow(
                                         'Stock',
                                         filteredProducts[index]['quantity']

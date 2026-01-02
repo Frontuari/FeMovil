@@ -36,6 +36,42 @@ Future<List<Map<String, dynamic>>> getProductsAndTaxesBuys() async {
   }
 }
 
+Future<List<Map<String, dynamic>>> getBPartnerNoSync() async {
+
+  //Trae todos los clientes no sincronziados
+  final db = await DatabaseHelper.instance.database;
+  if (db != null) {
+    return await db.rawQuery('''
+        SELECT * FROM clients WHERE c_bpartner_id=0
+    ''');
+  } else {
+    print('Error: db is null');
+    return [];
+  }
+}
+
+Future<Map<String, dynamic>?> getClientbpartnerIDData(int clientId) async {
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) {
+    print('Error: db is null');
+    return null;
+  }
+
+  final clientQuery = await db.query(
+    'clients',
+    where: 'c_bpartner_id = ?',
+    whereArgs: [clientId],
+  );
+
+  if (clientQuery.isEmpty) {
+    print('Error: cliente no encontrado');
+    return null;
+  }
+
+  return clientQuery.first;
+}
+
+
 
 Future<List<Map<String, dynamic>>> getProductsScreen(
     {required int page, required int pageSize}) async {
@@ -134,6 +170,8 @@ Future<List<Map<String, dynamic>>> getClientsScreen({required int page, required
     return [];
   }
 }
+
+
 
 Future<List<Map<String, dynamic>>> getClientsByNameOrRUC(String query) async {
   final db = await DatabaseHelper.instance.database;

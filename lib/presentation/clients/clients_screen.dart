@@ -1,9 +1,16 @@
 import 'package:femovil/config/app_bar_femovil.dart';
 import 'package:femovil/database/create_database.dart';
 import 'package:femovil/database/gets_database.dart';
+import 'package:femovil/database/update_database.dart';
+import 'package:femovil/infrastructure/models/clients.dart';
 import 'package:femovil/presentation/clients/add_clients.dart';
 import 'package:femovil/presentation/clients/clients_details.dart';
 import 'package:femovil/presentation/clients/filter_dialog_clients.dart';
+import 'package:femovil/presentation/clients/idempiere/clients_send_sync.dart';
+import 'package:femovil/presentation/clients/idempiere/create_customer.dart';
+import 'package:femovil/utils/alerts_messages.dart';
+import 'package:femovil/utils/searck_key_idempiere.dart';
+import 'package:femovil/utils/snackbar_messages.dart';
 import 'package:flutter/material.dart';
 
 class Clients extends StatefulWidget {
@@ -25,6 +32,9 @@ class _ClientsState extends State<Clients> {
   String input = "";
   bool _isLoading = false;
   bool _hasMoreProducts = true;
+  late List<Map<String, dynamic>> clientsNoSync = [];
+  int countClientSync = 0;
+  List<Customer> customersSend = [];
 
   Future<void> _loadClients() async {
     final clientes = await getClientsScreen(page: 1, pageSize: _pageSize);
@@ -36,14 +46,45 @@ class _ClientsState extends State<Clients> {
     });
   }
 
+  Future<void> anyNoSyncClient() async {
+    final clientsNoSync = await getBPartnerNoSync();
 
+    print("Estoy obteniendo Clientes No Sincronizados $clientsNoSync");
+
+    setState(() {
+      this.clientsNoSync = clientsNoSync;
+      countClientSync = clientsNoSync.length;
+    });
+
+    print("Estoy obteniendo Clientes $clientsNoSync");
+    print('Cantidades no Sincronizados $countClientSync');
+    if (countClientSync > 0) {
+          showWarningSnackbar(context, 'Clientes Por Enviar Datos: $countClientSync');
+    }
+  }
+
+  Future<void> sendClientIdempiereScreen() async {
+
+    showLoadingDialog(context, message: 'Sincronizando clientes...');
+    final clientSyncService = ClientSyncService();
+
+    int syncedCount = await clientSyncService.syncClients();
+
+    print('Se sincronizaron $syncedCount clientes con iDempiere');
+    
+    Navigator.of(context).pop(); // Cerrar el diálogo de carga
+
+    await SuccesMessages.showSuccesMessagesDialog(context, 'Se sincronizaron $syncedCount clientes con iDempiere');
+
+    await anyNoSyncClient();
+  }
 
   Future<void> _loadMoreClients() async {
     if (_isLoading || !_hasMoreProducts) return;
 
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       final List<Map<String, dynamic>> newData = await getClientsScreen(
@@ -56,10 +97,9 @@ class _ClientsState extends State<Clients> {
           for (var client in newData) {
             bool exists = clients
                 .any((existingClient) => existingClient['id'] == client['id']);
-                print('esto es exist $exists');
+            print('esto es exist $exists');
             if (!exists) {
               clients = [...clients, client];
-              
             }
           }
           _hasMoreProducts = newData.length == _pageSize;
@@ -78,7 +118,7 @@ class _ClientsState extends State<Clients> {
     }
   }
 
-     void _scrollListener() {
+  void _scrollListener() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 100) {
       _loadMoreClients();
@@ -100,8 +140,7 @@ class _ClientsState extends State<Clients> {
     }
   }
 
-
- void _showFilterOptions(BuildContext context) async {
+  void _showFilterOptions(BuildContext context) async {
     final selectedFilter = await showDialog<String>(
       context: context,
       builder: (context) => FilterGroups(
@@ -131,18 +170,15 @@ class _ClientsState extends State<Clients> {
     });
   }
 
-void _applyFilter() {
-    
-
+  void _applyFilter() {
     if (_filter.isNotEmpty && _filter != "Todos") {
       searchClient = searchClient
           .where((client) => client['group_bp_name'] == _filter)
           .toList();
       print("Este es el searchClient $_filter $searchClient");
-    }else if(_filter  == 'Todos'){
-        searchController.text = '';
-        searchClient = clients;
-
+    } else if (_filter == 'Todos') {
+      searchController.text = '';
+      searchClient = clients;
     }
   }
 
@@ -150,20 +186,19 @@ void _applyFilter() {
   void initState() {
     // print("Esto es la variable global ${variablesG[0]['m_pricelist_id']}");
     _loadClients();
-     _scrollController = ScrollController();
+    anyNoSyncClient();
+    _scrollController = ScrollController();
 
     _scrollController.addListener(_scrollListener);
 
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
-
-        if (input == "") {
-        searchClient = clients.toList();
-      }
+    if (input == "") {
+      searchClient = clients.toList();
+    }
 
     final screenMax = MediaQuery.of(context).size.width * 0.8;
     final screenHight = MediaQuery.of(context).size.height * 0.8;
@@ -196,8 +231,8 @@ void _applyFilter() {
                           9.0), // Ajusta el radio de las esquinas
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              Colors.grey.withOpacity(0.2), // Color de la sombra
+                          color: Colors.grey
+                              .withOpacity(0.2), // Color de la sombra
                           spreadRadius: 2, // Extensión de la sombra
                           blurRadius: 3, // Difuminado de la sombra
                           offset:
@@ -208,11 +243,11 @@ void _applyFilter() {
                     child: TextField(
                       controller: searchController,
                       onChanged: (value) {
-                          if(value.isNotEmpty){
-                            _filter = '';
-                          }
+                        if (value.isNotEmpty) {
+                          _filter = '';
+                        }
 
-                         setState(() {
+                        setState(() {
                           input = value;
                           _searchAndFilterClients(value);
                         });
@@ -240,7 +275,6 @@ void _applyFilter() {
         ),
         body: Stack(
           children: [
-         
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -262,6 +296,23 @@ void _applyFilter() {
                           _showFilterOptions(context);
                         },
                       ),
+                      if (countClientSync > 0)
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            sendClientIdempiereScreen();
+                          },
+                          icon: const Icon(Icons.sync),
+                          label: const Text('Enviar Datos de Cliente'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff7531ff),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
                       IconButton(
                           onPressed: () {
                             _loadClients();
@@ -281,7 +332,7 @@ void _applyFilter() {
                       itemCount: searchClient.length,
                       itemBuilder: (context, index) {
                         final client = searchClient[index];
-        
+
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(

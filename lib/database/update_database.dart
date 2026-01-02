@@ -318,5 +318,28 @@ Future updateMProductIdOrderCompra(int orderId, int mProductId) async {
   }
 }
 
+Future<void> updateClientAfterSync({
+  required int localId,
+  required int cBPartnerId,
+  required int cLocationId,
+  required int cBPartnerLocationId,
+}) async {
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) return;
+
+  await db.update(
+    'clients',
+    {
+      'c_bpartner_id': cBPartnerId,
+      'c_location_id': cLocationId,
+      'c_bpartner_location_id': cBPartnerLocationId,
+    },
+    where: 'id = ?',
+    whereArgs: [localId],
+  );
+
+  print('Cliente local $localId actualizado correctamente');
+}
+
 
 

@@ -151,13 +151,18 @@ try {
                               "val": customer['c_country_id']
                           },
                      
-                              {
+                     //De Momento son solamente con estos campos, ya En el futuro se visualizara Si se requiere que sea mas dinamico
+                     // No envia el Campo de c_region_id si es 0, para Evitar Errores
+                         if (customer['c_region_id'] != 0)
+                               {
                               "@column": "C_Region_ID",
                               "val": customer['c_region_id']
                           },
-                             {
-                              "@column": "C_City_ID",
-                              "val": customer['c_city_id']
+                        // No envia el Campo de c_city_id si es 0, para Evitar Errores
+                         if (customer['c_city_id'] != 0)
+                          {
+                            "@column": "C_City_ID",
+                            "val": customer['c_city_id']
                           },
 
                                {

@@ -1,3 +1,5 @@
+import 'package:femovil/presentation/clients/clients_details.dart';
+import 'package:femovil/presentation/clients/clients_screen.dart';
 import 'package:flutter/material.dart';
 //Ejemplo de Mostrar un mensaje de error
 //WarningMessages.showWarningMessagesDialog(context, 'Este es un mensaje de advertencia.');
@@ -272,3 +274,218 @@ class ErrorMessageList {
     );
   }
 }
+
+
+class SuccessClientModalGeneric {
+  static Future<void> show(
+    BuildContext context,
+     {
+    bool goBack = false,
+    String? title,
+   String? messsage,
+    bool stayButton = false,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        // ancho máximo del dialog (ajustable)
+        final double dialogWidth = MediaQuery.of(context).size.width * 0.82; // 82% de la pantalla
+        final double maxDialogWidth = 400; // no crecer demasiado en pantallas grandes
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text(
+            title?.isNotEmpty == true ? title! : 'Registro Enviado de Manera Exitosa',
+            style: const TextStyle(
+              fontFamily: 'Poppins Bold',
+              color: Colors.green,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: 280,
+              maxWidth: dialogWidth.clamp(0, maxDialogWidth),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                     Text(
+                  messsage?.isNotEmpty == true ? messsage! : 'Orden Generadar\n¿Qué desea realizar?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Poppins Regular'),
+                ),
+                const SizedBox(height: 20),
+
+                if (stayButton)
+                  _buildFullWidthButton(
+                    label: 'Permanecer en la ventana',
+                    icon: Icons.hourglass_empty,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                _buildFullWidthButton(
+                  label: 'Regresar',
+                  icon: Icons.arrow_back,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (goBack) Navigator.pop(context);
+                  },
+                ),
+                _buildFullWidthButton(
+                  label: 'Menú Principal',
+                  icon: Icons.home,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Widget _buildFullWidthButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: onPressed,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20),
+              Text(label),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class WarningClientModalGeneric {
+  static Future<void> show(
+    BuildContext context,
+    {
+    bool goBack = false,
+    String? title,
+    String? messsage,
+    bool stayButton = false,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        final double dialogWidth = MediaQuery.of(context).size.width * 0.82;
+        final double maxDialogWidth = 400; 
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text(
+            title?.isNotEmpty == true ? title! : 'Advertencia',
+            style: const TextStyle(
+              fontFamily: 'Poppins Bold',
+              color: Colors.amber,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: 280,
+              maxWidth: dialogWidth.clamp(0, maxDialogWidth),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                 Text(
+                  messsage?.isNotEmpty == true ? messsage! : 'Registro Realizado,\n¿Qué desea realizar?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Poppins Regular'),
+                ),
+                const SizedBox(height: 20),
+
+                if (stayButton)
+                  _buildFullWidthButton(
+                    label: 'Permanecer en la ventana',
+                    icon: Icons.hourglass_empty,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                _buildFullWidthButton(
+                  label: 'Regresar',
+                  icon: Icons.arrow_back,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (goBack) Navigator.pop(context);
+                  },
+                ),
+                _buildFullWidthButton(
+                  label: 'Menú Principal',
+                  icon: Icons.home,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Widget _buildFullWidthButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: onPressed,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20),
+              Text(label),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+

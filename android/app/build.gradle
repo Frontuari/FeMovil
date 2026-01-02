@@ -25,7 +25,7 @@ if (flutterVersionCode == null) {
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.2.3'
+    flutterVersionName = '1.2.4'
 }
 
 android {
@@ -50,8 +50,8 @@ android {
         applicationId "com.frontuari.femovil"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 7
-        versionName "1.2.3"
+        versionCode 8
+        versionName "1.2.4"
     }
 
     signingConfigs {
