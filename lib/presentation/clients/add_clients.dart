@@ -1056,73 +1056,10 @@ class _AddClientsFormState extends State<AddClientsForm> {
     bool ifExists = await customerExists(ruc);
 
     if (ifExists) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              'Cliente ya registrado',
-              style: TextStyle(
-                fontFamily: 'Poppins SemiBold',
-                fontSize: 18,
-              ),
-            ),
-            content: Text(
-              'El Cliente con el ID fiscal proporcionado ya está registrado en el sistema.',
-              style: TextStyle(
-                fontFamily: 'Poppins Regular',
-                fontSize: 16,
-              ),
-            ),
-            actions: [
-              TextButton(
-                child: Text(
-                  'Aceptar',
-                  style: TextStyle(
-                    fontFamily: 'Poppins SemiBold',
-                    fontSize: 16,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-
+       ErrorMessage.showErrorMessageDialog(context, "El Cliente con el Identificador:$ruc fiscal proporcionado ya está registrado en el sistema.");
       return;
     }
 
-    // Crea una instancia del producto
-    /*Customer client = Customer(
-      bpName: name,
-      ruc: ruc,
-      address: address,
-      cBpGroupId: selectGoupBp,
-      cBparnetLocationId: 0,
-      lcoTaxPayerTypeId: selectlcoTaxPayerTypeId,
-      lvePersonTypeId: selectlveTypePerson,
-      personTypeName: personTypeText,
-      taxPayerTypeName: payerTypeName,
-      cCityId: 0,
-      cCountryId: selectCountryId,
-      cLocationId: 0,
-      cRegionId: 0,
-      cbPartnerId: 0,
-      city: city,
-      codClient: 0,
-      codePostal: codePostal,
-      country: countryTextName,
-      isBillTo: 'Y',
-      lcoTaxIdTypeId: selectIdType,
-      taxIdTypeName: idTypeName,
-      email: correo,
-      phone: telefono,
-      cBpGroupName: groupBpName,
-      region: province
-    );*/
     Customer client = Customer(
       bpName: name,
       ruc: ruc,

@@ -51,7 +51,7 @@ Future<List<Map<String, dynamic>>> listarCategorias() async {
           if(db != null) {
             return await db.rawQuery('''
             SELECT DISTINCT product_group_id, product_group_name
-               FROM products
+               FROM products WHERE product_group_id>0
             ''');
           }
           return [];

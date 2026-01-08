@@ -6,7 +6,12 @@ import 'package:femovil/database/update_database.dart';
 import 'package:femovil/infrastructure/models/products.dart';
 import 'package:femovil/presentation/products/idempiere/create_product.dart';
 import 'package:femovil/presentation/products/utils/switch_generated_names_select.dart';
+import 'package:femovil/presentation/screen/home/home_screen.dart';
+import 'package:femovil/utils/alerts_messages.dart';
+import 'package:femovil/utils/alerts_modals_redirects.dart';
+import 'package:femovil/utils/searck_key_idempiere.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/message_format.dart';
 
 class AddProductForm extends StatefulWidget {
   const AddProductForm({super.key});
@@ -181,9 +186,7 @@ class _AddProductFormState extends State<AddProductForm> {
                             focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                                 borderSide: const BorderSide(
-                                    width: 1, color: Colors.red))
-                                    
-                                    ),
+                                    width: 1, color: Colors.red))),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor ingresa el nombre del producto';
@@ -592,44 +595,10 @@ class _AddProductFormState extends State<AddProductForm> {
                             ]),
                         width: MediaQuery.of(context).size.width,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               // Guarda el producto en la base de datos Sqflite
-                              _saveProduct();
-                               showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 20),
-                                  backgroundColor: Colors.white,
-                                  // Center the title, content, and actions using a Column
-                                  content: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize
-                                        .min, // Wrap content vertically
-                                    children: [
-                                      Image.asset('lib/assets/Check@2x.png',
-                                          width: 50,
-                                          height:
-                                              50), // Adjust width and height
-                                      const Text('Producto Creado con Exito',
-                                          style: TextStyle(
-                                              fontFamily: 'Poppins Bold')),
-                                      TextButton(
-                                        onPressed: () => {
-                                          Navigator.pop(context),
-                                          Navigator.pop(context)
-
-                                        },
-                                        child: const Text('Volver'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-
+                              await _saveProduct();
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -656,7 +625,7 @@ class _AddProductFormState extends State<AddProductForm> {
     );
   }
 
-  void _saveProduct() {
+  Future<void> _saveProduct() async {
     // Obtén los valores del formulario
     String name = _nameController.text;
     double price = double.parse(_priceController.text);
@@ -667,9 +636,7 @@ class _AddProductFormState extends State<AddProductForm> {
     String productTypeId = _selectedProductType;
     int prodructGroupId = _seletedProductGroup;
     int codProd = 0;
-
     int qtySold = 0;
-
     String categoria = _prodCatText;
     String taxName = _taxText;
     String productGroupName = _productGroupText;
@@ -696,63 +663,59 @@ class _AddProductFormState extends State<AddProductForm> {
         produtGroupName: productGroupName,
         priceListSales: 0);
 
-    // Llama a un método para guardar el producto en Sqflite
-    final id = saveProductToDatabase(product);
+    try {
+      showLoadingDialog(context, message: 'Creando Producto');
+      final responseIdempiere = await createProductIdempiere(product.toMap());
+      Navigator.pop(context);
 
-      try {
-        createProductIdempiere(product.toMap());
-        final scaffoldMessenger = ScaffoldMessenger.of(_context);
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('Producto guardado En Idempiere'),
-          ),
-        );
+      print('Respuesta de iDempiere: $responseIdempiere');
+      final m_Product_ID =
+          findValueByColumn(responseIdempiere, 'M_Product_ID') ?? 0;
+      final value = findValueByColumn(responseIdempiere, 'Value') ?? 0;
 
-        
-      
-      } catch (e) {
-      print("Error sincronizando con Idempiere: $e");
-          final scaffoldMessenger = ScaffoldMessenger.of(_context);
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('No se Guardo en Idempiere'),
-          ),
-        );
-  // Aquí podrías mostrar un SnackBar o un AlertDialog de error.
-}
-    print('Esto es el id $id');
-    //  dynamic result = await createProductIdempiere(product.toMap());
-    //  print('este es el $result');
-    //  if(!result != ''){
-    //   final mProductId = result['StandardResponse']['outputFields']['outputField'][0]['@value'];
-    //   final codProdc = result['StandardResponse']['outputFields']['outputField'][1]['@value'];
-    //   print('Este es el mp product id $mProductId && el codprop $codProdc');
-    //   // Limpia los controladores de texto después de guardar el producto
+      if (m_Product_ID == 0) {
+        throw Exception(responseIdempiere);
+      }
 
-    //   await DatabaseHelper.instance.updateProductMProductIdAndCodProd(id, mProductId, codProdc);
-    // }
-    //   _nameController.clear();
-    //   _priceController.clear();
-    //   _quantityController.clear();
+      Product productResponse = Product(
+          mProductId: m_Product_ID,
+          productType: productTypeId,
+          productTypeName: ptype,
+          codProd: value,
+          prodCatId: prodCatId,
+          taxName: taxName,
+          umId: umId,
+          name: name,
+          price: price,
+          quantity: quantity,
+          categoria: categoria,
+          qtySold: qtySold,
+          taxId: selectTax,
+          umName: uM,
+          productGroupId: prodructGroupId,
+          produtGroupName: productGroupName,
+          priceListSales: 0);
+      await saveProductToDatabase(productResponse);
 
-    //     setState(() {
-    //       _selectedTaxIndex = 0;
-    //       _selectedCategoriesIndex = 0;
-    //       _selectedUmIndex = 0;
-    //  });
-    // _formKey.currentContext!.reset();
-    // setState(() {
-    // _imageFile = null;
-    // });
+       await SuccessProductModal.show(
+            context,
+            title: 'Advertencia',
+            message: 'Producto Creado Exitosamente  $name \n Codigo de Producto $value',goBack: true,
+            stayButton: true
+          );     
 
-    // final scaffoldMessenger = ScaffoldMessenger.of(_context);
-    // scaffoldMessenger.showSnackBar(
-    //   const SnackBar(
-    //     content: Text('Producto guardado correctamente'),
-    //   ),
-    // );
+    } catch (e) {
+      await saveProductToDatabase(product);
+      print('Error add_products.dart $e');
+          await WarningProductModal.show(
+            context,
+            title: 'Advertencia',
+            message: 'Se creó el el Producto a nivel de APP.\n\nPor favor, Sincronice en Productos. \n\n¿Qué Deseas Hacer?',goBack: true,
+            stayButton: true
+          );       
 
-
+ 
+    }
 
     setState(() {
       _nameController.clear();
@@ -761,6 +724,9 @@ class _AddProductFormState extends State<AddProductForm> {
       _selectedUmIndex = 0;
       _selectedProductType = 'first';
       _seletedProductGroup = 0;
+      _selectedTaxIndex = 0;
+      _selectedCategoriesIndex = 0;
+      _selectedUmIndex = 0;
     });
 
     // Muestra un mensaje de éxito o realiza cualquier otra acción necesaria

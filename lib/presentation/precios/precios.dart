@@ -217,7 +217,18 @@ Widget build(BuildContext context) {
                      Icon(Icons.attach_money, color: colorPrimary, size: 20),
                     const SizedBox(width: 8),
                     Text(
-                      'Precio: \$${product['pricelistsales'] is int || product['pricelistsales'] is double ? product['pricelistsales'] : 0}',
+                      'Precio de Venta: \$${product['pricelistsales'] is int || product['pricelistsales'] is double ? product['pricelistsales'] : 0}',
+                      style: const TextStyle(fontFamily: 'Poppins Regular', color: Colors.black),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                 Row(
+                  children: [
+                     Icon(Icons.attach_money, color: colorPrimary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Precio de Compra: \$${product['price'] is int || product['price'] is double ? product['price'] : 0}',
                       style: const TextStyle(fontFamily: 'Poppins Regular', color: Colors.black),
                     ),
                   ],

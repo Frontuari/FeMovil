@@ -50,6 +50,20 @@ Future<List<Map<String, dynamic>>> getBPartnerNoSync() async {
   }
 }
 
+Future<List<Map<String, dynamic>>> getProductNoSync() async {
+
+  //Trae todos los clientes no sincronziados
+  final db = await DatabaseHelper.instance.database;
+  if (db != null) {
+    return await db.rawQuery('''
+        SELECT * FROM products WHERE m_product_id=0
+    ''');
+  } else {
+    print('Error: db is null');
+    return [];
+  }
+}
+
 Future<Map<String, dynamic>?> getClientbpartnerIDData(int clientId) async {
   final db = await DatabaseHelper.instance.database;
   if (db == null) {

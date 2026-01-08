@@ -164,7 +164,7 @@ class ProductDetailsScreen extends StatelessWidget {
                                   height: 10,
                                 ),
                                 Text(
-                                    '\$ ${product['price'] is double ? product['price'] : 0}')
+                                    '\$ ${product['pricelistsales'].toString()}')
                               ],
                             ),
                           ],
@@ -172,57 +172,51 @@ class ProductDetailsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // _buildTextFormField('Nombre', product['name'].toString(), mediaScreen),
                     // // _buildTextFormField('Path Image', product['image_path'].toString()),
                     // // _buildImage(product['image_path'].toString()),
-                    // _buildTextFormField('Categoría', product['categoria'].toString(), mediaScreen),
-                    // _buildTextFormField('Impuesto', product['tax_cat_name'].toString(), mediaScreen),
-                    // _buildTextFormField('Grupo de producto', product['product_group_name'].toString() == '{@nil: true}' ? 'Sin Registro' : product['product_group_name'].toString()  , mediaScreen),
-                    // _buildTextFormField('Unidad de medida', product['um_name'].toString(), mediaScreen),
-                    // _buildTextFormField('Tipo de producto', product['product_type_name'], mediaScreen),
-                    // _buildTextFormField('Precio', '\$${product['price'] is double ? product['price']: 0}', mediaScreen),
-                    // _buildTextFormField('Cantidad Disponible', product['quantity'].toString(), mediaScreen),
+               
 
                     SizedBox(
                       height: mediaScreen * 0.2,
                     ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  blurRadius: 7,
-                                  spreadRadius: 2)
-                            ]),
-                        width: mediaScreen,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditProductScreen(product: product)),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(int.parse('0xFF7531FF')),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Editar',
-                            style: TextStyle(
-                                fontFamily: 'Poppins Bold', fontSize: 17),
-                          ),
-                        ),
-                      ),
-                    ),
+                  ////COMENTADO EL EDITAR pRODUCTO
+                  ////Solo edita de Manera Local, por eso se hizo el comentario, se requiere un endpoint para actualizar
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(10),
+                    //         boxShadow: [
+                    //           BoxShadow(
+                    //               color: Colors.grey.withOpacity(0.5),
+                    //               blurRadius: 7,
+                    //               spreadRadius: 2)
+                    //         ]),
+                    //     width: mediaScreen,
+                    //     child: ElevatedButton(
+                    //       onPressed: () {
+                    //         Navigator.pushReplacement(
+                    //           context,
+                    //           MaterialPageRoute(
+                    //               builder: (context) =>
+                    //                   EditProductScreen(product: product)),
+                    //         );
+                    //       },
+                    //       style: ElevatedButton.styleFrom(
+                    //         backgroundColor: Color(int.parse('0xFF7531FF')),
+                    //         foregroundColor: Colors.white,
+                    //         shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.circular(10.0),
+                    //         ),
+                    //       ),
+                    //       child: const Text(
+                    //         'Editar',
+                    //         style: TextStyle(
+                    //             fontFamily: 'Poppins Bold', fontSize: 17),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

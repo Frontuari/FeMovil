@@ -44,16 +44,10 @@ try {
       'address' : row['field'].firstWhere((field) => field['@column'] == 'Address')['val'],
       'lco_tax_payer_typeid': row['field'].firstWhere((field) => field['@column'] == 'LCO_TaxPayerType_ID')['val'],
       'tax_payer_type_name': row['field'].firstWhere((field) => field['@column'] == 'TaxPayerTypeName')['val'],
-      // 'lve_person_type_id': row['field'][27]['val'],
-      // 'person_type_name': row['field'][28]['val'],
 
-
-     // Asegúrate de convertir la cantidad a un tipo numérico adecuado
-      // Añade otros campos que necesites sincronizar
     };
 
 
-    // print('Esto es tax payer type ${row['field'][26]['val']}');
          
              
     // Agrega los datos del producto a la lista

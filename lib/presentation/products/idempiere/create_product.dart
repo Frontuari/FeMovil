@@ -76,10 +76,6 @@ try {
                         "val": product['um_id']
                     },
                     {
-                        "@column": "SKU",
-                        "val": "034619849"
-                    },
-                    {
                         "@column": "IsStocked",
                         "val": "Y"
                     },
@@ -126,10 +122,10 @@ try {
   final parsedJson = jsonDecode(responseBody);
 
 
-      print("esta es la respuesta $parsedJson");
+      print("Respuesta de Creacion de Producto $parsedJson");
       return parsedJson;
         } catch (e) {
-          return 'este es el error e $e';
+          return 'Error al Crear Producto en Idempiere $e';
       }
 
 

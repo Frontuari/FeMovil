@@ -52,9 +52,28 @@ void showWarningSnackbar(BuildContext context, String message) {
         ),
       ),
       backgroundColor: Colors.amber, // Color de fondo rojo
-      duration: Duration(seconds: 3), // Duración de la visualización
+      duration: Duration(seconds: 2), // Duración de la visualización
       behavior: SnackBarBehavior.floating, // El snackbar flota encima
       margin: EdgeInsets.all(16), // Espaciado desde los bordes
+    ),
+  );
+}
+void showWarningSnackbarDisplace(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 16,
+          fontWeight: FontWeight.bold, 
+        ),
+      ),
+      backgroundColor: Colors.amber,
+      duration: const Duration(seconds: 2),
+      
+      behavior: SnackBarBehavior.fixed, 
+      
     ),
   );
 }

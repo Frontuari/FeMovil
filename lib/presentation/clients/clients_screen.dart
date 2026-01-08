@@ -59,7 +59,7 @@ class _ClientsState extends State<Clients> {
     print("Estoy obteniendo Clientes $clientsNoSync");
     print('Cantidades no Sincronizados $countClientSync');
     if (countClientSync > 0) {
-          showWarningSnackbar(context, 'Clientes Por Enviar Datos: $countClientSync');
+          showWarningSnackbarDisplace(context, 'Clientes Por Enviar Datos: $countClientSync');
     }
   }
 
@@ -73,8 +73,13 @@ class _ClientsState extends State<Clients> {
     print('Se sincronizaron $syncedCount clientes con iDempiere');
     
     Navigator.of(context).pop(); // Cerrar el diálogo de carga
+    if (syncedCount>0) {
+          await SuccesMessages.showSuccesMessagesDialog(context, 'Se sincronizaron $syncedCount clientes con iDempiere');
 
-    await SuccesMessages.showSuccesMessagesDialog(context, 'Se sincronizaron $syncedCount clientes con iDempiere');
+    }
+    else{
+    await ErrorMessage.showErrorMessageDialog(context, 'No se pudo Sincronizar los Clientes intente más tarde ');
+    }
 
     await anyNoSyncClient();
   }

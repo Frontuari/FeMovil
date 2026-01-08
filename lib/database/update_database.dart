@@ -343,3 +343,23 @@ Future<void> updateClientAfterSync({
 
 
 
+Future<int> updateProductAfterSync({
+  required int localId, 
+  required int mProductId, 
+  required dynamic codProd
+}) async {
+  final db = await DatabaseHelper.instance.database;
+  if (db == null) return 0; 
+  return await db.update(
+    'products',
+    {
+      'm_product_id': mProductId,
+      'cod_product': codProd,
+    },
+    where: 'id = ?', 
+    whereArgs: [localId],
+  );
+}
+
+
+
