@@ -21,7 +21,6 @@ createInvoicedWithholdingIdempiere(retenciones) async {
               }
   
 
-        
 
       
       HttpClient httpClient = HttpClient()
@@ -191,7 +190,7 @@ createInvoicedWithholdingIdempiere(retenciones) async {
         "@postCommit": "false",
         "TargetPort": "setDocAction",                      
           "ModelSetDocAction": {
-              "serviceType": "completeInvoce",
+              "serviceType": "completeInvoice", // Acción para completar la factura O Retencion
               "tableName": "C_Invoice",
               "recordIDVariable": "@C_Invoice.C_Invoice_ID",
               "docAction": variablesG[0]['doc_status_invoice_so'],

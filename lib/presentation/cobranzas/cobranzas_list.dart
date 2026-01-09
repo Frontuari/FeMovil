@@ -29,7 +29,7 @@ class _CobranzasState extends State<Cobranzas> {
 
     // ______________________________________________
 
-    print("Esto es la venta Data $CobranzasData");
+    print("Esto es la Cobranza $CobranzasData");
 
     setState(() {
       Cobranzas = CobranzasData;
@@ -428,11 +428,34 @@ class _CobranzasState extends State<Cobranzas> {
                                                               overflow:
                                                                   TextOverflow
                                                                       .ellipsis,
+                                                            )),
+                                                   
+                                                      ],
+                                                    ),
+                                                  if (venta['c_order_id'] == null)
+                                                   const  Row(
+                                                      children: [
+                                                       Text(
+                                                          'Estado: ',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Poppins SemiBold'),
+                                                        ),
+                                                          SizedBox(
+                                                            child:  Text(
+                                                              'No sincronizado',
+                                                              style:  TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins Regular'),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                             ))
                                                       ],
                                                     ),
                                                   ],
                                                 ),
+                                             if (venta['c_order_id'] != null)
                                                 GestureDetector(
                                                   onTap: () {
                                                     Navigator.of(context).push(
@@ -450,6 +473,7 @@ class _CobranzasState extends State<Cobranzas> {
                                                       ),
                                                     );
                                                   },
+                                          
                                                   child: Row(
                                                     children: [
                                                       const Text('Ver',

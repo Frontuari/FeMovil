@@ -71,7 +71,6 @@ void showWarningSnackbarDisplace(BuildContext context, String message) {
       ),
       backgroundColor: Colors.amber,
       duration: const Duration(seconds: 2),
-      
       behavior: SnackBarBehavior.fixed, 
       
     ),

@@ -885,6 +885,9 @@ _bankAccFuture = _getBankAcc();
 
       dynamic response = await createCobroIdempiere(cobro);
 
+
+      print('Respuesta del cobro $response');
+
       dynamic numDoc = response['CompositeResponses']['CompositeResponse']['StandardResponse'][0]['outputFields']['outputField'][1]['@value'];
       print('Esto es cobroId $cobroId, y numdoc $numDoc');
     
