@@ -67,3 +67,31 @@ dynamic findIsError(dynamic json) {
 
   return null;
 }
+
+String? findErrorMessage(dynamic json) {
+  // Caso 1: Es un Mapa (Objeto)
+  if (json is Map) {
+    // Si encontramos la clave exacta "Error" y no es nula, retornamos su valor
+    if (json.containsKey('Error') && json['Error'] != null) {
+      return json['Error'].toString();
+    }
+
+    // Si no está aquí, buscamos recursivamente en los valores hijos
+    for (var value in json.values) {
+      final result = findErrorMessage(value);
+      if (result != null) return result;
+    }
+  } 
+  
+  // Caso 2: Es una Lista (Array)
+  else if (json is List) {
+    // Buscamos recursivamente en cada elemento de la lista
+    for (var element in json) {
+      final result = findErrorMessage(element);
+      if (result != null) return result;
+    }
+  }
+
+  // Si recorrimos todo y no encontramos nada
+  return null;
+}

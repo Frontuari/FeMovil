@@ -8,6 +8,7 @@ class CobroDetails extends StatelessWidget {
   final Map<String, dynamic> cobro;
   const CobroDetails({super.key, required this.cobro});
 
+  
 
 
 
@@ -15,6 +16,7 @@ class CobroDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaScreen = MediaQuery.of(context).size.width * 0.8;
     final heightScreen = MediaQuery.of(context).size.height * 1;
+    print(  'Esto es el cobro en detalles $cobro');
     return Scaffold(
 
           appBar: PreferredSize(

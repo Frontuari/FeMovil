@@ -141,7 +141,6 @@ bool hasInvoice = cobro['c_invoice_id'] != null &&
                     "val": "Y"
                   }
                 ]
-            
                     
                      ]
                       }
@@ -167,10 +166,7 @@ bool hasInvoice = cobro['c_invoice_id'] != null &&
     }
 };
 
-
-
   final jsonBody = jsonEncode(requestBody);
-
     request.headers.set('Content-Type', 'application/json; charset=utf-8');
     request.headers.set('Accept', 'application/json');
 

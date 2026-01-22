@@ -26,6 +26,7 @@ Future<void> insertTaxData() async {
 
 
  Future insertCobro({
+    required int id,
     required int cBankAccountId,
     required String bankAccountT,
     required int? cDocTypeId,
@@ -51,6 +52,7 @@ Future<void> insertTaxData() async {
   int cobroId =  await db!.insert(
       'cobros',
       {
+        'id': id, //Agregado inserccion de ID para tomar el ID de Idempiere
         'c_bankaccount_id': cBankAccountId,
         'c_doctype_id': cDocTypeId,
         'date_trx': dateTrx,

@@ -144,11 +144,17 @@ Future<List<Map<String, dynamic>>> getTaxs() async {
 
 Future<List<Map<String, dynamic>>> getBankAccounts() async {
   final db = await DatabaseHelper.instance.database;
+  
   if (db != null) {
-    // Realiza la consulta para recuperar todos los registros de la tabla "bank_account_app"
-    return await db.query('bank_account_app');
+    // Usamos rawQuery para manipular los strings con SQL
+    return await db.rawQuery('''
+      SELECT 
+        *, 
+        SUBSTR(account_no, -4) as account_last_4, 
+        '**** ' || SUBSTR(account_no, -4) as account_masked
+      FROM bank_account_app
+    ''');
   } else {
-    // Manejar el caso en el que db sea null, por ejemplo, lanzar una excepción o mostrar un mensaje de error
     print('Error: db is null');
     return [];
   }
@@ -1018,8 +1024,7 @@ Future<List<Map<String, dynamic>>> getCobros(
       FROM cobros
       INNER JOIN orden_venta o ON cobros.sale_order_id = o.id
       INNER JOIN clients c ON o.cliente_id = c.id
-      LIMIT ? OFFSET ?
-    ''', [pageSize, offset]);
+    ''', []);
     return result;
   } else {
     // Manejar el caso en el que db sea null
