@@ -59,402 +59,50 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
       body: Column(
         children: [
           const SizedBox(height: 25),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                  width: 155,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF0EBFC),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 7,
-                            spreadRadius: 2)
-                      ]),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        child: Container(
-                            margin: const EdgeInsets.only(top: 6),
-                            width: 150,
-                            child: const Row(
-                              children: [
-                                SizedBox(
-                                  width: 25,
-                                ),
-                                Text(
-                                  'Productos',
-                                  style:
-                                      TextStyle(fontFamily: 'Poppins SemiBold'),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            )),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 5),
-                        child: Container(
-                          width: 150,
-                          height: 20, // Altura del contenedor
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Color de fondo inicial
-                            border: Border.all(
-                                color: const Color(0XFFA5F52B)), // Borde verde
-                          ),
-                          child: Stack(
-                            children: [
-                              StripedContainer(syncPercentages: syncPercentage),
-                              Center(
-                                child: Text(
-                                  '${syncPercentage.toStringAsFixed(1)} %', // Porcentaje visible
-                                  style: TextStyle(
-                                      color: syncPercentage == 100
-                                          ? Colors.white
-                                          : Colors.black, // Color del texto
-                                      fontFamily: 'Poppins SemiBold'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 155,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF0EBFC),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 7,
-                            spreadRadius: 2)
-                      ]),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        child: Container(
-                            margin: const EdgeInsets.only(top: 6),
-                            width: 150,
-                            child: const Text(
-                              'Clientes',
-                              style: TextStyle(fontFamily: 'Poppins SemiBold'),
-                              textAlign: TextAlign.center,
-                            )),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 5),
-                        child: Container(
-                          width: 150,
-                          height: 20, // Altura del contenedor
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Color de fondo inicial
-                            border: Border.all(
-                                color: const Color(0XFFA5F52B)), // Borde verde
-                            borderRadius: BorderRadius.circular(
-                                5.0), // Bordes redondeados
-                          ),
-                          child: Stack(
-                            children: [
-                              StripedContainer(
-                                  syncPercentages: syncPercentageClient),
-                              Center(
-                                child: Text(
-                                  '${syncPercentageClient.toStringAsFixed(1)} %',
-                                  style: TextStyle(
-                                      color: syncPercentageClient == 100
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontFamily: 'Poppins SemiBold'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+         Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: GridView.count(
+          crossAxisCount: 3, // ¡Aquí definimos las 3 columnas!
+          crossAxisSpacing: 10, // Espacio horizontal entre tarjetas
+          mainAxisSpacing: 10, // Espacio vertical entre tarjetas
+          childAspectRatio: 0.75, // Relación de aspecto (Alto vs Ancho) para que no se corte
+          shrinkWrap: true, // Importante si está dentro de otro scroll
+          physics: const NeverScrollableScrollPhysics(), // Para que no haga scroll interno
+          children: [
+            SyncStatusCard(
+              title: 'Productos',
+              percentage: syncPercentage,
+              icon: Icons.inventory_2_outlined,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                  width: 155,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF0EBFC),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 7,
-                            spreadRadius: 2)
-                      ]),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        child: Container(
-                            margin: const EdgeInsets.only(top: 6),
-                            width: 150,
-                            child: const Text(
-                              'Proveedores',
-                              style: TextStyle(fontFamily: 'Poppins SemiBold'),
-                              textAlign: TextAlign.center,
-                            )),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 5),
-                        child: Container(
-                          width: 150,
-                          height: 20, // Altura del contenedor
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Color de fondo inicial
-                            border: Border.all(
-                                color: const Color(0XFFA5F52B)), // Borde verde
-                            borderRadius: BorderRadius.circular(
-                                5.0), // Bordes redondeados
-                          ),
-                          child: Stack(
-                            children: [
-                              StripedContainer(
-                                  syncPercentages: syncPercentageProviders),
-                              Center(
-                                child: Text(
-                                  '${syncPercentageProviders.toStringAsFixed(1)} %',
-                                  style: TextStyle(
-                                      color: syncPercentageProviders == 100
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontFamily: 'Poppins SemiBold'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 155,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF0EBFC),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 7,
-                            spreadRadius: 2)
-                      ]),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        child: Container(
-                            margin: const EdgeInsets.only(top: 6),
-                            width: 155,
-                            child: const Text(
-                              'Ventas',
-                              style: TextStyle(fontFamily: 'Poppins SemiBold'),
-                              textAlign: TextAlign.center,
-                            )),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 5),
-                        child: Container(
-                          width: 150,
-                          height: 20, // Altura del contenedor
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Color de fondo inicial
-                            border: Border.all(
-                                color: const Color(0XFFA5F52B)), // Borde verde
-                            borderRadius: BorderRadius.circular(
-                                5.0), // Bordes redondeados
-                          ),
-                          child: Stack(
-                            children: [
-                              StripedContainer(
-                                  syncPercentages: syncPercentageSelling),
-                              Center(
-                                child: Text(
-                                  '${syncPercentageSelling.toStringAsFixed(1)} %', // Porcentaje visible
-                                  style: TextStyle(
-                                    color: syncPercentageSelling == 100
-                                        ? Colors.white
-                                        : Colors.black, // Color del texto
-                                    fontFamily: 'Poppins SemiBold',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            SyncStatusCard(
+              title: 'Clientes',
+              percentage: syncPercentageClient,
+              icon: Icons.people_alt_outlined,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                  width: 155,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF0EBFC),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 7,
-                            spreadRadius: 2)
-                      ]),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        child: Container(
-                            margin: const EdgeInsets.only(top: 6),
-                            width: 155,
-                            child: const Text(
-                              'Impuestos',
-                              style: TextStyle(fontFamily: 'Poppins SemiBold'),
-                              textAlign: TextAlign.center,
-                            )),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 5),
-                        child: Container(
-                          width: 150,
-                          height: 20, // Altura del contenedor
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Color de fondo inicial
-                            border: Border.all(
-                                color: const Color(0XFFA5F52B)), // Borde verde
-                            borderRadius: BorderRadius.circular(
-                                5.0), // Bordes redondeados
-                          ),
-                          child: Stack(
-                            children: [
-                              StripedContainer(
-                                  syncPercentages: syncPercentageImpuestos),
-                              Center(
-                                child: Text(
-                                  '${syncPercentageImpuestos.toStringAsFixed(1)} %',
-                                  style: TextStyle(
-                                    color: syncPercentageImpuestos == 100
-                                        ? Colors.white
-                                        : Colors.black,
-                                    fontFamily: 'Poppins SemiBold',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 155,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF0EBFC),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 7,
-                            spreadRadius: 2)
-                      ]),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 0),
-                        child: Container(
-                            margin: const EdgeInsets.only(top: 6),
-                            width: 155,
-                            child: const Text(
-                              'Cuentas Bancarias',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins SemiBold',
-                              ),
-                              textAlign: TextAlign.center,
-                            )),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 5),
-                        child: Container(
-                          width: 150,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: const Color(0XFFA5F52B)),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          child: Stack(
-                            children: [
-                              StripedContainer(
-                                  syncPercentages: syncPercentageBankAccount),
-                              Center(
-                                child: Text(
-                                  '${syncPercentageBankAccount.toStringAsFixed(1)} %',
-                                  style: TextStyle(
-                                      shadows: const [
-                                        Shadow(
-                                            blurRadius: 15, color: Colors.grey)
-                                      ],
-                                      color: syncPercentageBankAccount == 100
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontFamily: 'Poppins SemiBold'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            SyncStatusCard(
+              title: 'Proveedores',
+              percentage: syncPercentageProviders,
+              icon: Icons.local_shipping_outlined,
             ),
-          ),
-          const SizedBox(
-            height: 25,
-          ),
+            SyncStatusCard(
+              title: 'Ventas',
+              percentage: syncPercentageSelling,
+              icon: Icons.point_of_sale_outlined,
+            ),
+            SyncStatusCard(
+              title: 'Impuestos',
+              percentage: syncPercentageImpuestos,
+              icon: Icons.request_quote_outlined,
+            ),
+            SyncStatusCard(
+              title: 'Bancos',
+              percentage: syncPercentageBankAccount,
+              icon: Icons.account_balance_outlined,
+            ),
+          ],
+        ),
+      ),
+      
           Align(
             alignment: Alignment.topCenter,
             child: Container(
