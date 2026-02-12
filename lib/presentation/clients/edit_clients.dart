@@ -4,6 +4,7 @@ import 'package:femovil/database/update_database.dart';
 import 'package:femovil/presentation/clients/idempiere/update_customer.dart';
 import 'package:femovil/presentation/clients/select_customer.dart';
 import 'package:femovil/utils/alerts_messages.dart';
+import 'package:femovil/utils/searck_key_idempiere.dart';
 import 'package:flutter/material.dart';
 
 class EditClientScreen extends StatefulWidget {
@@ -66,6 +67,7 @@ class _EditClientScreenState extends State<EditClientScreen> {
     print('Esta es la respuesta de getGroupTercero $getGroupTercero');
     print('Esto es getTaxType $getTaxType');
     print('Estos son los taxPayers $getTaxPayer');
+
 
   
     // print('Estos son los type person $getTypePerson');
@@ -157,6 +159,9 @@ class _EditClientScreenState extends State<EditClientScreen> {
   @override
   Widget build(BuildContext context) {
     final mediaScreen = MediaQuery.of(context).size.width *0.8;
+
+    print('Todo lo traido con el cliente ${widget.client.toString()}');
+
   
     setState(() {
       
@@ -423,6 +428,32 @@ class _EditClientScreenState extends State<EditClientScreen> {
                                 'c_city_id': selectedCityId,
                                 
                               };
+                        Map<String, dynamic> updatedClientIdempiere = {
+                                'id': widget.client['id'], // Asegúrate de incluir el ID del producto
+                                'c_bpartner_id': widget.client['c_bpartner_id'],
+                                'bp_name': newName,
+                                'ruc': newRuc,
+                                'email': newCorreo,
+                                'phone': newTelefono,
+                                'c_bp_group_id': selectedGroupId,
+                                'group_bp_name': newGrupo,
+                                'lco_tax_id_typeid': selectedTaxId,
+                                'tax_id_type_name': taxType,
+                                'lco_tax_payer_typeid': selectedTaxPayerId,
+                                'tax_payer_type_name': taxPayer,
+                                'lve_person_type_id': selectedPersonType,
+                                'person_type_name': personType,
+                                'address': newDireccion,
+                                'code_postal': newCode,
+                                'c_country_id': selectedCountryId,
+                                'c_region_id': selectedProvinceId,
+                                'c_city_id': selectedCityId,
+                                'c_location_id': widget.client['c_location_id'],
+                                'c_bpartner_location_id': widget.client['c_bpartner_location_id'],
+                                'c_city':newCity
+
+                                
+                              };
                                 print('Data que trae el client $updatedClient');
 
                               print('id updateClient $updatedClient');
@@ -430,38 +461,38 @@ class _EditClientScreenState extends State<EditClientScreen> {
                               // Actualizar el producto en la base de datos
 
                               showLoadingDialog(context, message: 'Guardando');
-                              await updateClient(updatedClient);
+                            
 
-                              await updateCustomerIdempiere(updatedClient);
+                              dynamic response=  await updateCustomerIdempiere(updatedClientIdempiere);
+                            print('respuesta de update customer idempiere $response');
                               Navigator.pop(context);
 
+                              if (response==false) {
+                                ErrorMessage.showErrorMessageDialog(context, 'No se Puede Actualizar Intente Mas tarde');
+                                return;
+                              } else {
+                                   print('Data que trae el client despues del update $response');
 
-                              showDialog(
-                                context: currentContext!,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                                    backgroundColor: Colors.white,
-                                    // Center the title, content, and actions using a Column
-                                    content: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min, // Wrap content vertically
-                                      children: [
-                                        Image.asset('lib/assets/Check@2x.png', width: 50, height: 50), // Adjust width and height
-                                        const Text('Cliente actualizado', style: TextStyle(fontFamily: 'Poppins Bold')),
-                                        TextButton(
-                                          onPressed: () => {
-                                            Navigator.pop(context),
-                                            Navigator.pop(context),
-                                            Navigator.pop(context)
-                                          },
-                                          child: const Text('Volver'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                                 bool searchError = findIsError(response) ?? false;
+                                  if (searchError) {
+                                  dynamic  responseFindError=findErrorMessage(response);
+                                ErrorMessage.showErrorMessageDialog(context, "Error Respuesta del Sistema $responseFindError");   
+                                return;
+                                  }
+                                else {
+                                    await updateClient(updatedClient);
+                                    await  SuccesMessages.showSuccesMessagesDialog(context, 'El cliente se ha actualizado correctamente.',goBack: true);
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
                                 }
-                              );
+
+                                
+
+                              }
+
+                        
+
+
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -544,13 +575,5 @@ class _EditClientScreenState extends State<EditClientScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    // Clean up controllers
-    _nameController.dispose();
-    _rucController.dispose();
-    _correoController.dispose();
-    _telefonoController.dispose();
-    super.dispose();
-  }
+
 }

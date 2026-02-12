@@ -135,12 +135,12 @@ try {
 
                       },
                       {
-                      "TargetPort": "createUpdateData",
+                      "TargetPort": "updateData",
                       "ModelCRUD": {
-                      "serviceType" : "CreateLocationAPP",
+                      "serviceType" : "UpdateLocationAPP",
                       "TableName" : "C_Location",
-                      "RecordID" : "0",
-                      "Action": "CreateUpdate",
+                      "RecordID" : customer['c_location_id'],
+                      "Action": "Update",
                       "DataRow": {
                       "field": [
                             {
@@ -155,6 +155,10 @@ try {
                              {
                               "@column": "C_City_ID",
                               "val": customer['c_city_id']
+                          },
+                          {
+                              "@column": "City",
+                              "val": customer['c_city']
                           },
 
                                {
@@ -177,17 +181,27 @@ try {
                       
                       },
                       {
-                      "TargetPort": "createUpdateData",
+                      "TargetPort": "updateData",
                       "ModelCRUD": {
-                      "serviceType" : "CreateBPLocationAPP",
+                      "serviceType" : "UpdateBPLocationAPP",
                       "TableName" : "C_BPartner_Location",
-                      "RecordID" : "0",
+                      "RecordID" : customer['c_bpartner_location_id'],
                       "Action": "Update",
                       "DataRow": {
                       "field": [
+
                           {
-                              "@column": "C_BPartner_ID",
-                              "val": "@C_BPartner.C_BPartner_ID"
+                              "@column": "C_Location_ID",
+                              "val": customer['c_location_id']
+                          },
+                          {
+                              "@column": "Name",
+                              "val": customer['address']
+                          },
+                  
+                          {
+                              "@column": "IsShipTo",
+                              "val": "Y"
                           },
                           {
                               "@column": "IsShipTo",
@@ -202,10 +216,7 @@ try {
                               "val": customer['phone']
                           },
                         
-                          {
-                              "@column": "C_Location_ID",
-                              "val": "@C_Location.C_Location_ID"
-                          },
+                        
                           {
                               "@column": "IsRemitTo",
                               "val": "Y"
@@ -252,7 +263,8 @@ try {
       print("esta es la respuesta $parsedJson");
       return parsedJson;
         } catch (e) {
-          return 'este es el error e $e';
+          print('Error en la solicitud: $e');
+          return false;
       }
 
 
