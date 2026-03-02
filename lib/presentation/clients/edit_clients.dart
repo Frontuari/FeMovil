@@ -445,18 +445,18 @@ class _EditClientScreenState extends State<EditClientScreen> {
                                 'person_type_name': personType,
                                 'address': newDireccion,
                                 'code_postal': newCode,
-                                'c_country_id': selectedCountryId,
+                                'c_country_id': selectedCountryId,  
                                 'c_region_id': selectedProvinceId,
                                 'c_city_id': selectedCityId,
-                                'c_location_id': widget.client['c_location_id'],
-                                'c_bpartner_location_id': widget.client['c_bpartner_location_id'],
+                                'c_location_id': (widget.client['c_location_id'] == '{@nil=true}') ? 0 : widget.client['c_location_id'],
+                                'c_bpartner_location_id': (widget.client['c_bpartner_location_id'] == '{@nil=true}') ? 0 : widget.client['c_bpartner_location_id'],
                                 'c_city':newCity
 
                                 
                               };
                                 print('Data que trae el client $updatedClient');
 
-                              print('id updateClient $updatedClient');
+                              print('id updateClient Idempiere $updatedClientIdempiere');
 
                               // Actualizar el producto en la base de datos
 
@@ -476,10 +476,17 @@ class _EditClientScreenState extends State<EditClientScreen> {
                                  bool searchError = findIsError(response) ?? false;
                                   if (searchError) {
                                   dynamic  responseFindError=findErrorMessage(response);
-                                ErrorMessage.showErrorMessageDialog(context, "Error Respuesta del Sistema $responseFindError");   
+                                    ErrorMessage.showErrorMessageDialog(context, "Error Respuesta del Sistema $responseFindError");   
                                 return;
                                   }
                                 else {
+                                final realLocationId = findValueByColumn(response, 'C_Location_ID') ?? 0;
+                                final realBPartnerLocationId = findValueByColumn(response, 'C_BPartner_Location_ID') ?? 0;
+
+                                updatedClient['c_location_id'] = realLocationId;
+                                updatedClient['c_bpartner_location_id'] = realBPartnerLocationId;
+
+                                    print('Respuesta Idempiere $response');
                                     await updateClient(updatedClient);
                                     await  SuccesMessages.showSuccesMessagesDialog(context, 'El cliente se ha actualizado correctamente.',goBack: true);
                                             Navigator.pop(context);

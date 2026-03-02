@@ -57,7 +57,8 @@ try {
   var language = jsonData["Language"];
   String encodedName = customer['bp_name'];
 
-
+//El isUpdate Validara si el c_location_id es 0, en caso de ser 0, significa que la dirreccion no existe asi que procedera a Crear
+final bool isUpdate = customer['c_location_id'] != 0 && customer['c_location_id'] != '0';
   // Configurar el cuerpo de la solicitud en formato JSON
 
   final requestBody= {
@@ -135,12 +136,12 @@ try {
 
                       },
                       {
-                      "TargetPort": "updateData",
+                      "TargetPort": isUpdate ? "updateData" : "createUpdateData"    ,
                       "ModelCRUD": {
-                      "serviceType" : "UpdateLocationAPP",
+                      "serviceType": isUpdate ? "UpdateLocationAPP" : "CreateLocationAPP",
                       "TableName" : "C_Location",
-                      "RecordID" : customer['c_location_id'],
-                      "Action": "Update",
+                     "RecordID": isUpdate ? customer['c_location_id'].toString() : "0",
+                      "Action": isUpdate ? "Update" : "CreateUpdate",
                       "DataRow": {
                       "field": [
                             {
@@ -156,6 +157,7 @@ try {
                               "@column": "C_City_ID",
                               "val": customer['c_city_id']
                           },
+                          if(isUpdate)
                           {
                               "@column": "City",
                               "val": customer['c_city']
@@ -181,28 +183,28 @@ try {
                       
                       },
                       {
-                      "TargetPort": "updateData",
+                      "TargetPort": isUpdate ? "updateData" : "createUpdateData",
                       "ModelCRUD": {
-                      "serviceType" : "UpdateBPLocationAPP",
+                      "serviceType": isUpdate ? "UpdateBPLocationAPP" : "CreateBPLocationAPP",
                       "TableName" : "C_BPartner_Location",
-                      "RecordID" : customer['c_bpartner_location_id'],
+                      "RecordID": isUpdate ? customer['c_bpartner_location_id'].toString() : "0"  ,
                       "Action": "Update",
                       "DataRow": {
                       "field": [
 
-                          {
-                              "@column": "C_Location_ID",
-                              "val": customer['c_location_id']
-                          },
+                        if (!isUpdate)
+                         {"@column": "C_BPartner_ID", "val": "@C_BPartner.C_BPartner_ID"},
+
+                        {
+                      "@column": "C_Location_ID",
+                      "val": isUpdate ? customer['c_location_id'] : "@C_Location.C_Location_ID"
+                    },
                           {
                               "@column": "Name",
                               "val": customer['address']
                           },
                   
-                          {
-                              "@column": "IsShipTo",
-                              "val": "Y"
-                          },
+                       
                           {
                               "@column": "IsShipTo",
                               "val": "Y"
@@ -228,11 +230,7 @@ try {
                       
                       ]
                       }
-
-
                       }
-
-                      
                       
                       }
 
@@ -269,3 +267,4 @@ try {
 
 
 }
+

@@ -900,11 +900,13 @@ class _CobroState extends State<Cobro> {
 
       print('NumDoc del cobro $numDoc');
 
-      if (isErrorTrue) {
-      dynamic errorMessage = findErrorMessage(response) ?? 'Error desconocido'  ;
+      if (isErrorTrue || cPaymentID==0) {
+        dynamic errorMessage = findErrorMessage(response) ?? ''  ;
 
-        ErrorMessage.showErrorMessageDialog(context, 'Error al crear el cobro en Sistema. \n Error: $errorMessage');
+          ErrorMessage.showErrorMessageDialog(context, 'No hay Conexión a Internet. \n Error: $errorMessage');
+
         return;
+
       } else {
         await insertCobro(
           id: cPaymentID,
@@ -946,8 +948,7 @@ class _CobroState extends State<Cobro> {
       // });
 
       // Mostrar un mensaje de éxito
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cobro creado con éxito')));
+    
 
       // Navigator.push(
       //     context, MaterialPageRoute(builder: (context) => Cobranzas()));
