@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'dart:convert';
 import 'package:femovil/config/get_users.dart';
@@ -99,10 +100,14 @@ class AuthenticationService {
       //response = await getUserByLogin(username, password);
 
       print('Esto es la respuesta del user $response');
-      if (response is! Map<String, dynamic>) {
-        // No se pudo obtener una respuesta válida ni de la red ni de la base de datos local
-        return "hay problemas con el internet";
-      }
+       if (e.toString().contains("No host specified") || e.toString().contains("SocketException")) {
+          return "hay problemas con el internet";
+        }
+
+        // IMPORTANTE: Verifica que 'result' y 'response' existan antes de usarlos
+        if (result == null || result["response"] == null) {
+          return "No se encontro datos de registros de usuario";
+        }
 
       if (response['name'] == username && response['password'] == password) {
         // Usuario autenticado

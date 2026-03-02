@@ -54,12 +54,22 @@ class _LoginState extends State<Login> {
               final Map<String, dynamic> jsonData = json.decode(content);
 
               // Asigna los valores a las variables globales
-              user = jsonData['user'] as String;
-              password = jsonData['password'] as String;
-              if (jsonData.containsKey('auth') && jsonData['auth'] != null) {
-                auth = jsonData['auth'] as bool;
-                // Ahora puedes trabajar con 'auth' sabiendo que no es nulo.
-              }
+            // 1. Cargamos datos temporales
+          String tempUser = jsonData['user'] as String? ?? '';
+          String tempPass = jsonData['password'] as String? ?? '';
+          bool tempAuth = jsonData['auth'] as bool? ?? false;
+
+            if (tempUser.isNotEmpty && tempPass.isNotEmpty && tempAuth == true) {
+              user = tempUser;
+              password = tempPass;
+              auth = true;
+            } else {
+              // Si falta algo o auth es false, forzamos el estado a LOGOUT
+              // Esto arregla el crash porque evita que entre al "limbo"
+              user = '';
+              password = '';
+              auth = false;
+            }
 
               setState(() {
                 isLoading = false; // Cuando todas las operaciones asincrónicas hayan terminado.
@@ -69,6 +79,12 @@ class _LoginState extends State<Login> {
             }
           } catch (e) {
             print('Error al decodificar JSON: $e');
+        setState(() {
+          user = '';
+          password = '';
+          auth = false;
+          isLoading = false;
+        });
           }
         }
 
@@ -424,7 +440,15 @@ class _LoginState extends State<Login> {
         ),
       );
     } else {
-      return const Perfil();
+       if (auth == true) {
+        return const Perfil();
+      } else {
+        // Reiniciamos variables para forzar la vista de login
+        user = '';
+        password = '';
+        auth = false;
+        return const Login(); // O el bloque del formulario
+      }
     }
   }
 
