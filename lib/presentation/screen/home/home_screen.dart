@@ -14,7 +14,9 @@ import 'package:femovil/presentation/screen/proveedores/providers_screen.dart';
 import 'package:femovil/presentation/screen/ventas/ventas.dart';
 import 'package:femovil/sincronization/sincronization_screen.dart';
 import 'package:femovil/presentation/print_settings/print_settings.dart';
+import 'package:femovil/utils/alerts_messages.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 bool flag = false;
 bool processingApproval = false;
@@ -49,6 +51,8 @@ class HomeState extends State<Home> {
     DatabaseHelper.instance.initDatabase();
      print('Esto es la variable global de country_id ${variablesG}');
     super.initState();
+    checkForUpdate();
+
     print("me monte");
   }
 
@@ -58,6 +62,33 @@ class HomeState extends State<Home> {
 
     super.dispose();
   }
+
+ Future<void> checkForUpdate() async {
+    try {
+    print('Chequeando update');
+      final info = await InAppUpdate.checkForUpdate();
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        if (!mounted) return;
+        final bool? shouldUpdate = await showConfirmationDialog(
+          context: context,
+          title: "Nueva Versión Disponible",
+          content:
+              "Hay una nueva versión de la app con mejoras y correcciones. ¿Quieres actualizarla ahora?",
+          confirmText: "Actualizar",
+          cancelText: "Más tarde",
+        );
+        if (shouldUpdate == true) {
+          InAppUpdate.performImmediateUpdate().catchError((e) {
+            print("Error al actualizar: $e");
+            return AppUpdateResult.inAppUpdateFailed;
+          });
+        }
+      }
+    } catch (e) {
+      // Si no hay internet o falla la verificación, no hacemos nada (el usuario no se entera)
+      print('Error buscando updates: $e');
+    }
+ }
 
   @override
   Widget build(BuildContext context) {
