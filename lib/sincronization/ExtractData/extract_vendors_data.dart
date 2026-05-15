@@ -2,66 +2,79 @@ import 'dart:convert';
 
 // Función para procesar la respuesta de iDempiere y extraer los datos de los productos
 List<Map<String, dynamic>> extractVendorsData(String responseData) {
-  // Decodifica la respuesta JSON
-  Map<String, dynamic> parsedResponse = jsonDecode(responseData);
+  print("data response $responseData");
 
-  // Extrae la lista de DataRow de la respuesta
-  List<dynamic> dataRows = parsedResponse['WindowTabData']['DataSet']['DataRow'];
+  final Map<String, dynamic> parsedResponse = jsonDecode(responseData);
 
-  // Crea una lista para almacenar los datos de los productos
+  // Verificación temprana: Si no hay filas, retornamos la lista vacía inmediatamente.
+  if (parsedResponse['WindowTabData']['@NumRows'] == 0) {
+    return [];
+  }
+
+  // Corrección crítica: Normalización de DataRow a Lista para evitar crashes cuando solo viene 1 registro
+  List<dynamic> dataRows =
+      parsedResponse['WindowTabData']['DataSet']['DataRow'] is Map
+          ? [parsedResponse['WindowTabData']['DataSet']['DataRow']]
+          : parsedResponse['WindowTabData']['DataSet']['DataRow'];
+
   List<Map<String, dynamic>> vendorsData = [];
 
-  print('Esto es la respuesta del erp proveedores $dataRows');
+  try {
+    for (var row in dataRows) {
+      
+      // Función de extracción segura
+      dynamic getVal(String columnName, {dynamic defaultValue}) {
+        final field = row['field'].firstWhere(
+          (f) => f['@column'] == columnName,
+          orElse: () => null,
+        );
 
-  // Itera sobre cada DataRow y extrae los datos relevantes de los productos
+        if (field == null) return defaultValue;
 
-try {
+        final val = field['val'];
 
-  
-  
-  for (var row in dataRows) {
-    Map<String, dynamic> vendorsDatas = {
-      'c_bpartner_id': row['field'].firstWhere((field) => field['@column'] == 'C_BPartner_ID')['val'],
-      'c_code_id': row['field'].firstWhere((field) => field['@column'] == 'Value')['val'],
-      'bpname': row['field'].firstWhere((field) => field['@column'] == 'BPName')['val'],
-      'email': row['field'].firstWhere((field) => field['@column'] == 'EMail')['val'],
-      'c_bp_group_id': row['field'].firstWhere((field) => field['@column'] == 'C_BP_Group_ID')['val'],
-      'groupbpname':row['field'].firstWhere((field) => field['@column'] == 'groupbpname')['val'],
-      'tax_id': row['field'].firstWhere((field) => field['@column'] == 'TaxID')['val'],
-      'is_vendor': row['field'].firstWhere((field) => field['@column'] == 'IsVendor')['val'],
-      'lco_tax_id_type_id': row['field'].firstWhere((field) => field['@column'] == 'LCO_TaxIdType_ID')['val'],
-      'tax_id_type_name':row['field'].firstWhere((field) => field['@column'] == 'TaxIdTypeName')['val'],
-      'c_bpartner_location_id': row['field'].firstWhere((field) => field['@column'] == 'C_BPartner_Location_ID')['val'],
-      'is_bill_to': row['field'].firstWhere((field) => field['@column'] == 'IsBillTo')['val'],
-      'phone': row['field'].firstWhere((field) => field['@column'] == 'Phone')['val'],
-      'c_location_id': row['field'].firstWhere((field) => field['@column'] == 'C_Location_ID')['val'],
-      'address': row['field'].firstWhere((field) => field['@column'] == 'Address1')['val'],
-      'city': row['field'].firstWhere((field) => field['@column'] == 'City')['val'],
-      'country_name': row['field'].firstWhere((field) => field['@column'] == 'CountryName')['val'],
-      'postal': row['field'].firstWhere((field) => field['@column'] == 'Postal')['val'],
-      'c_city_id': row['field'].firstWhere((field) => field['@column'] == 'C_City_ID')['val'],
-      'c_country_id': row['field'].firstWhere((field) => field['@column'] == 'C_Country_ID')['val'],
-      'lco_taxt_payer_type_id': row['field'].firstWhere((field) => field['@column'] == 'LCO_TaxPayerType_ID')['val'],
-      'tax_payer_type_name': row['field'].firstWhere((field) => field['@column'] == 'TaxPayerTypeName')['val'],
-      // 'lve_person_type_id': row['field'][22]['val'],
-      // 'person_type_name': row['field'][23]['val'],
+        // Validar si val es objeto con @nil = true o string vacío
+        if (val is Map && (val['@nil'] == true || val['@nil'] == 'true')) {
+          return defaultValue;
+        }
+        if (val is String && val.trim().isEmpty) {
+          return defaultValue;
+        }
 
-     // Asegúrate de convertir la cantidad a un tipo numérico adecuado
-      // Añade otros campos que necesites sincronizar
-    };
+        return val;
+      }
 
+      // Mapeo riguroso con valores por defecto acordes al tipo de dato esperado
+      Map<String, dynamic> vendorsDatas = {
+        'c_bpartner_id': getVal('C_BPartner_ID', defaultValue: 0),
+        'c_code_id': getVal('Value', defaultValue: ''),
+        'bpname': getVal('BPName', defaultValue: ''),
+        'email': getVal('EMail', defaultValue: ''),
+        'c_bp_group_id': getVal('C_BP_Group_ID', defaultValue: 0),
+        'groupbpname': getVal('groupbpname', defaultValue: ''), // Nota: Verifica si en el ERP es 'GroupBPName' o 'groupbpname'
+        'tax_id': getVal('TaxID', defaultValue: ''),
+        'is_vendor': getVal('IsVendor', defaultValue: ''),
+        'lco_tax_id_type_id': getVal('LCO_TaxIdType_ID', defaultValue: 0),
+        'tax_id_type_name': getVal('TaxIdTypeName', defaultValue: ''),
+        'c_bpartner_location_id': getVal('C_BPartner_Location_ID', defaultValue: 0),
+        'is_bill_to': getVal('IsBillTo', defaultValue: ''),
+        'phone': getVal('Phone', defaultValue: ''),
+        'c_location_id': getVal('C_Location_ID', defaultValue: 0),
+        'address': getVal('Address1', defaultValue: ''),
+        'city': getVal('City', defaultValue: ''),
+        'country_name': getVal('CountryName', defaultValue: ''),
+        'postal': getVal('Postal', defaultValue: ''),
+        'c_city_id': getVal('C_City_ID', defaultValue: 0),
+        'c_country_id': getVal('C_Country_ID', defaultValue: 0),
+        'lco_taxt_payer_type_id': getVal('LCO_TaxPayerType_ID', defaultValue: 0),
+        'tax_payer_type_name': getVal('TaxPayerTypeName', defaultValue: ''),
+      };
 
-    // print('Esto es tax payer type ${row['field'][26]['val']}');
-         
-             
-    // Agrega los datos del producto a la lista
-    vendorsData.add(vendorsDatas);
+      vendorsData.add(vendorsDatas);
+    }
+  } catch (e) {
+    print("❌ Error procesando proveedores del ERP: $e");
   }
-} catch (e) {
-
-  print("ESTE ES EL ERROR $e");
-  
-}
 
   print("esto es vendorData $vendorsData");
 

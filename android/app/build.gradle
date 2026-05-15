@@ -25,7 +25,7 @@ if (flutterVersionCode == null) {
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.2.7'
+    flutterVersionName = '1.2.8'
 }
 
 android {
@@ -51,7 +51,7 @@ android {
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode 11
-        versionName "1.2.7"
+        versionName "1.2.8"
     }
 
     signingConfigs {

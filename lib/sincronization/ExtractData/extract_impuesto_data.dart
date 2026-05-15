@@ -1,45 +1,70 @@
 import 'dart:convert';
 
 // Función para procesar la respuesta de iDempiere y extraer los datos de los productos
+import 'dart:convert';
+
 List<Map<String, dynamic>> extractImpuestoData(String responseData) {
+  print("data response $responseData");
+
   // Decodifica la respuesta JSON
-  Map<String, dynamic> parsedResponse = jsonDecode(responseData);
+  final Map<String, dynamic> parsedResponse = jsonDecode(responseData);
 
-  // Extrae la lista de DataRow de la respuesta
-  List<dynamic> dataRows = parsedResponse['WindowTabData']['DataSet']['DataRow'];
+  // Verificación temprana: Si la consulta no trae impuestos, salimos de inmediato
+  if (parsedResponse['WindowTabData']['@NumRows'] == 0) {
+    return [];
+  }
 
-  // Crea una lista para almacenar los datos de los productos
+  // Normalización crítica de DataRow: Convertimos a lista en caso de que venga 1 solo registro (Map)
+  List<dynamic> dataRows =
+      parsedResponse['WindowTabData']['DataSet']['DataRow'] is Map
+          ? [parsedResponse['WindowTabData']['DataSet']['DataRow']]
+          : parsedResponse['WindowTabData']['DataSet']['DataRow'];
+
   List<Map<String, dynamic>> impuestosData = [];
 
-  print('Esto es la respuesta del erp Impuestos  $dataRows');
+  try {
+    for (var row in dataRows) {
+      
+      // Función interna de extracción defensiva
+      dynamic getVal(String columnName, {dynamic defaultValue}) {
+        final field = row['field'].firstWhere(
+          (f) => f['@column'] == columnName,
+          orElse: () => null,
+        );
 
-  // Itera sobre cada DataRow y extrae los datos relevantes de los productos
+        if (field == null) return defaultValue;
 
-try {
+        final val = field['val'];
 
-  
-  
-  for (var row in dataRows) {
-    Map<String, dynamic> impuestoData = {
-      'c_tax_id': row['field'].firstWhere((field) => field['@column'] == 'C_Tax_ID')['val'],
-      'tax_indicator': row['field'].firstWhere((field) => field['@column'] == 'TaxIndicator')['val'],
-      'rate': row['field'].firstWhere((field) => field['@column'] == 'Rate')['val'],
-      'name': row['field'].firstWhere((field) => field['@column'] == 'Name')['val'],
-      'c_tax_category_id': row['field'].firstWhere((field) => field['@column'] == 'C_TaxCategory_ID')['val'],
-      'iswithholding':row['field'].firstWhere((field) => field['@column'] == 'IsWithholding')['val'],
-      'sopo_type':row['field'].firstWhere((field) => field['@column'] == 'SOPOType')['val'],
-     // Asegúrate de convertir la cantidad a un tipo numérico adecuado
-      // Añade otros campos que necesites sincronizar
-    };
+        // Neutralizar el @nil explícito de iDempiere
+        if (val is Map && (val['@nil'] == true || val['@nil'] == 'true')) {
+          return defaultValue;
+        }
+        
+        // Evitar strings vacíos donde se espera información útil
+        if (val is String && val.trim().isEmpty) {
+          return defaultValue;
+        }
 
-    // Agrega los datos del producto a la lista
-    impuestosData.add(impuestoData);
+        return val;
+      }
+
+      // Mapeo seguro con valores por defecto orientados al tipo de dato (IDs/Rates a número, Nombres a string)
+      Map<String, dynamic> impuestoData = {
+        'c_tax_id': getVal('C_Tax_ID', defaultValue: 0),
+        'tax_indicator': getVal('TaxIndicator', defaultValue: ''),
+        'rate': getVal('Rate', defaultValue: 0.0), // Asumimos que la tasa (Rate) es un valor decimal
+        'name': getVal('Name', defaultValue: ''),
+        'c_tax_category_id': getVal('C_TaxCategory_ID', defaultValue: 0),
+        'iswithholding': getVal('IsWithholding', defaultValue: 'N'), // Suele ser 'Y' o 'N' en el ERP
+        'sopo_type': getVal('SOPOType', defaultValue: 'P'),
+      };
+
+      impuestosData.add(impuestoData);
+    }
+  } catch (e) {
+    print("❌ Error crítico procesando impuestos del ERP: $e");
   }
-} catch (e) {
-
-  print("ESTE ES EL ERROR $e");
-  
-}
 
   print("esto es impuestosData $impuestosData");
 

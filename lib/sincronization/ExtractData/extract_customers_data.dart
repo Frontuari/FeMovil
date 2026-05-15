@@ -1,63 +1,89 @@
 import 'dart:convert';
 
 // Función para procesar la respuesta de iDempiere y extraer los datos de los productos
+import 'dart:convert';
+
 List<Map<String, dynamic>> extractCustomersData(String responseData) {
+  print("data response $responseData");
+
   // Decodifica la respuesta JSON
-  Map<String, dynamic> parsedResponse = jsonDecode(responseData);
+  final Map<String, dynamic> parsedResponse = jsonDecode(responseData);
 
-  // Extrae la lista de DataRow de la respuesta
-  List<dynamic> dataRows = parsedResponse['WindowTabData']['DataSet']['DataRow'];
+  // Verificación de integridad: abortar tempranamente si no hay registros
+  if (parsedResponse['WindowTabData']['@NumRows'] == 0) {
+    return [];
+  }
 
-  // Crea una lista para almacenar los datos de los productos
+  // Corrección de la estructura: Asegurar que DataRow se trate como Lista incluso si viene 1 solo registro
+  List<dynamic> dataRows =
+      parsedResponse['WindowTabData']['DataSet']['DataRow'] is Map
+          ? [parsedResponse['WindowTabData']['DataSet']['DataRow']]
+          : parsedResponse['WindowTabData']['DataSet']['DataRow'];
+
   List<Map<String, dynamic>> customersData = [];
 
-  print('Esto es la respuesta del erp de CUstomers $dataRows');
+  try {
+    for (var row in dataRows) {
+      
+      // Función interna para blindar la extracción de cada nodo
+      dynamic getVal(String columnName, {dynamic defaultValue}) {
+        final field = row['field'].firstWhere(
+          (f) => f['@column'] == columnName,
+          orElse: () => null,
+        );
 
-  // Itera sobre cada DataRow y extrae los datos relevantes de los productos
+        // Si la columna ni siquiera existe en este registro, devolvemos el valor por defecto
+        if (field == null) return defaultValue;
 
-try {
+        final val = field['val'];
 
-  
-  
-  for (var row in dataRows) {
-    Map<String, dynamic> customerData = {
-      'c_bpartner_id': row['field'].firstWhere((field) => field['@column'] == 'C_BPartner_ID')['val'],
-      'cod_client': row['field'].firstWhere((field) => field['@column'] == 'Value')['val'],
-      'bp_name': row['field'].firstWhere((field) => field['@column'] == 'BPName')['val'],
-      'c_bp_group_id':row['field'].firstWhere((field) => field['@column'] == 'C_BP_Group_ID')['val'],
-      'group_bp_name': row['field'].firstWhere((field) => field['@column'] == 'groupbpname')['val'],
-      'lco_tax_id_typeid':row['field'].firstWhere((field) => field['@column'] == 'LCO_TaxIdType_ID')['val'],
-      'tax_id_type_name': row['field'].firstWhere((field) => field['@column'] == 'TaxIdTypeName')['val'],
-      'email': row['field'].firstWhere((field) => field['@column'] == 'EMail')['val'],
-      'c_bpartner_location_id': row['field'].firstWhere((field) => field['@column'] == 'C_BPartner_Location_ID')['val'],
-      'is_bill_to':row['field'].firstWhere((field) => field['@column'] == 'IsBillTo')['val'],
-      'phone': row['field'].firstWhere((field) => field['@column'] == 'Phone')['val'],
-      'c_location_id': row['field'].firstWhere((field) => field['@column'] == 'C_Location_ID')['val'],
-      'city': row['field'].firstWhere((field) => field['@column'] == 'City')['val'],
-      'region': row['field'].firstWhere((field) => field['@column'] == 'RegionName')['val'],
-      'country': row['field'].firstWhere((field) => field['@column'] == 'CountryName')['val'],
-      'code_postal': row['field'].firstWhere((field) => field['@column'] == 'Postal')['val'],
-      'c_city_id': row['field'].firstWhere((field) => field['@column'] == 'C_City_ID')['val'],
-      'c_region_id': row['field'].firstWhere((field) => field['@column'] == 'C_Region_ID')['val'],
-      'c_country_id': row['field'].firstWhere((field) => field['@column'] == 'C_Country_ID')['val'],
-      'ruc': row['field'].firstWhere((field) => field['@column'] == 'TaxID')['val'],
-      'address' : row['field'].firstWhere((field) => field['@column'] == 'Address')['val'],
-      'lco_tax_payer_typeid': row['field'].firstWhere((field) => field['@column'] == 'LCO_TaxPayerType_ID')['val'],
-      'tax_payer_type_name': row['field'].firstWhere((field) => field['@column'] == 'TaxPayerTypeName')['val'],
+        // Cazar y neutralizar los nulos explícitos de iDempiere ("@nil": true)
+        if (val is Map && (val['@nil'] == true || val['@nil'] == 'true')) {
+          return defaultValue;
+        }
+        
+        // Limpiar strings vacíos que puedan causar ruido
+        if (val is String && val.trim().isEmpty) {
+          return defaultValue;
+        }
 
-    };
+        return val;
+      }
 
+      // Extracción limpia y segura garantizando tipos de datos predecibles
+      Map<String, dynamic> customerData = {
+        'c_bpartner_id': getVal('C_BPartner_ID', defaultValue: 0),
+        'cod_client': getVal('Value', defaultValue: ''),
+        'bp_name': getVal('BPName', defaultValue: ''),
+        'c_bp_group_id': getVal('C_BP_Group_ID', defaultValue: 0),
+        'group_bp_name': getVal('groupbpname', defaultValue: ''), 
+        'lco_tax_id_typeid': getVal('LCO_TaxIdType_ID', defaultValue: 0),
+        'tax_id_type_name': getVal('TaxIdTypeName', defaultValue: ''),
+        'email': getVal('EMail', defaultValue: ''),
+        'c_bpartner_location_id': getVal('C_BPartner_Location_ID', defaultValue: 0),
+        'is_bill_to': getVal('IsBillTo', defaultValue: ''),
+        'phone': getVal('Phone', defaultValue: ''),
+        'c_location_id': getVal('C_Location_ID', defaultValue: 0),
+        'city': getVal('City', defaultValue: ''),
+        'region': getVal('RegionName', defaultValue: ''),
+        'country': getVal('CountryName', defaultValue: ''),
+        'code_postal': getVal('Postal', defaultValue: ''),
+        'c_city_id': getVal('C_City_ID', defaultValue: 0),
+        'c_region_id': getVal('C_Region_ID', defaultValue: 0),
+        'c_country_id': getVal('C_Country_ID', defaultValue: 0),
+        'ruc': getVal('TaxID', defaultValue: ''),
+        'address': getVal('Address', defaultValue: ''), 
+        'lco_tax_payer_typeid': getVal('LCO_TaxPayerType_ID', defaultValue: 0),
+        'tax_payer_type_name': getVal('TaxPayerTypeName', defaultValue: ''),
+      };
 
-         
-             
-    // Agrega los datos del producto a la lista
-    customersData.add(customerData);
+      customersData.add(customerData);
+    }
+  } catch (e) {
+    // Un simple print en un try-catch general a veces oculta qué fila específica falló, 
+    // pero al menos ahora la aplicación no sufrirá un fatal crash.
+    print("❌ Error crítico procesando clientes del ERP: $e");
   }
-} catch (e) {
-
-  print("ESTE ES EL ERROR $e");
-  
-}
 
   print("esto es customer data $customersData");
 
