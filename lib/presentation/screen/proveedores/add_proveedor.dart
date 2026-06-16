@@ -1179,8 +1179,11 @@ class _AddProvidersFormState extends State<AddProvidersForm> {
     );
     Navigator.pop(context);
     if (isErrorTrue) {
+      dynamic  responseFindError=findErrorMessage(responseIdempiere);
+
       ErrorMessage.showErrorMessageDialog(context,
-          'Error al crear el cliente. Por favor, intenta de nuevo. Verifique que los datos esten correctos');
+          'Error al crear el cliente. Por favor, intenta de nuevo. Verifique que los datos esten correctos \n $responseFindError');
+       
     } else {
       if (c_BPartner_ID == 0) {
         WarningMessages.showWarningMessagesDialog(
